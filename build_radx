@@ -1,0 +1,75 @@
+#! /bin/bash
+#
+# Building RADX and required libraries
+# ====================================
+#
+# Downloading:
+# ------------
+#
+# Download into a single directory all of the files in:
+#
+#    ftp.rap.ucar.edu/pub/titan/radx
+#
+# By default the libraries and applications will be installed in:
+#
+#   /usr/local/include
+#   /usr/local/lib
+#   /usr/local/bin
+#
+# You can change the install location by specifying it as
+# a single argument to this script.
+#
+# For example:
+#
+#   build_radx /tmp/radx_build
+#
+# will install in:
+#
+#   /tmp/radx_build/include
+#   /tmp/radx_build/lib
+#   /tmp/radx_build/bin
+#
+
+# Prerequisite - build netcdf
+#
+# Run the build_netcdf script first, then this one.
+
+#--------------------------------------------------------------------
+# usage function
+#
+
+function usage() {
+    echo
+    echo "Usage: build_radx [ -h ] [ prefix ]"
+    echo
+    echo "  -h: produce this usage list"
+    echo "  optionally set the prefix"
+    echo
+}
+
+# set the install prefix
+
+prefix=/home/sugar/Developer/radx_build_gcc
+
+if [ $# -gt 0 ]
+then
+  if [ "$1" == -h -o "$2" == -h ] 
+  then
+    usage
+    exit 0
+  fi
+  prefix=$1
+fi
+
+echo "Using prefix: $prefix"
+
+export CXXFLAGS="-O0 -g -std=c++14"
+export LDFLAGS="-L${prefix}/lib -Wl,-rpath,'\$\$ORIGIN'/radx_runtime_libs:${prefix}/lib"
+
+echo "LDFLAGS=$LDFLAGS"
+
+autoreconf --install
+./configure --with-hdf5=${prefix} --with-netcdf=${prefix} --prefix=${prefix} || exit 1
+make -j 8 || exit 1
+make install-strip || exit 1
+

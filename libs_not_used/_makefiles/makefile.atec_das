@@ -1,0 +1,61 @@
+#
+# Recursive make - makes the subdirectory code
+#
+# This makefile makes the listed libraries
+#
+# NOTE: If you do a 'make -k install' with this Makefile you may get the
+#	following unexpected behavior: even if a submodule of a library fails 
+#	to build, the library may still be installed. To prevent this, write
+#	a script to go through all the libraries in the SUB_DIRS list, go
+#	to each library directory and do a 'make install'.
+#
+#	If you are updating the RAP nightly builds, you must modify this
+#	file AND the distribs/rap_libs_checkout script as
+#	well. This is due to the above 'make -k' problem.
+#
+
+include $(RAP_MAKE_INC_DIR)/rap_make_macros
+
+TARGETS = $(GENERAL_TARGETS) $(LIB_TARGETS) $(DOC_TARGETS) $(INSTALL_TARGETS)
+
+SUB_DIRS = \
+	advect \
+	cidd \
+	clapack \
+	contour \
+	ctetwws \
+	dataport \
+	didss \
+	dsdata \
+	dsserver \
+        xview \
+	devguide \
+	edge \
+	eispack \
+	euclid \
+	Fmq \
+	grib \
+	Mdv \
+	mdv \
+	mm5 \
+	ncf \
+	olgx \
+	perl5 \
+	physics \
+	rapformats \
+	rapmath \
+	rapplot \
+	rdi \
+	rsbutil \
+	Spdb \
+	sim \
+	shapelib \
+	symprod \
+	tdrp \
+	tetwws \
+	tiff \
+	titan \
+	trmm_rsl \
+	toolsa
+
+include $(RAP_MAKE_INC_DIR)/rap_make_recursive_dir_targets

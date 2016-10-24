@@ -1,0 +1,43 @@
+# NAME tdbz.colors
+
+0	1	royalblue3
+1	2	blue
+2       4      mediumblue
+4       6      navyblue
+6       8      midnightblue
+8       10     dimgray
+10      12     slategray
+12      14     seagreen
+14      16     forestgreen
+16      18     olivedrab
+18      20     yellowgreen
+20 	25     gold
+25	30     yellow
+30	35     orange
+35 	40     coral
+40      50     tomato
+50      60     firebrick1
+60 	80     OrangeRed
+80 	100    Red
+100 	200    DeepPink
+200	1000   Pink
+
+#0 	3 	medium sea green
+#3 	6 	medium aquamarine
+#6 	9 	medium slate blue
+#9 	12 	blue
+#12 	15 	blue4
+#15 	18 	DarkOrchid4
+#18 	21 	HotPink4
+#21 	24 	maroon
+#24 	27 	VioletRed4
+#27 	31 	sienna
+#31 	35 	chocolate
+#35 	40 	goldenrod
+#40 	45 	yellow
+#45 	50 	dark salmon
+#50 	55 	salmon
+#55 	60 	firebrick2
+#60 	65 	DeepPink1
+#65 	70 	light grey
+#70 	1000 	snow

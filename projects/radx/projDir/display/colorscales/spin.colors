@@ -1,0 +1,73 @@
+# colorscale for spin
+
+0	0.5	royalblue3
+0.5	1	blue
+1       2      mediumblue
+2       3      navyblue
+3       4      midnightblue
+4       5     dimgray
+5       6     slategray
+6       7     seagreen
+7       8     forestgreen
+8       9     olivedrab
+9       10     yellowgreen
+10 	15     gold
+15	20     yellow
+20	25     orange
+25 	30     coral
+30      40     tomato
+40      50     firebrick1
+50 	60     OrangeRed
+60 	80     Red
+80 	100    DeepPink
+100	1000   Pink
+
+#0   	1   	DarkSlateBlue
+#1    	2    	NavyBlue2
+#2   	3    	Blue
+#3    	4   	MediumBlue
+#4    	5    	SkyBlue
+#5    	6    	DarkGreen
+#6   	8   	ForestGreen
+#8   	10  	YellowGreen
+#10   	15  	Gold
+#15   	20   	Yellow
+#20   	25  	Coral
+#25  	30  	Orange
+#30  	40  	MediumVioletRed
+#40  	50  	DarkRed
+#50   	75  	OrangeRed
+#75  	100 	Red
+
+#0	1	DarkSlateBlue
+#1 	2 	NavyBlue
+#2	4 	Blue
+#4 	6	MediumBlue
+#6 	8 	SkyBlue
+#8 	10 	DarkGreen
+#10	15	ForestGreen
+#15	20	YellowGreen
+#20	25	Gold
+#25	30 	Yellow
+#30	40	Coral
+#40	50	Orange
+#50	60	MediumVioletRed
+#60	70	OrangeRed
+#70	80	Red
+#80	100	Gray
+
+#0       4       gray10
+#4       6       darkblue
+#6       8       royalblue4
+#8       10      slateblue4
+#10      15      green4
+#15      20      olivedrab3
+#20      25      darkolivegreen2
+#25	35  	yellow2
+#35      50      orange
+#50	60 	firebrick
+#60      70      red1
+#70	80 	DeepPink1
+#80  	90 	light grey
+#90 	100 	white
+

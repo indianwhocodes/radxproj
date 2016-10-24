@@ -1,0 +1,83 @@
+#! /bin/bash
+
+#--------------------------------------------------------------------
+#
+# install source radx release
+#
+# Mike Dixon, RAP, NCAR, Boulder, CO, USA
+# July 2010
+#
+#--------------------------------------------------------------------
+
+# set the path
+
+export PATH=.:/bin:./make_bin:/usr/bin:/sbin:/usr/sbin:/usr/bin/X11:/usr/local/bin:/usr/local/sbin:$HOME/bin
+
+# set package name
+
+package=$1
+sub_dir=$2
+release_dir=$3
+
+#######################################################
+# get run time
+
+year=`date -u +'%Y'`
+month=`date -u +'%m'`
+day=`date -u +'%d'`
+hour=`date -u +'%H'`
+min=`date -u +'%M'`
+sec=`date -u +'%S'`
+
+#--------------------------------------------------------------------
+
+echo
+echo "*********************************************************************"
+echo
+echo "  Installing ${package} release"
+echo
+echo "  NCAR, Boulder, CO, USA"
+echo
+echo "  $year/$month/$day $hour:$min:$sec"
+echo
+echo "*********************************************************************"
+echo
+
+echo "Installing the release ...."
+
+release=`ls ${package}-????????.src.tgz`
+
+# compute target dir
+
+target_dir=${release_dir}/${sub_dir}
+
+# clean up target dir
+
+/bin/rm -rf $target_dir/*
+
+# copy in new release
+
+mkdir -p $target_dir
+cp $release $target_dir
+
+tar_url=ftp://ftp.rap.ucar.edu/pub/titan/${sub_dir}/${release}
+formula_name="${package}.rb"
+./distribs/${package}/build_${package}_formula $tar_url $release $formula_name
+
+/bin/cp -f ./distribs/${package}/docs/*TXT ${target_dir}
+/bin/cp -f ./distribs/${package}/build_${package} ${target_dir}
+/bin/cp -f ./distribs/${package}/build_netcdf ${target_dir}
+/bin/cp -f ./distribs/${package}/RELEASE_NOTES/radx_release_notes.txt ${target_dir}
+/bin/mv -f $formula_name ${target_dir}
+
+#--------------------------------------------------------------------
+# done
+
+echo
+echo "  **************************************************"
+echo "  *** Done installing release ***"
+echo "  *** release file name: $release ***"
+echo "  **************************************************"
+echo
+
+exit 0

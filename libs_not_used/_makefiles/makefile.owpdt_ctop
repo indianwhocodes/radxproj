@@ -1,0 +1,37 @@
+#
+# Recursive make - makes the subdirectory code
+#
+# This makefile makes all the current RAP libraries used by OWPDT.
+#
+# NOTE: If you do a 'make -k install' with this Makefile you may get the
+#	following unexpected behavior: even if a submodule of a library fails 
+#	to build, the library may still be installed. To prevent this, write
+#	a script to go through all the libraries in the SUB_DIRS list, go
+#	to each library directory and do a 'make install'.
+#
+
+include $(RAP_MAKE_INC_DIR)/rap_make_macros
+
+TARGETS = $(GENERAL_TARGETS) $(LIB_TARGETS) $(DOC_TARGETS) $(INSTALL_TARGETS)
+
+SUB_DIRS = \
+	Fmq \
+	Mdv \
+	Spdb \
+	dataport \
+	didss \
+	dsdata \
+	dsserver \
+        euclid \
+        grib \
+	grib2 \
+	mdv \
+	perl5 \
+	python \
+	rapformats \
+	rapmath \
+	rapplot \
+	tdrp \
+	toolsa
+
+include $(RAP_MAKE_INC_DIR)/rap_make_recursive_dir_targets

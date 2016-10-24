@@ -1,0 +1,18 @@
+#! /bin/csh
+
+# run tests on RAPIC files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert RAPIC to cfradial
+
+RadxConvert -d -f $RADX_DATA_DIR/examples/rapic/darwin/20110207/201102071340Gunn_Pt.rapic -outdir $RADX_DATA_DIR/test/cfradial/rapic/darwin
+
+# test for differences
+
+RadxDiff -d -f1 $RADX_DATA_DIR/examples/rapic/darwin/20110207/201102071340Gunn_Pt.rapic -f2 $RADX_DATA_DIR/test/cfradial/rapic/darwin/20110207/cfrad.20110207_134003.000_to_20110207_134820.000_Gunn_v6_SUR.nc -out_path $OUTPATH -out_append
+
+# test against reference
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/rapic/darwin/20110207/cfrad.20110207_134003.000_to_20110207_134820.000_Gunn_v6_SUR.nc -f2 $RADX_DATA_DIR/reference/cfradial/rapic/darwin/20110207/cfrad.20110207_134003.000_to_20110207_134820.000_Gunn_v6_SUR.nc -out_path $OUTPATH -out_append

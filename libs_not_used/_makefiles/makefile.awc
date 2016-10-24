@@ -1,0 +1,45 @@
+#
+# Recursive make for AWC libraries
+#
+
+include $(RAP_MAKE_INC_DIR)/rap_make_macros
+
+TARGETS = $(GENERAL_TARGETS) $(LIB_TARGETS) $(DOC_TARGETS) $(INSTALL_TARGETS)
+
+SUB_DIRS = \
+	perl5 \
+        dataport \
+	didss \
+	mdv \
+        toolsa \
+	physics \
+	symprod \
+	symprod98 \
+        cidd \
+	rapmath \
+	rapplot \
+	grib \
+        titan \
+        tdrp \
+	rapformats \
+	Mdv \
+	dsserver \
+	spdb \
+	spdbFormats \
+	euclid \
+	SpdbServer \
+	devguide \
+	MotifApp
+
+$(TARGETS): FORCE
+	$(MAKE) $(SUB_DIRS) TARGET=$@
+
+$(SUB_DIRS): FORCE
+	cd $@; $(MAKE) $(TARGET)
+
+FORCE:
+
+
+
+
+

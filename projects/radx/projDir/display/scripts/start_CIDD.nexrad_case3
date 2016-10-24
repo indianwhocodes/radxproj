@@ -1,0 +1,19 @@
+#! /bin/csh
+
+# run tests on CfRadial files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+
+cd $HOME/cvs/projects/radx/projDir/display/params
+
+CIDD -t 20101109230500 -p CIDD.nexrad
+
+
+
+
+
+
+
+
+
+

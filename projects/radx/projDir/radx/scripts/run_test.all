@@ -1,0 +1,52 @@
+#! /bin/csh
+
+# run all radx tests
+
+setenv RADX_DATA_DIR $HOME/data/radx
+setenv OUTPATH /tmp/radx_test.out
+
+/bin/rm -f $OUTPATH
+/bin/rm -rf $RADX_DATA_DIR/test
+
+cd $PROJ_DIR/radx/scripts
+
+echo Running tests for cfradial
+./run_test.cfradial
+
+echo Running tests for nexrad
+./run_test.nexrad
+
+echo Running tests for uf
+./run_test.uf
+
+echo Running tests for dorade
+./run_test.dorade
+
+echo Running tests for foray
+./run_test.foray
+
+echo Running tests for mdv
+./run_test.mdv
+
+echo Running tests for rapic
+./run_test.rapic
+
+echo Running tests for eec
+./run_test.eec
+
+echo Running tests for sigmet
+./run_test.sigmet
+
+echo Running tests for leosphere
+./run_test.leosphere
+
+echo Running tests for doe netcdf
+./run_test.doe
+
+echo "======== RESULTS ========"
+echo "File: $OUTPATH"
+cat $OUTPATH
+echo "========================="
+echo "Word count of results file"
+wc $OUTPATH
+echo "========================="

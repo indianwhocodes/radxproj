@@ -1,0 +1,23 @@
+#! /bin/csh
+
+# run tests on DORADE files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert DORADE to cfradial
+
+RadxConvert -d -f $RADX_DATA_DIR/examples/dorade/spol/20080604/swp.1080604001503.SPOLRVP8.0.000.5_SUR_v036 -ag -outdir $RADX_DATA_DIR/test/cfradial/dorade/spol -field DBZ -field VR -field SW
+
+# convert back to DORADE
+
+RadxConvert -d -f $RADX_DATA_DIR/test/cfradial/dorade/spol/20080604/cfrad.20080604_001503.000_to_20080604_002217.000_SPOL_v36_SUR.nc -outdir $RADX_DATA_DIR/test/dorade/spol -dorade
+
+# test for differences
+
+RadxDiff -d -ag -max_diff 0.1 -f1 $RADX_DATA_DIR/examples/dorade/spol/20080604/swp.1080604001503.SPOLRVP8.0.000.5_SUR_v036 -f2 $RADX_DATA_DIR/test/dorade/spol/20080604/swp.1080604001503.SPOLRVP8.0.0.5_SUR_v036 -out_path $OUTPATH -out_append -field1 DBZ -field1 VR -field1 SW -field2 DBZ -field2 VR -field2 SW -out_path $OUTPATH -out_append
+
+# test against reference
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/dorade/spol/20080604/cfrad.20080604_001503.000_to_20080604_002217.000_SPOL_v36_SUR.nc -f2 $RADX_DATA_DIR/reference/cfradial/dorade/spol/20080604/cfrad.20080604_001503.000_to_20080604_002217.000_SPOL_v36_SUR.nc -out_path $OUTPATH -out_append
+

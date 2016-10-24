@@ -1,0 +1,17 @@
+#! /bin/csh
+
+# run tests on RAPIC files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert GAMIC to cfradial
+
+# real data
+
+RadxConvert -outdir $RADX_DATA_DIR/gamic/cfradial -debug -f ~/data/radx/examples/gamic/belem/2013-10-12_1*
+
+# simulated data
+
+RadxConvert -outdir $RADX_DATA_DIR/gamic/cfradial -debug -field Z -field V -field SQI -field LOG -f ~/data/radx/examples/gamic/sim/volumetric-2013-05-22--16:58:01,00.mvol
+

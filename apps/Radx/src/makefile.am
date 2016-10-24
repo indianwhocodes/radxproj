@@ -1,0 +1,17 @@
+###############################################
+#
+# makefile template for automake
+#
+# dir: ./apps/Radx/src
+#
+# written by script createMakefile.am.recurse.py
+#
+# created 2016-03-27 13:55:29.532492
+#
+###############################################
+
+# subdirectories
+
+SUBDIRS = \
+	Radx2Grid 
+

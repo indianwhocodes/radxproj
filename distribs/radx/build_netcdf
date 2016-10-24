@@ -1,0 +1,158 @@
+#! /bin/bash
+#
+# Building NETCDF and required libraries
+# ======================================
+#
+# Downloading:
+# ------------
+#
+# Download into a single directory all of the files in:
+#
+#    ftp.rap.ucar.edu/pub/titan/radx
+#
+# List of tar files (2013/08/25):
+#
+#  hdf5-1.8.14.tar.gz
+#  netcdf-4.3.2.tar.gz
+#  netcdf-cxx-4.2.tar.gz
+#  netcdf-cxx4-4.2.1.tar.gz
+#  netcdf-fortran-4.4.1.tar.gz
+#  udunits-2.1.24.tar.gz
+#
+# By default the libraries and applications will be installed in:
+#
+#   /usr/local/include
+#   /usr/local/lib
+#   /usr/local/bin
+#
+# You can change the install location by specifying it as
+# a single argument to this script.
+#
+# For example:
+#
+#   build_radx /tmp/radx_build
+#
+# will install in:
+#
+#   /tmp/radx_build/include
+#   /tmp/radx_build/lib
+#   /tmp/radx_build/bin
+#
+
+#--------------------------------------------------------------------
+# usage function
+#
+
+function usage() {
+    echo
+    echo "Usage: build_netcdf [ -h ] [ prefix ]"
+    echo
+    echo "  -h: produce this usage list"
+    echo "  optionally set the prefix"
+    echo
+}
+
+# set the path
+
+export PATH=.:/bin:/usr/bin:/sbin:/usr/sbin:/usr/bin/X11:/usr/local/bin:/usr/local/sbin
+
+# set the install prefix
+
+prefix=/usr/local
+
+if [ $# -gt 0 ]
+then
+  if [ "$1" == -h -o "$2" == -h ] 
+  then
+    usage
+    exit 0
+  fi
+  prefix=$1
+fi
+
+echo "Installing in prefix: $prefix"
+
+# go down one dir
+
+cd netcdf_tar_files
+
+# set environment
+# ---------------
+
+export CFLAGS="-I${prefix}/include -fPIC"
+export CPPFLAGS=-I${prefix}/include
+export "LDFLAGS=-L${prefix}/lib -Wl,-rpath,'\$\$ORIGIN'/radx_runtime_libs:${prefix}/lib"
+
+export CC=gcc
+export CXX=g++
+export F90=gfortran
+export F77=gfortran
+export FC=gfortran
+
+#  Building HDF5
+#  -------------
+
+tar xvfz hdf5-*.tar.gz
+cd hdf5-*/
+./configure --prefix=${prefix} --enable-cxx --enable-fortran || exit 1
+make -j 8 || exit 1
+make install || exit 1
+cd ..
+
+# Building udunits2
+# -----------------
+
+tar xvfz udunits-*.tar.gz
+cd udunits-*/
+./configure --prefix=${prefix} || exit 1
+make -j 8 || exit 1
+make install || exit 1
+cd ..
+
+# Building netcdf C
+# -----------------
+
+tar xvfz netcdf-4*.tar.gz
+cd netcdf-4*/
+./configure --enable-netcdf4 --enable-shared --prefix=${prefix} || exit 1
+make -j 8 || exit 1
+make install || exit 1
+cd ..
+
+# ---------------------------
+# append USE_NETCDF4 to FLAGS
+
+export CFLAGS="$CFLAGS -DUSE_NETCDF4"
+export CPPFLAGS="$CPPFLAGS -DUSE_NETCDF4"
+export LDFLAGS="$LDFLAGS -DUSE_NETCDF4"
+ 
+# Building netcdf Fortran
+# ------------------------
+
+tar xvfz netcdf-fortran*.tar.gz
+cd netcdf-fortran*/
+./configure --enable-shared --prefix=${prefix} || exit 1
+make -j 8 || exit 1
+make install || exit 1
+cd ..
+
+# Building netcdf C++ legacy
+# --------------------------
+
+tar xvfz netcdf-cxx-4*.tar.gz
+cd netcdf-cxx-4*/
+./configure --enable-shared --prefix=${prefix} || exit 1
+make -j 8 || exit 1
+make install || exit 1
+cd ..
+
+# Building netcdf C++ 4
+# ---------------------
+
+tar xvfz netcdf-cxx4-4*.tar.gz
+cd netcdf-cxx4-4*/
+./configure --enable-shared --prefix=${prefix} || exit 1
+make -j 8 || exit 1
+make install || exit 1
+cd ..
+

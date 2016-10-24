@@ -1,0 +1,40 @@
+#! /bin/csh
+
+# run tests on NEXRAD files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert nexrad to cfradial
+
+RadxConvert -d -f $RADX_DATA_DIR/examples/nexrad/kftg/19960830/KFTG19960830_233019.msg1 -outdir $RADX_DATA_DIR/test/cfradial/nexrad/kftg
+
+RadxConvert -d -f $RADX_DATA_DIR/examples/nexrad/kftg/20061026/KFTG20061026_120152.msg1 -outdir $RADX_DATA_DIR/test/cfradial/nexrad/kftg
+
+RadxConvert -d -f $RADX_DATA_DIR/examples/nexrad/kftg/20101109/KFTG20101109_230524_V03.nex2 -outdir $RADX_DATA_DIR/test/cfradial/nexrad/kftg
+
+# convert back to nexrad
+
+RadxConvert -d -f $RADX_DATA_DIR/test/cfradial/nexrad/kftg/19960830/cfrad.19960830_233052.077_to_19960830_233607.686_KFTG_v373_SUR.nc -outdir $RADX_DATA_DIR/test/nexrad/kftg -nexrad
+
+RadxConvert -d -f $RADX_DATA_DIR/test/cfradial/nexrad/kftg/20061026/cfrad.20061026_120223.656_to_20061026_120734.211_KFTG_v806_SUR.nc -outdir $RADX_DATA_DIR/test/nexrad/kftg -nexrad
+
+RadxConvert -d -f $RADX_DATA_DIR/test/cfradial/nexrad/kftg/20101109/cfrad.20101109_230556.895_to_20101109_231105.791_KFTG_v766_SUR.nc -outdir $RADX_DATA_DIR/test/nexrad/kftg -nexrad
+
+# test for differences
+
+RadxDiff -d -max_diff 1 -no_sweep_numbers -match_geom -min_percent 1 -f2 $RADX_DATA_DIR/examples/nexrad/kftg/19960830/KFTG19960830_233019.msg1 -f1 $RADX_DATA_DIR/test/nexrad/kftg/19960830/nexrad.19960830_233052_KFTG_v373_SUR.msg31 -out_path $OUTPATH -out_append
+
+RadxDiff -d -no_sweep_numbers -f1 $RADX_DATA_DIR/examples/nexrad/kftg/20061026/KFTG20061026_120152.msg1 -f2 $RADX_DATA_DIR/test/nexrad/kftg/20061026/nexrad.20061026_120223_KFTG_v806_SUR.msg31 -out_path $OUTPATH -out_append
+
+RadxDiff -d -no_sweep_numbers -f1 $RADX_DATA_DIR/examples/nexrad/kftg/20101109/KFTG20101109_230524_V03.nex2 -f2 $RADX_DATA_DIR/test/nexrad/kftg/20101109/nexrad.20101109_230556_KFTG_v766_SUR.msg31 -out_path $OUTPATH -out_append
+
+# test against reference
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/nexrad/kftg/19960830/cfrad.19960830_233052.077_to_19960830_233607.686_KFTG_v373_SUR.nc -f2 $RADX_DATA_DIR/reference/cfradial/nexrad/kftg/19960830/cfrad.19960830_233052.077_to_19960830_233607.686_KFTG_v373_SUR.nc -out_path $OUTPATH -out_append
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/nexrad/kftg/20061026/cfrad.20061026_120223.656_to_20061026_120734.211_KFTG_v806_SUR.nc -f2 $RADX_DATA_DIR/reference/cfradial/nexrad/kftg/20061026/cfrad.20061026_120223.656_to_20061026_120734.211_KFTG_v806_SUR.nc -out_path $OUTPATH -out_append
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/nexrad/kftg/20101109/cfrad.20101109_230556.895_to_20101109_231105.791_KFTG_v766_SUR.nc -f2 $RADX_DATA_DIR/reference/cfradial/nexrad/kftg/20101109/cfrad.20101109_230556.895_to_20101109_231105.791_KFTG_v766_SUR.nc -out_path $OUTPATH -out_append
+
+

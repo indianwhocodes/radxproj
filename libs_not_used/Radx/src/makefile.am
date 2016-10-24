@@ -1,0 +1,181 @@
+###############################################
+#
+# makefile template for automake
+#
+# library name: Radx
+#
+# written by script createMakefile.am.lib
+#
+# created 2016-03-27 13:55:28.441966
+#
+###############################################
+
+# compile flags - include header subdirectory
+
+AM_CFLAGS = -I./include
+# NOTE: X11R6 is for Mac OSX location of XQuartz
+AM_CFLAGS += -I/usr/X11R6/include
+ACLOCAL_AMFLAGS = -I m4
+AM_CFLAGS += -I../../Fmq/src/include
+AM_CFLAGS += -I../../Mdv/src/include
+AM_CFLAGS += -I../../Radx/src/include
+AM_CFLAGS += -I../../Spdb/src/include
+AM_CFLAGS += -I../../dataport/src/include
+AM_CFLAGS += -I../../didss/src/include
+AM_CFLAGS += -I../../dsserver/src/include
+AM_CFLAGS += -I../../dsdata/src/include
+AM_CFLAGS += -I../../euclid/src/include
+AM_CFLAGS += -I../../physics/src/include
+AM_CFLAGS += -I../../radar/src/include
+AM_CFLAGS += -I../../rapformats/src/include
+AM_CFLAGS += -I../../rapmath/src/include
+AM_CFLAGS += -I../../tdrp/src/include
+AM_CFLAGS += -I../../toolsa/src/include
+AM_CFLAGS += -I../../kd/src/include
+
+AM_CXXFLAGS = $(AM_CFLAGS)
+
+# target library file
+
+lib_LTLIBRARIES = libRadx.la
+
+# headers to be installed
+
+includedir = $(prefix)/include/Radx
+
+include_HEADERS = \
+	include/Radx/ByteOrder.hh \
+	include/Radx/D3rNcRadxFile.hh \
+	include/Radx/DoeNcRadxFile.hh \
+	include/Radx/DoradeData.hh \
+	include/Radx/DoradeRadxFile.hh \
+	include/Radx/ForayNcRadxFile.hh \
+	include/Radx/GamicHdf5RadxFile.hh \
+	include/Radx/GemRadxFile.hh \
+	include/Radx/Hdf5Utils.hh \
+	include/Radx/HrdData.hh \
+	include/Radx/HrdRadxFile.hh \
+	include/Radx/LeoRadxFile.hh \
+	include/Radx/NcfRadxFile.hh \
+	include/Radx/NetcdfClassic.hh \
+	include/Radx/NetcdfCxxUtils.hh \
+	include/Radx/NexradCmdRadxFile.hh \
+	include/Radx/NexradData.hh \
+	include/Radx/NexradLoc.hh \
+	include/Radx/NexradRadxFile.hh \
+	include/Radx/NexradVcp.hh \
+	include/Radx/NidsData.hh \
+	include/Radx/NidsRadxFile.hh \
+	include/Radx/NoxpNcRadxFile.hh \
+	include/Radx/NsslMrdRadxFile.hh \
+	include/Radx/OdimHdf5RadxFile.hh \
+	include/Radx/Radx.hh \
+	include/Radx/RadxAngleHist.hh \
+	include/Radx/RadxArray.hh \
+	include/Radx/RadxAzElev.hh \
+	include/Radx/RadxBuf.hh \
+	include/Radx/RadxCfactors.hh \
+	include/Radx/RadxComplex.hh \
+	include/Radx/RadxEvent.hh \
+	include/Radx/RadxField.hh \
+	include/Radx/RadxFile.hh \
+	include/Radx/RadxGeoref.hh \
+	include/Radx/RadxMsg.hh \
+	include/Radx/RadxPacking.hh \
+	include/Radx/RadxPath.hh \
+	include/Radx/RadxPlatform.hh \
+	include/Radx/RadxRangeGeom.hh \
+	include/Radx/RadxRay.hh \
+	include/Radx/RadxRcalib.hh \
+	include/Radx/RadxReadDir.hh \
+	include/Radx/RadxRemap.hh \
+	include/Radx/RadxStr.hh \
+	include/Radx/RadxSweep.hh \
+	include/Radx/RadxTime.hh \
+	include/Radx/RadxTimeList.hh \
+	include/Radx/RadxVol.hh \
+	include/Radx/RadxXml.hh \
+	include/Radx/RapicRadxFile.hh \
+	include/Radx/RayxData.hh \
+	include/Radx/RayxMapping.hh \
+	include/Radx/SigmetData.hh \
+	include/Radx/SigmetRadxFile.hh \
+	include/Radx/TdwrLoc.hh \
+	include/Radx/TdwrRadxFile.hh \
+	include/Radx/TwolfRadxFile.hh \
+	include/Radx/Udunits2.hh \
+	include/Radx/UfData.hh \
+	include/Radx/UfRadxFile.hh
+
+libRadx_la_SOURCES = \
+	DOE/DoeNcRadxFile.cc \
+	D3R/D3rNcRadxFile.cc \
+	Dorade/DoradeData.cc \
+	Dorade/DoradeRadxFile.cc \
+	ForayNc/ForayNcRadxFile.cc \
+	ForayNc/ForayNcRadxFile_read.cc \
+	ForayNc/ForayNcRadxFile_write.cc \
+	Gamic/GamicHdf5RadxFile.cc \
+	Gematronik/GemBlob.cc \
+	Gematronik/GemRadxFile.cc \
+	Gematronik/GemInputField.cc \
+	Gematronik/GemSweep.cc \
+	hdf5/Hdf5Utils.cc \
+	Hrd/HrdRadxFile.cc \
+	Leosphere/LeoRadxFile.cc \
+	Ncf/NcfRadxFile.cc \
+	Ncf/NcfRadxFile_read.cc \
+	Ncf/NcfRadxFile_write.cc \
+	Nexrad/NexradCmdRadxFile.cc \
+	Nexrad/NexradData.cc \
+	Nexrad/NexradLoc.cc \
+	Nexrad/NexradRadxFile.cc \
+	Nexrad/NexradVcp.cc \
+	Nexrad/NidsData.cc \
+	Nexrad/NidsRadxFile.cc \
+	netcdf/NetcdfClassic.cc \
+	netcdf/Udunits2.cc \
+	Noxp/NoxpNcRadxFile.cc \
+	NsslMrd/NsslMrdRadxFile.cc \
+	Odim/OdimHdf5RadxFile.cc \
+	Radx/ByteOrder.cc \
+	Radx/Radx.cc \
+	Radx/RadxAngleHist.cc \
+	Radx/RadxAzElev.cc \
+	Radx/RadxBuf.cc \
+	Radx/RadxComplex.cc \
+	Radx/RadxCfactors.cc \
+	Radx/RadxEvent.cc \
+	Radx/RadxField.cc \
+	Radx/RadxFile.cc \
+	Radx/RadxGeoref.cc \
+	Radx/RadxMsg.cc \
+	Radx/RadxPacking.cc \
+	Radx/RadxPath.cc \
+	Radx/RadxPlatform.cc \
+	Radx/RadxRangeGeom.cc \
+	Radx/RadxRay.cc \
+	Radx/RadxRcalib.cc \
+	Radx/RadxReadDir.cc \
+	Radx/RadxRemap.cc \
+	Radx/RadxSweep.cc \
+	Radx/RadxStr.cc \
+	Radx/RadxTime.cc \
+	Radx/RadxTimeList.cc \
+	Radx/RadxVol.cc \
+	Radx/RadxXml.cc \
+	Radx/RayxData.cc \
+	Radx/RayxMapping.cc \
+	Rapic/Linebuff.cc \
+	Rapic/PPIField.cc \
+	Rapic/RapicRadxFile.cc \
+	Rapic/RapicRay.cc \
+	Rapic/ScanParams.cc \
+	Rapic/sRadl.cc \
+	Sigmet/SigmetRadxFile.cc \
+	Tdwr/TdwrLoc.cc \
+	Tdwr/TdwrRadxFile.cc \
+	Twolf/TwolfRadxFile.cc \
+	Uf/UfData.cc \
+	Uf/UfRadxFile.cc
+

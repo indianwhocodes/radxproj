@@ -1,0 +1,19 @@
+# NAME cnr.colors
+
+-50 	-45 	gray30
+-45 	-40 	maroon
+-40	-38 	dark orchid
+-38	-36 	blue
+-36	-34 	royal blue
+-34	-32 	deep sky blue
+-32 	-30 	medium spring green
+-30 	-28	forest green
+-28	-26	gray
+-26	-24	tan2
+-24	-22	gold1
+-22	-20	yellow
+-20	-15	salmon1
+-15	-10	tomato
+-10	0 	brown1
+0 	10 	red
+10 	20 	firebrick

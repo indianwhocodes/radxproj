@@ -1,0 +1,22 @@
+#! /bin/csh
+
+# run tests on MDV files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert MDV to cfradial
+
+RadxConvert -d -f $RADX_DATA_DIR/examples/mdv/dynamo/20111016/100539.mdv -outdir $RADX_DATA_DIR/test/cfradial/mdv/dynamo -field DBZ_F -field VEL_F -field WIDTH_F -field SNRHC_F
+
+# convert back to MDV
+
+RadxConvert -d -f $RADX_DATA_DIR/test/cfradial/mdv/dynamo/20111016/cfrad.20111016_100031.000_to_20111016_100539.000_SPOL_v4094_SUR.nc -outdir $RADX_DATA_DIR/test/mdv/dynamo -mdv
+
+# test for differences
+
+RadxDiff -d -f1 $RADX_DATA_DIR/examples/mdv/dynamo/20111016/100539.mdv -f2 $RADX_DATA_DIR/test/mdv/dynamo/20111016/100539.mdv -field1 DBZ_F -field1 VEL_F -field1 WIDTH_F -field1 SNRHC_F -field2 DBZ_F -field2 VEL_F -field2 WIDTH_F -field2 SNRHC_F -out_path $OUTPATH -out_append
+
+# test against reference
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/mdv/dynamo/20111016/cfrad.20111016_100031.000_to_20111016_100539.000_SPOL_v4094_SUR.nc -f2 $RADX_DATA_DIR/reference/cfradial/mdv/dynamo/20111016/cfrad.20111016_100031.000_to_20111016_100539.000_SPOL_v4094_SUR.nc -out_path $OUTPATH -out_append

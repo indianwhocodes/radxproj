@@ -1,0 +1,21 @@
+# NAME snr.colors
+
+# kessinger 	5/2/2001
+
+-10	-8 	medium aquamarine
+-8	-6	medium slate blue
+-6 	-4 	blue
+-4 	-2 	blue4
+-2 	00 	DarkOrchid4
+00 	02 	HotPink4
+02 	04 	maroon
+04 	06 	VioletRed4
+06 	08 	sienna
+08 	10 	chocolate
+10 	15 	goldenrod
+15 	20 	yellow
+20 	25 	dark salmon
+25 	30 	salmon
+30 	35 	firebrick2
+35 	40 	DeepPink1
+40 	80 	snow

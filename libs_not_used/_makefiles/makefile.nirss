@@ -1,0 +1,26 @@
+#
+# Recursive make for NIRSS libraries
+#
+#grib \
+
+include $(RAP_MAKE_INC_DIR)/rap_make_macros
+
+TARGETS = $(GENERAL_TARGETS) $(LIB_TARGETS) $(DOC_TARGETS) $(INSTALL_TARGETS)
+
+SUB_DIRS = \
+        dataport \
+        didss \
+        dsdata \
+        dsserver \
+        euclid \
+        Fmq \
+        perl5 \
+        Mdv \
+        rapformats \
+        rapmath \
+        Spdb \
+        tdrp \
+        toolsa
+
+include $(RAP_MAKE_INC_DIR)/rap_make_recursive_dir_targets
+

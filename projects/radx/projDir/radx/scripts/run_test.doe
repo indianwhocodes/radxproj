@@ -1,0 +1,15 @@
+#! /bin/csh
+
+# run tests on DOE netcdf files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert DOE netcdf to cfradial
+
+RadxConvert -d -f $RADX_DATA_DIR/examples/doe/swacr/sbsswacrhsrhiS1.b1.20110119.061606.cdf -outdir $RADX_DATA_DIR/test/cfradial/doe/swacr
+
+# test against reference
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/doe/swacr/20110119/cfrad.20110119_061610.583_to_20110119_062119.906_swac_v0_MAN.nc -f2 $RADX_DATA_DIR/reference/cfradial/doe/swacr/20110119/cfrad.20110119_061610.583_to_20110119_062119.906_swac_v0_MAN.nc -out_path $OUTPATH -out_append
+

@@ -1,0 +1,16 @@
+MAP_NAME NAME_Equip
+# NAME project equipment locations   7/04 C. Kessinger
+#
+ICONDEF CROSS 6
+0 -5
+0 5
+32767 32767
+-5 0 
+5 0
+32767 32767
+#
+ICON CROSS  23.5    -108.0  -8 -5 Altair
+ICON CROSS  24.280  -107.160  -8 -5 NOAA Profiler
+ICON CROSS  25.68935  -109.07375  -8 -5 Los Mochis
+ICON CROSS  28.81389  -111.92722  -8 -5 Bahia Kino
+ICON CROSS  31.34333  -113.50889  -8 -5 Puerto Penasco

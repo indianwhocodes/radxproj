@@ -1,0 +1,121 @@
+###############################################
+#
+# makefile template for automake
+#
+# library name: rapmath
+#
+# written by script createMakefile.am.lib
+#
+# created 2016-03-27 13:55:29.223814
+#
+###############################################
+
+# compile flags - include header subdirectory
+
+AM_CFLAGS = -I./include
+# NOTE: X11R6 is for Mac OSX location of XQuartz
+AM_CFLAGS += -I/usr/X11R6/include
+ACLOCAL_AMFLAGS = -I m4
+AM_CFLAGS += -I../../Fmq/src/include
+AM_CFLAGS += -I../../Mdv/src/include
+AM_CFLAGS += -I../../Radx/src/include
+AM_CFLAGS += -I../../Spdb/src/include
+AM_CFLAGS += -I../../dataport/src/include
+AM_CFLAGS += -I../../didss/src/include
+AM_CFLAGS += -I../../dsserver/src/include
+AM_CFLAGS += -I../../dsdata/src/include
+AM_CFLAGS += -I../../euclid/src/include
+AM_CFLAGS += -I../../physics/src/include
+AM_CFLAGS += -I../../radar/src/include
+AM_CFLAGS += -I../../rapformats/src/include
+AM_CFLAGS += -I../../rapmath/src/include
+AM_CFLAGS += -I../../tdrp/src/include
+AM_CFLAGS += -I../../toolsa/src/include
+AM_CFLAGS += -I../../kd/src/include
+
+AM_CXXFLAGS = $(AM_CFLAGS)
+
+# target library file
+
+lib_LTLIBRARIES = librapmath.la
+
+# headers to be installed
+
+includedir = $(prefix)/include/rapmath
+
+include_HEADERS = \
+	include/rapmath/AngleCombiner.hh \
+	include/rapmath/Fuzzy2d.hh \
+	include/rapmath/FuzzyF.hh \
+	include/rapmath/FuzzyFunction.hh \
+	include/rapmath/LagrangePtFunc.hh \
+	include/rapmath/LinearPtFunc.hh \
+	include/rapmath/Math.hh \
+	include/rapmath/NewtonPtFunc.hh \
+	include/rapmath/OrderedList.hh \
+	include/rapmath/ParamsFuzzyFunction.hh \
+	include/rapmath/PtFunction.hh \
+	include/rapmath/PtFuzzyFunc.hh \
+	include/rapmath/RMmalloc.h \
+	include/rapmath/RapComplex.hh \
+	include/rapmath/SFuzzyF.hh \
+	include/rapmath/ScaleFuzzyFunc.hh \
+	include/rapmath/StepPtFunc.hh \
+	include/rapmath/TrapFuzzyF.hh \
+	include/rapmath/bd_tree.h \
+	include/rapmath/math_macros.h \
+	include/rapmath/round.h \
+	include/rapmath/stats.h \
+	include/rapmath/trig.h \
+	include/rapmath/umath.h \
+	include/rapmath/usort.h \
+	include/rapmath/usort_stl.h \
+	include/rapmath/usvd.h
+
+librapmath_la_SOURCES = \
+	angles/AngleCombiner.cc \
+	complex/RapComplex.cc \
+	functions/PtFunction.cc \
+	functions/LagrangePtFunc.cc \
+	functions/LinearPtFunc.cc \
+	functions/NewtonPtFunc.cc \
+	functions/FuzzyF.cc \
+	functions/Fuzzy2d.cc \
+	functions/FuzzyFunction.cc \
+	functions/ParamsFuzzyFunction.cc \
+	functions/PtFuzzyFunc.cc \
+	functions/ScaleFuzzyFunc.cc \
+	functions/StepPtFunc.cc \
+	functions/SFuzzyF.cc \
+	functions/TrapFuzzyF.cc \
+	lists/OrderedList.cc \
+	malloc/RMmalloc.c \
+	misc/Math.cc \
+	round/nint.c \
+	stats/beta.c \
+	stats/exponential.c \
+	stats/gamma.c \
+	stats/normal.c \
+	stats/primes.c \
+	stats/uniform.c \
+	stats/weibull.c \
+	tree/bd_tree.c \
+	trig/trig.c \
+	umath/dir_speed_2_uv.c \
+	umath/uLatLon.c \
+	umath/uintersect.c \
+	umath/uline_through_ellipse.c \
+	umath/ulong_scale.c \
+	umath/umax_wt_bip.c \
+	umath/upoint_in_ellipse.c \
+	umath/upoint_in_polygon.c \
+	umath/usign.c \
+	umath/usort.c \
+	umath/ustat.c \
+	umath/usvd.c \
+	umath/uv_2_dir_speed.c \
+	umath/usort_stl.cc \
+	umath/uCurveFit.cc \
+	umath/uNewtRaph.cc \
+	umath/uPct.cc
+

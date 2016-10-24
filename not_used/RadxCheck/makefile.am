@@ -1,0 +1,96 @@
+###############################################
+#
+# makefile template for automake
+#
+# app name: RadxCheck
+#
+# written by script createMakefile.am.app.radx.py
+#
+# created 2016-03-27 13:55:29.788021
+#
+###############################################
+
+# compile flags - includes
+
+AM_CFLAGS = -I.
+AM_CFLAGS += -I../../../../libs/Fmq/src/include
+AM_CFLAGS += -I../../../../libs/Mdv/src/include
+AM_CFLAGS += -I../../../../libs/Radx/src/include
+AM_CFLAGS += -I../../../../libs/Spdb/src/include
+AM_CFLAGS += -I../../../../libs/dataport/src/include
+AM_CFLAGS += -I../../../../libs/didss/src/include
+AM_CFLAGS += -I../../../../libs/dsserver/src/include
+AM_CFLAGS += -I../../../../libs/dsdata/src/include
+AM_CFLAGS += -I../../../../libs/euclid/src/include
+AM_CFLAGS += -I../../../../libs/physics/src/include
+AM_CFLAGS += -I../../../../libs/radar/src/include
+AM_CFLAGS += -I../../../../libs/rapformats/src/include
+AM_CFLAGS += -I../../../../libs/rapmath/src/include
+AM_CFLAGS += -I../../../../libs/tdrp/src/include
+AM_CFLAGS += -I../../../../libs/toolsa/src/include
+AM_CFLAGS += -I../../../../libs/kd/src/include
+
+AM_CXXFLAGS = $(AM_CFLAGS)
+
+# load flags
+
+AM_LDFLAGS = -L.
+AM_LDFLAGS += -L../../../../libs/Fmq/src
+AM_LDFLAGS += -L../../../../libs/Mdv/src
+AM_LDFLAGS += -L../../../../libs/Radx/src
+AM_LDFLAGS += -L../../../../libs/Spdb/src
+AM_LDFLAGS += -L../../../../libs/dataport/src
+AM_LDFLAGS += -L../../../../libs/didss/src
+AM_LDFLAGS += -L../../../../libs/dsserver/src
+AM_LDFLAGS += -L../../../../libs/dsdata/src
+AM_LDFLAGS += -L../../../../libs/euclid/src
+AM_LDFLAGS += -L../../../../libs/physics/src
+AM_LDFLAGS += -L../../../../libs/radar/src
+AM_LDFLAGS += -L../../../../libs/rapformats/src
+AM_LDFLAGS += -L../../../../libs/rapmath/src
+AM_LDFLAGS += -L../../../../libs/tdrp/src
+AM_LDFLAGS += -L../../../../libs/toolsa/src
+AM_LDFLAGS += -L../../../../libs/kd/src
+
+# load libs
+
+LDADD = -ldsdata
+LDADD += -lradar
+LDADD += -lFmq
+LDADD += -lSpdb
+LDADD += -lMdv
+LDADD += -lphysics
+LDADD += -lRadx
+LDADD += -lrapformats
+LDADD += -ldsserver
+LDADD += -ldidss
+LDADD += -leuclid
+LDADD += -lrapmath
+LDADD += -ltoolsa
+LDADD += -ldataport
+LDADD += -ltdrp
+LDADD += -lnetcdf_c++
+LDADD += -lnetcdf
+LDADD += -lhdf5_cpp
+LDADD += -lhdf5_hl
+LDADD += -lhdf5
+LDADD += -ludunits2
+LDADD += -lz
+LDADD += -lbz2
+LDADD += -lexpat
+LDADD += -lpthread
+LDADD += -lm
+LDADD += -lfftw3
+
+# set app name
+
+bin_PROGRAMS = RadxCheck
+
+# source files
+
+RadxCheck_SOURCES = \
+	Params.cc \
+	Args.cc \
+	Main.cc \
+	RadxCheck.cc
+

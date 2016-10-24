@@ -1,0 +1,28 @@
+#! /bin/csh
+
+# run tests on CfRadial files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert cfradial netcdf4 to cfradial netcdf3
+
+RadxConvert -d -f $RADX_DATA_DIR/examples/cfradial4/20111223/cfrad.20111223_230031_607_SPOL_v208_SUR.nc -outdir $RADX_DATA_DIR/test/cfradial3 -cfradial -cf_classic -field DBZ -field VEL -field WIDTH
+
+# convert back to netcdf4
+
+RadxConvert -d -f $RADX_DATA_DIR/test/cfradial3/20111223/cfrad.20111223_230031.606_to_20111223_230527.607_SPOL_v208_SUR.nc -cfradial -cf_netcdf4 -outdir $RADX_DATA_DIR/test/cfradial4
+
+# test for differences
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial3/20111223/cfrad.20111223_230031.606_to_20111223_230527.607_SPOL_v208_SUR.nc -f2 $RADX_DATA_DIR/test/cfradial4/20111223/cfrad.20111223_230031.606_to_20111223_230527.607_SPOL_v208_SUR.nc -out_path $OUTPATH -out_append
+
+RadxDiff -d -f1 $RADX_DATA_DIR/examples/cfradial4/20111223/cfrad.20111223_230031_607_SPOL_v208_SUR.nc -f2 $RADX_DATA_DIR/test/cfradial4/20111223/cfrad.20111223_230031.606_to_20111223_230527.607_SPOL_v208_SUR.nc -field1 DBZ -field1 VEL -field1 WIDTH -field2 DBZ -field2 VEL -field2 WIDTH -out_path $OUTPATH -out_append
+
+# test against reference
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial4/20111223/cfrad.20111223_230031.606_to_20111223_230527.607_SPOL_v208_SUR.nc -f2 $RADX_DATA_DIR/reference/cfradial4/20111223/cfrad.20111223_230031.606_to_20111223_230527.607_SPOL_v208_SUR.nc -out_path $OUTPATH -out_append
+
+
+
+

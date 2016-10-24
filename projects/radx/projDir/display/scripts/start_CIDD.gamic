@@ -1,0 +1,16 @@
+#! /bin/csh
+
+# run tests on CfRadial files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+
+cd $HOME/cvs/projects/radx/projDir/display/params
+
+setenv RADAR_LAT -23.2492
+setenv RADAR_LON -45.9359
+
+CIDD -font fixed -p CIDD.gamic -v 2
+
+
+
+

@@ -1,0 +1,46 @@
+# rhohv
+
+0.0 	0.10 	dark green
+0.10 	0.15 	dark olive green
+0.15 	0.20 	forest green
+0.20 	0.25 	SpringGreen3
+0.25	0.30	medium sea green
+0.30	0.35 	medium aquamarine
+0.35	0.40 	medium slate blue
+0.40	0.45 	blue
+0.45 	0.50 	blue4
+0.50 	0.55 	DarkOrchid4
+0.55 	0.60 	HotPink4
+0.60 	0.65 	maroon
+0.65 	0.70 	VioletRed4
+0.70 	0.75 	sienna
+0.75 	0.80 	chocolate
+0.80 	0.85 	goldenrod
+0.85 	0.90 	yellow
+0.90 	0.92 	dark salmon
+0.92 	0.94 	salmon
+0.94 	0.95 	firebrick2
+0.95 	0.96 	OrangeRed
+0.96	0.97	Red3
+0.97	0.98	Red1
+0.98 	0.99 	DeepPink3
+0.99 	1.00 	DeepPink1
+
+#0.00	0.70	DarkSlateBlue
+#0.70	0.80	NavyBlue
+#0.80	0.85	Blue
+#0.85	0.90	SkyBlue
+#0.80	0.92	MediumBlue
+#0.85	0.93 	DarkGreen
+#0.90	0.94	ForestGreen
+#0.91	0.95	YellowGreen
+#0.92	0.96	Gold
+#0.93 	0.97 	Yellow
+#0.94 	0.98 	Coral
+#0.95	0.91	Orange
+#0.95	0.985	MediumVioletRed
+#0.97 	0.995 	OrangeRed
+#0.98	1.00	Red
+#0.99	1.00	DarkRed
+
+

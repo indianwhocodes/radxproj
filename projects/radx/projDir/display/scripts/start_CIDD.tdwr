@@ -1,0 +1,19 @@
+#! /bin/csh
+
+# run tests on CfRadial files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+
+setenv RADAR_LAT 35.2761
+setenv RADAR_LON -97.5098
+setenv RADAR_NAME TOKC
+
+cd $HOME/cvs/projects/radx/projDir/display/params
+
+CIDD -p CIDD.tdwr
+
+
+
+
+
+

@@ -1,0 +1,22 @@
+#! /bin/csh
+
+# run tests on FORAY files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert FORAY to cfradial
+    
+RadxConvert -d -ag -f $RADX_DATA_DIR/examples/foray/timrex/20080602/ncswp_SPOLRVP8_20080602_060002.000_v072_s000_000.5_SUR_.nc -outdir $RADX_DATA_DIR/test/cfradial/foray/timrex -field SNR -field DBZ_F -field VEL_F -field WIDTH_F
+
+# convert back to FORAY
+
+RadxConvert -d -f $RADX_DATA_DIR/test/cfradial/foray/timrex/20080602/cfrad.20080602_060002.000_to_20080602_060712.000_SPOL_v72_SUR.nc -outdir $RADX_DATA_DIR/test/foray/timrex -foray
+
+# test for differences
+
+RadxDiff -d -ag -f1 $RADX_DATA_DIR/examples/foray/timrex/20080602/ncswp_SPOLRVP8_20080602_060002.000_v072_s000_000.5_SUR_.nc -f2 $RADX_DATA_DIR/test/foray/timrex/20080602/ncswp_SPOLRVP8_20080602_060002.000_v072_s000_000.5_SUR_.nc -out_path $OUTPATH -out_append -field1 SNR -field1 DBZ_F -field1 VEL_F -field1 WIDTH_F -field2 SNR  -field2 DBZ_F -field2 VEL_F -field2 WIDTH_F
+
+# test against reference
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/foray/timrex/20080602/cfrad.20080602_060002.000_to_20080602_060712.000_SPOL_v72_SUR.nc -f2 $RADX_DATA_DIR/reference/cfradial/foray/timrex/20080602/cfrad.20080602_060002.000_to_20080602_060712.000_SPOL_v72_SUR.nc -out_path $OUTPATH -out_append

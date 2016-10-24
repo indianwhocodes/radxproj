@@ -1,0 +1,20 @@
+#! /bin/csh
+
+# run tests on EEC cfradial files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert EEC to NCAR version of cfradial
+
+RadxConvert -d -f $RADX_DATA_DIR/examples/eec/20130313/EEC-20130313-144538-PPIVol.nc -outdir $RADX_DATA_DIR/test/cfradial/eec
+
+# test for differences
+
+RadxDiff -d -f1 $RADX_DATA_DIR/examples/eec/20130313/EEC-20130313-143034-PPIVol.nc -f2 $RADX_DATA_DIR/test/cfradial/eec/20130313/cfrad.20130313_143034.000_to_20130313_143535.000_EEC_v1_XXX.nc -out_path $OUTPATH -out_append
+
+# test against reference
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/eec/20130313/cfrad.20130313_143034.000_to_20130313_143535.000_EEC_v1_XXX.nc -f2 $RADX_DATA_DIR/reference/cfradial/eec/20130313/cfrad.20130313_143034.000_to_20130313_143535.000_EEC_v1_XXX.nc -out_path $OUTPATH -out_append
+
+

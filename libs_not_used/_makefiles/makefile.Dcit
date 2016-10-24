@@ -1,0 +1,45 @@
+#
+# Recursive make - makes the subdirectory code
+#
+
+include $(RAP_MAKE_INC_DIR)/rap_make_macros
+
+TARGETS = $(GENERAL_TARGETS) $(LIB_TARGETS) $(DOC_TARGETS) $(INSTALL_TARGETS)
+
+SUB_DIRS = \
+	Fmq \
+	Mdv \
+        Radx \
+        Spdb \
+	cfrd \
+        dataport \
+	didss \
+	dsdata \
+	dsserver \
+        euclid \
+	grib \
+	grib2 \
+	matrix \
+	mdv \
+	ncf \
+	perl5 \
+	physics \
+	python \
+	radar \
+	rapformats \
+	rapmath \
+        rapplot \
+        shapelib \
+	titan \
+        tdrp \
+        toolsa
+
+
+$(TARGETS): FORCE
+	$(MAKE) $(SUB_DIRS) TARGET=$@
+
+$(SUB_DIRS): FORCE
+	cd $@; $(MAKE) $(TARGET)
+
+FORCE:
+

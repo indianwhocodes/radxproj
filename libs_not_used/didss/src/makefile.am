@@ -1,0 +1,81 @@
+###############################################
+#
+# makefile template for automake
+#
+# library name: didss
+#
+# written by script createMakefile.am.lib
+#
+# created 2016-03-27 13:55:28.701976
+#
+###############################################
+
+# compile flags - include header subdirectory
+
+AM_CFLAGS = -I./include
+# NOTE: X11R6 is for Mac OSX location of XQuartz
+AM_CFLAGS += -I/usr/X11R6/include
+ACLOCAL_AMFLAGS = -I m4
+AM_CFLAGS += -I../../Fmq/src/include
+AM_CFLAGS += -I../../Mdv/src/include
+AM_CFLAGS += -I../../Radx/src/include
+AM_CFLAGS += -I../../Spdb/src/include
+AM_CFLAGS += -I../../dataport/src/include
+AM_CFLAGS += -I../../didss/src/include
+AM_CFLAGS += -I../../dsserver/src/include
+AM_CFLAGS += -I../../dsdata/src/include
+AM_CFLAGS += -I../../euclid/src/include
+AM_CFLAGS += -I../../physics/src/include
+AM_CFLAGS += -I../../radar/src/include
+AM_CFLAGS += -I../../rapformats/src/include
+AM_CFLAGS += -I../../rapmath/src/include
+AM_CFLAGS += -I../../tdrp/src/include
+AM_CFLAGS += -I../../toolsa/src/include
+AM_CFLAGS += -I../../kd/src/include
+
+AM_CXXFLAGS = $(AM_CFLAGS)
+
+# target library file
+
+lib_LTLIBRARIES = libdidss.la
+
+# headers to be installed
+
+includedir = $(prefix)/include/didss
+
+include_HEADERS = \
+	include/didss/DataFileNames.hh \
+	include/didss/DsAccess.hh \
+	include/didss/DsAccessFile.hh \
+	include/didss/DsDataFile.hh \
+	include/didss/DsInputPath.hh \
+	include/didss/DsMessage.hh \
+	include/didss/DsMsgPart.hh \
+	include/didss/DsTimeList.hh \
+	include/didss/DsURL.hh \
+	include/didss/DsUrlQueue.hh \
+	include/didss/IPAddress.hh \
+	include/didss/LdataInfo.hh \
+	include/didss/RapDataDir.hh \
+	include/didss/RapDataDir_r.hh \
+	include/didss/ds_input_path.h \
+	include/didss/ds_message.h \
+	include/didss/ds_msg_handle.h \
+	include/didss/rap_data_dir.h
+
+libdidss_la_SOURCES = \
+	DataFileNames/DataFileNames.cc \
+	DsInputPath/ds_input_path.c \
+	DsInputPath/DsInputPath.cc \
+	DsInputPath/DsDataFile.cc \
+	DsInputPath/DsTimeList.cc \
+	DsMessage/ds_message.c \
+	DsMessage/ds_msg_handle.c \
+	DsMessage/DsMessage.cc \
+	DsMessage/DsMsgPart.cc \
+	DsURL/DsURL.cc \
+	DsURL/DsUrlQueue.cc \
+	LdataInfo/LdataInfo.cc \
+	RapDataDir/RapDataDir.cc \
+	RapDataDir/RapDataDir_r.cc
+

@@ -1,0 +1,18 @@
+#! /bin/csh
+
+# run tests on Sigmet files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert SIGMET to cfradial
+
+RadxConvert -d -f $RADX_DATA_DIR/examples/sigmet/dynamo/20111016/SR1111016060158.RAWRL6R -outdir $RADX_DATA_DIR/test/cfradial/sigmet/dynamo
+
+# test for differences
+
+RadxDiff -d -f1 $RADX_DATA_DIR/examples/sigmet/dynamo/20111016/SR1111016060158.RAWRL6R -f2 $RADX_DATA_DIR/test/cfradial/sigmet/dynamo/20111016/cfrad.20111016_060200.891_to_20111016_060540.779_SMAR_v1_SUR.nc -out_path $OUTPATH -out_append
+
+# test against reference
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/sigmet/dynamo/20111016/cfrad.20111016_060200.891_to_20111016_060540.779_SMAR_v1_SUR.nc -f2 $RADX_DATA_DIR/reference/cfradial/sigmet/dynamo/20111016/cfrad.20111016_060200.891_to_20111016_060540.779_SMAR_v1_SUR.nc -out_path $OUTPATH -out_append

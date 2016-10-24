@@ -1,0 +1,52 @@
+#
+# Recursive make - makes the subdirectory code
+#
+
+include $(RAP_MAKE_INC_DIR)/rap_make_macros
+
+TARGETS = $(GENERAL_TARGETS) $(LIB_TARGETS) $(DOC_TARGETS) $(INSTALL_TARGETS)
+
+SUB_DIRS = \
+	ConvWx \
+	ConvWxBlending \
+	ConvWxParams \
+	Fmq \
+        Mdv \
+	NcfMdv \
+        Niwot \
+	Radx \
+	Spdb \
+	cospa_params \
+	cospa \
+	ctetwws \
+	dataport \
+	didss \
+	dsdata \
+	dsserver \
+	euclid \
+	grib \
+	grib2 \
+        ncf \
+	niwot \
+	niwot_basic \
+	niwot_util \
+	niwot_verif \
+	physics \
+	rapformats \
+	rapmath \
+	rapplot \
+	shapelib \
+	symprod \
+	tdrp \
+	tetwws \
+	titan \
+	toolsa
+
+$(TARGETS): FORCE
+	$(MAKE) $(SUB_DIRS) TARGET=$@
+
+$(SUB_DIRS): FORCE
+	cd $@; $(MAKE) $(TARGET)
+
+FORCE:
+

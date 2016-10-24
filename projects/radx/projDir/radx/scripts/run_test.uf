@@ -1,0 +1,22 @@
+#! /bin/csh
+
+# run tests on UF files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert UF to cfradial
+
+RadxConvert -d -f $RADX_DATA_DIR/examples/uf/kftg/20110714/20110714_011353_KFTG_v250_SUR.uf -outdir $RADX_DATA_DIR/test/cfradial/uf/kftg
+
+# convert back to UF
+
+RadxConvert -d -f $RADX_DATA_DIR/test/cfradial/uf/kftg/20110714/cfrad.20110714_010939.000_to_20110714_011353.000_KFTG_v250_SUR.nc -outdir $RADX_DATA_DIR/test/uf/kftg -uf
+
+# test for differences
+
+RadxDiff -d -f1 $RADX_DATA_DIR/examples/uf/kftg/20110714/20110714_011353_KFTG_v250_SUR.uf -f2 $RADX_DATA_DIR/test/uf/kftg/20110714/20110714_010939_KFTG_v250_SUR.uf -out_path $OUTPATH -out_append
+
+# test against reference
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/uf/kftg/20110714/cfrad.20110714_010939.000_to_20110714_011353.000_KFTG_v250_SUR.nc -f2 $RADX_DATA_DIR/reference/cfradial/uf/kftg/20110714/cfrad.20110714_010939.000_to_20110714_011353.000_KFTG_v250_SUR.nc -out_path $OUTPATH -out_append

@@ -1,0 +1,29 @@
+#
+# Recursive make for RAL libraries for SPOL
+#
+
+include $(RAP_MAKE_INC_DIR)/rap_make_macros
+
+TARGETS = $(GENERAL_TARGETS) $(LIB_TARGETS) $(DOC_TARGETS) $(INSTALL_TARGETS)
+
+SUB_DIRS = \
+	dataport \
+	didss \
+	dsserver \
+	euclid \
+	Fmq \
+	tdrp \
+	toolsa \
+	perl5 \
+	radar \
+	rapformats \
+	rapmath \
+	rvp8_rap
+
+include $(RAP_MAKE_INC_DIR)/rap_make_recursive_dir_targets
+
+
+
+
+
+

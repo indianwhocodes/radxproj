@@ -1,0 +1,17 @@
+###############################################
+#
+# makefile template for automake
+#
+# dir: ./libs/Spdb
+#
+# written by script createMakefile.am.recurse.py
+#
+# created 2016-03-27 13:55:28.491357
+#
+###############################################
+
+# subdirectories
+
+SUBDIRS = \
+	src
+

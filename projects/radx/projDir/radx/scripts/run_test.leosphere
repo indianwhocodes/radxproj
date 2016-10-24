@@ -1,0 +1,27 @@
+#! /bin/csh
+
+# run tests on LEOSPHERE files
+
+setenv RADX_DATA_DIR $HOME/data/radx
+#setenv OUTPATH /tmp/radx_test.out
+
+# convert LEOSPHERE to cfradial
+
+RadxConvert -d -f \
+  $RADX_DATA_DIR/examples/leosphere/WLS200S-19_2013_02_21__02_13_52_PPI.rtd \
+  $RADX_DATA_DIR/examples/leosphere/WLS200S-19_2013_02_21__02_14_22_PPI.rtd \
+  $RADX_DATA_DIR/examples/leosphere/WLS200S-19_2013_02_21__02_14_52_PPI.rtd \
+  $RADX_DATA_DIR/examples/leosphere/WLS200S-19_2013_02_21__02_15_23_PPI.rtd \
+  $RADX_DATA_DIR/examples/leosphere/WLS200S-19_2013_02_21__02_15_53_PPI.rtd \
+  $RADX_DATA_DIR/examples/leosphere/WLS200S-19_2013_02_21__02_16_24_PPI.rtd \
+  $RADX_DATA_DIR/examples/leosphere/WLS200S-19_2013_02_21__02_16_54_PPI.rtd \
+  $RADX_DATA_DIR/examples/leosphere/WLS200S-19_2013_02_21__02_17_25_PPI.rtd \
+  $RADX_DATA_DIR/examples/leosphere/WLS200S-19_2013_02_21__02_17_55_PPI.rtd \
+  $RADX_DATA_DIR/examples/leosphere/WLS200S-19_2013_02_21__02_18_26_PPI.rtd \
+  $RADX_DATA_DIR/examples/leosphere/WLS200S-19_2013_02_21__02_18_56_PPI.rtd \
+-ag_all -outdir $RADX_DATA_DIR/test/cfradial/leosphere
+
+# test against reference
+
+RadxDiff -d -f1 $RADX_DATA_DIR/test/cfradial/leosphere/20130221/cfrad.20130221_021351.710_to_20130221_021917.375_WLS2_v-1_PPI.nc -f2 $RADX_DATA_DIR/reference/cfradial/leosphere/20130221/cfrad.20130221_021351.710_to_20130221_021917.375_WLS2_v-1_PPI.nc -out_path $OUTPATH -out_append
+
