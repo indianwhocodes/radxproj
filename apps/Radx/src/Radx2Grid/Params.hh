@@ -69,7 +69,8 @@ public:
     INTERP_MODE_PPI = 1,
     INTERP_MODE_POLAR = 2,
     INTERP_MODE_CART_REORDER = 3,
-    INTERP_MODE_CART_SAT = 4
+    INTERP_MODE_CART_SAT = 4,
+    INTERP_MODE_CART_MAP = 5
   } interp_mode_t;
 
   typedef enum {
