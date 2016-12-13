@@ -38,6 +38,7 @@
 ///////////////////////////////////////////////////////////////
 
 #include "Radx2Grid.hh"
+#include "Radx2GridPlus.h"
 #include <signal.h>
 #include <new>
 #include <iostream>
@@ -47,7 +48,8 @@ using namespace std;
 
 static void tidy_and_exit (int sig);
 static void out_of_store();
-static Radx2Grid *Prog = NULL;
+//static Radx2Grid *Prog = NULL;
+static Radx2GridPlus *Prog = NULL;
 
 // main
 
@@ -57,7 +59,9 @@ int main(int argc, char **argv)
 
   // create program object
 
-  Prog = new Radx2Grid(argc, argv);
+//  Prog = new Radx2Grid(argc, argv);
+
+    Prog = new Radx2GridPlus(argc, argv);
   if (!Prog->OK) {
     cerr << "Error: Could not create Radx2Grid object." << endl;
     return(-1);

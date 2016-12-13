@@ -1318,7 +1318,7 @@ using namespace std;
     tt->help = tdrpStrDup("\nINTERP_MODE_CART: interpolate onto a 3-D Cartesian grid. This is equivalent to the old SPRINT application.\n\nINTERP_MODE_PPI: interpolate onto a 2-D Cartesian grid, preserving original radar elevation angles in the vertical. Also replaces SPRINT.\n\nINTERP_MODE_POLAR: interpolate onto a regular azimuth angle grid, preserving the elevation angles.\n\nINTERP_MODE_CART_REORDER: interpolate onto 3-D Cartesian grid using the reorder strategy - should only be used for MOVING platforms - DO NOT USE for FIXED platform, use INTERP_MODE_CART instead.\n\nINTERP_MODE_SAT: interpolate onto a grid, with a specified width along the satellite track.");
     tt->val_offset = (char *) &interp_mode - &_start_;
     tt->enum_def.name = tdrpStrDup("interp_mode_t");
-    tt->enum_def.nfields = 5;
+    tt->enum_def.nfields = 6; //tt->enum_def.nfields = 5;
     tt->enum_def.fields = (enum_field_t *)
         tdrpMalloc(tt->enum_def.nfields * sizeof(enum_field_t));
       tt->enum_def.fields[0].name = tdrpStrDup("INTERP_MODE_CART");
@@ -1331,6 +1331,8 @@ using namespace std;
       tt->enum_def.fields[3].val = INTERP_MODE_CART_REORDER;
       tt->enum_def.fields[4].name = tdrpStrDup("INTERP_MODE_CART_SAT");
       tt->enum_def.fields[4].val = INTERP_MODE_CART_SAT;
+      tt->enum_def.fields[5].name = tdrpStrDup("INTERP_MODE_NEW");
+      tt->enum_def.fields[5].val = INTERP_MODE_NEW;
     tt->single_val.e = INTERP_MODE_CART;
     tt++;
     
