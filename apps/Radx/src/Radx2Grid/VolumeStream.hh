@@ -26,7 +26,7 @@ class VolumeStream{
 	//Fuctions decide later	
 
 	public:
-	    void processFile();
+	    void fillFromFile();
 }
 
 #endif

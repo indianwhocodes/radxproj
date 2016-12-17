@@ -9,7 +9,7 @@ VolumeStream:: VolumeStream(string input_file){
 	//Intialize all to INVALID_DATA	(macro above)
 }
 
-VolumeStream::processFile()
+VolumeStream::fillFromFile()
 {
 	//Fill VolumeStream member variables from the input file
 }

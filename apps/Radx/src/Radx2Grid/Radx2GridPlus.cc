@@ -10,7 +10,7 @@ Radx2GridPlus:: Radx2GridPlus(string pname){
 int Radx2GridPlus:: processFile(const string filename, const Params &params ){
 
 	VolumeStream vs(filename);
-	vs.processFile();
+	vs.fillFromFile();
 
 	_no_of_fields = params.selected_fields_n;
 
@@ -23,7 +23,11 @@ int Radx2GridPlus:: processFile(const string filename, const Params &params ){
 
 	//vp_set is then used to form grid set where each VolumePoint corresponds to each Grid in a GridSet.
 	GridSet g(vp_res,params.grid_z_geom, params.grid_xy_geom);
-	g.interpolateEachPoint();	
+	vector<Grid *> gcell_res = g.fill();	
+
+	//gcell_res need to be written into final output file.
+
+
 	
 }
 
