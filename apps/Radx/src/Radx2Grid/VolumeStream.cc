@@ -1,3 +1,7 @@
+/******************************************************* 
+*	Author: Amarjit Kumar Singh - amarnitdgp@gmail.com *		
+*	Date :  12/15/2016 								   *
+********************************************************/
 
 
 #include "VolumeStream.hh"

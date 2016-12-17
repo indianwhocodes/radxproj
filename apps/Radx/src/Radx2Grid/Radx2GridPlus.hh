@@ -1,3 +1,8 @@
+/******************************************************* 
+*	Author: Amarjit Kumar Singh - amarnitdgp@gmail.com *		
+*	Date :  12/15/2016 								   *
+********************************************************/
+
 #ifndef Radx2GridPlus_hh
 #define Radx2GridPlus_hh
 
