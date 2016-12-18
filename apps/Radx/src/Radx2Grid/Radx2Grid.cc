@@ -37,6 +37,7 @@
 ///////////////////////////////////////////////////////////////
 
 #include "Radx2Grid.hh"
+#include "Radx2GridPlus.hh"
 #include "OutputMdv.hh"
 #include <toolsa/umisc.h>
 #include <toolsa/pmu.h>
@@ -365,10 +366,15 @@ int Radx2Grid::_processFile(const string &filePath)
     } else if (_params.interp_mode == Params::INTERP_MODE_CART_SAT) {
       _allocSatInterp();
       _satInterp->interpVol();
-    } else {
+    } else if (_params.interp_mode == Params::INTERP_MODE_CART) {
       _allocCartInterp();
       _cartInterp->setRhiMode(false);
       _cartInterp->interpVol();
+    } else {
+      Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Grid");
+      radx2GridPlus.processFile("Radx2Grid", _params);
+      exit(0);
+
     }
   }
 

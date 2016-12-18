@@ -1331,8 +1331,8 @@ using namespace std;
       tt->enum_def.fields[3].val = INTERP_MODE_CART_REORDER;
       tt->enum_def.fields[4].name = tdrpStrDup("INTERP_MODE_CART_SAT");
       tt->enum_def.fields[4].val = INTERP_MODE_CART_SAT;
-      tt->enum_def.fields[5].name = tdrpStrDup("INTERP_MODE_NEW");
-      tt->enum_def.fields[5].val = INTERP_MODE_NEW;
+      tt->enum_def.fields[5].name = tdrpStrDup("INTERP_MODE_CART_MAP");
+      tt->enum_def.fields[5].val = INTERP_MODE_CART_MAP;
     tt->single_val.e = INTERP_MODE_CART;
     tt++;
     
