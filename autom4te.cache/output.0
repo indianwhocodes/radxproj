@@ -595,7 +595,6 @@ PACKAGE_STRING='radx 1.0'
 PACKAGE_BUGREPORT='http://www.ral.ucar.edu/projects/titan/docs'
 PACKAGE_URL=''
 
-ac_unique_file="libs/Radx/src/include/Radx/Radx.hh"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -3061,8 +3060,6 @@ am__tar='$${TAR-tar} chof - "$$tardir"' am__untar='$${TAR-tar} xf -'
 
 
 
-# Check for the existance of this file before proceeding.
-
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking user options" >&5
 $as_echo "$as_me: checking user options" >&6;}
@@ -3113,6 +3110,9 @@ if test ! "x$NETCDFDIR" = x; then
    LDFLAGS="${LDFLAGS} -L${NETCDFDIR}/lib"
    CPPFLAGS="${CPPFLAGS} -I${NETCDFDIR}/include"
 fi    
+
+# Check for the existance of this file before proceeding.
+# AC_CONFIG_SRCDIR([${NETCDFDIR}/include/Radx/Radx.hh])
 
 # add lib dir relative to ORIGIN
 # Note: @S|@ is a quadrigraph for $
@@ -16663,7 +16663,7 @@ done
 
 # create makefiles
 
-ac_config_files="$ac_config_files makefile libs/makefile libs/Fmq/makefile libs/Fmq/src/makefile libs/Mdv/makefile libs/Mdv/src/makefile libs/Radx/makefile libs/Radx/src/makefile libs/Spdb/makefile libs/Spdb/src/makefile libs/dataport/makefile libs/dataport/src/makefile libs/didss/makefile libs/didss/src/makefile libs/dsserver/makefile libs/dsserver/src/makefile libs/dsdata/makefile libs/dsdata/src/makefile libs/euclid/makefile libs/euclid/src/makefile libs/physics/makefile libs/physics/src/makefile libs/radar/makefile libs/radar/src/makefile libs/rapformats/makefile libs/rapformats/src/makefile libs/rapmath/makefile libs/rapmath/src/makefile libs/tdrp/makefile libs/tdrp/src/makefile libs/toolsa/makefile libs/toolsa/src/makefile libs/kd/makefile libs/kd/src/makefile apps/makefile apps/Radx/makefile apps/Radx/src/makefile apps/Radx/src/Dsr2Radx/makefile apps/Radx/src/FixCfradialPaths/makefile apps/Radx/src/FixRadxPointing/makefile apps/Radx/src/Radx2Dsr/makefile apps/Radx/src/Radx2Grid/makefile apps/Radx/src/RadxCheck/makefile apps/Radx/src/RadxClutMon/makefile apps/Radx/src/RadxConvert/makefile apps/Radx/src/RadxCov2Mom/makefile apps/Radx/src/RadxDiff/makefile apps/Radx/src/RadxDwellCombine/makefile apps/Radx/src/RadxEvad/makefile apps/Radx/src/RadxFilter/makefile apps/Radx/src/RadxMergeFields/makefile apps/Radx/src/RadxMon/makefile apps/Radx/src/RadxPartRain/makefile apps/Radx/src/RadxPrint/makefile apps/Radx/src/RadxSunMon/makefile apps/Radx/src/RadxQpe/makefile apps/tdrp/makefile apps/tdrp/src/makefile apps/tdrp/src/tdrp_gen/makefile apps/tdrp/src/tdrp_test/makefile apps/tdrp/src/TdrpTest/makefile"
+ac_config_files="$ac_config_files makefile apps/makefile apps/Radx/makefile apps/Radx/src/makefile apps/Radx/src/Radx2Grid/makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -17777,66 +17777,10 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "makefile") CONFIG_FILES="$CONFIG_FILES makefile" ;;
-    "libs/makefile") CONFIG_FILES="$CONFIG_FILES libs/makefile" ;;
-    "libs/Fmq/makefile") CONFIG_FILES="$CONFIG_FILES libs/Fmq/makefile" ;;
-    "libs/Fmq/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/Fmq/src/makefile" ;;
-    "libs/Mdv/makefile") CONFIG_FILES="$CONFIG_FILES libs/Mdv/makefile" ;;
-    "libs/Mdv/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/Mdv/src/makefile" ;;
-    "libs/Radx/makefile") CONFIG_FILES="$CONFIG_FILES libs/Radx/makefile" ;;
-    "libs/Radx/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/Radx/src/makefile" ;;
-    "libs/Spdb/makefile") CONFIG_FILES="$CONFIG_FILES libs/Spdb/makefile" ;;
-    "libs/Spdb/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/Spdb/src/makefile" ;;
-    "libs/dataport/makefile") CONFIG_FILES="$CONFIG_FILES libs/dataport/makefile" ;;
-    "libs/dataport/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/dataport/src/makefile" ;;
-    "libs/didss/makefile") CONFIG_FILES="$CONFIG_FILES libs/didss/makefile" ;;
-    "libs/didss/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/didss/src/makefile" ;;
-    "libs/dsserver/makefile") CONFIG_FILES="$CONFIG_FILES libs/dsserver/makefile" ;;
-    "libs/dsserver/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/dsserver/src/makefile" ;;
-    "libs/dsdata/makefile") CONFIG_FILES="$CONFIG_FILES libs/dsdata/makefile" ;;
-    "libs/dsdata/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/dsdata/src/makefile" ;;
-    "libs/euclid/makefile") CONFIG_FILES="$CONFIG_FILES libs/euclid/makefile" ;;
-    "libs/euclid/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/euclid/src/makefile" ;;
-    "libs/physics/makefile") CONFIG_FILES="$CONFIG_FILES libs/physics/makefile" ;;
-    "libs/physics/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/physics/src/makefile" ;;
-    "libs/radar/makefile") CONFIG_FILES="$CONFIG_FILES libs/radar/makefile" ;;
-    "libs/radar/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/radar/src/makefile" ;;
-    "libs/rapformats/makefile") CONFIG_FILES="$CONFIG_FILES libs/rapformats/makefile" ;;
-    "libs/rapformats/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/rapformats/src/makefile" ;;
-    "libs/rapmath/makefile") CONFIG_FILES="$CONFIG_FILES libs/rapmath/makefile" ;;
-    "libs/rapmath/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/rapmath/src/makefile" ;;
-    "libs/tdrp/makefile") CONFIG_FILES="$CONFIG_FILES libs/tdrp/makefile" ;;
-    "libs/tdrp/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/tdrp/src/makefile" ;;
-    "libs/toolsa/makefile") CONFIG_FILES="$CONFIG_FILES libs/toolsa/makefile" ;;
-    "libs/toolsa/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/toolsa/src/makefile" ;;
-    "libs/kd/makefile") CONFIG_FILES="$CONFIG_FILES libs/kd/makefile" ;;
-    "libs/kd/src/makefile") CONFIG_FILES="$CONFIG_FILES libs/kd/src/makefile" ;;
     "apps/makefile") CONFIG_FILES="$CONFIG_FILES apps/makefile" ;;
     "apps/Radx/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/makefile" ;;
     "apps/Radx/src/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/makefile" ;;
-    "apps/Radx/src/Dsr2Radx/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/Dsr2Radx/makefile" ;;
-    "apps/Radx/src/FixCfradialPaths/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/FixCfradialPaths/makefile" ;;
-    "apps/Radx/src/FixRadxPointing/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/FixRadxPointing/makefile" ;;
-    "apps/Radx/src/Radx2Dsr/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/Radx2Dsr/makefile" ;;
     "apps/Radx/src/Radx2Grid/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/Radx2Grid/makefile" ;;
-    "apps/Radx/src/RadxCheck/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxCheck/makefile" ;;
-    "apps/Radx/src/RadxClutMon/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxClutMon/makefile" ;;
-    "apps/Radx/src/RadxConvert/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxConvert/makefile" ;;
-    "apps/Radx/src/RadxCov2Mom/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxCov2Mom/makefile" ;;
-    "apps/Radx/src/RadxDiff/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxDiff/makefile" ;;
-    "apps/Radx/src/RadxDwellCombine/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxDwellCombine/makefile" ;;
-    "apps/Radx/src/RadxEvad/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxEvad/makefile" ;;
-    "apps/Radx/src/RadxFilter/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxFilter/makefile" ;;
-    "apps/Radx/src/RadxMergeFields/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxMergeFields/makefile" ;;
-    "apps/Radx/src/RadxMon/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxMon/makefile" ;;
-    "apps/Radx/src/RadxPartRain/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxPartRain/makefile" ;;
-    "apps/Radx/src/RadxPrint/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxPrint/makefile" ;;
-    "apps/Radx/src/RadxSunMon/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxSunMon/makefile" ;;
-    "apps/Radx/src/RadxQpe/makefile") CONFIG_FILES="$CONFIG_FILES apps/Radx/src/RadxQpe/makefile" ;;
-    "apps/tdrp/makefile") CONFIG_FILES="$CONFIG_FILES apps/tdrp/makefile" ;;
-    "apps/tdrp/src/makefile") CONFIG_FILES="$CONFIG_FILES apps/tdrp/src/makefile" ;;
-    "apps/tdrp/src/tdrp_gen/makefile") CONFIG_FILES="$CONFIG_FILES apps/tdrp/src/tdrp_gen/makefile" ;;
-    "apps/tdrp/src/tdrp_test/makefile") CONFIG_FILES="$CONFIG_FILES apps/tdrp/src/tdrp_test/makefile" ;;
-    "apps/tdrp/src/TdrpTest/makefile") CONFIG_FILES="$CONFIG_FILES apps/tdrp/src/TdrpTest/makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

@@ -81,7 +81,8 @@ LDADD += -lbz2
 LDADD += -lpthread
 LDADD += -lexpat
 LDADD += -lm
-LDADD += -lfftw3
+LDADD += -lmkl_rt
+LDADD += -ldl
 
 # set app name
 
