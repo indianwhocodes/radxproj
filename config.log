@@ -190,567 +190,6 @@ configure:6103: found /usr/bin/ranlib
 configure:6114: result: ranlib
 configure:6216: checking command to parse /usr/bin/nm -B output from icc object
 configure:6369: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:6372: $? = 0
-configure:6376: /usr/bin/nm -B conftest.o \| sed -n -e 's/^.*[ ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[ ][ ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' | sed '/ __gnu_lto/d' \> conftest.nm
-configure:6379: $? = 0
-configure:6445: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib conftest.c conftstm.o >&5
-configure:6448: $? = 0
-configure:6486: result: ok
-configure:6533: checking for sysroot
-configure:6563: result: no
-configure:6570: checking for a working dd
-configure:6608: result: /usr/bin/dd
-configure:6612: checking how to truncate binary pipes
-configure:6627: result: /usr/bin/dd bs=4096 count=1
-configure:6763: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:6766: $? = 0
-configure:6956: checking for mt
-configure:6986: result: no
-configure:7006: checking if : is a manifest tool
-configure:7012: : '-?'
-configure:7020: result: no
-configure:7697: checking how to run the C preprocessor
-configure:7728: icc -E  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c
-configure:7728: $? = 0
-configure:7742: icc -E  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c
-conftest.c(11): error #2379: cannot open source file "ac_nonexistent.h"
-  #include <ac_nonexistent.h>
-                             ^
-
-configure:7742: $? = 2
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "radx"
-| #define PACKAGE_TARNAME "radx"
-| #define PACKAGE_VERSION "1.0"
-| #define PACKAGE_STRING "radx 1.0"
-| #define PACKAGE_BUGREPORT "http://www.ral.ucar.edu/projects/titan/docs"
-| #define PACKAGE_URL ""
-| #define PACKAGE "radx"
-| #define VERSION "1.0"
-| /* end confdefs.h.  */
-| #include <ac_nonexistent.h>
-configure:7767: result: icc -E
-configure:7787: icc -E  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c
-configure:7787: $? = 0
-configure:7801: icc -E  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c
-conftest.c(11): error #2379: cannot open source file "ac_nonexistent.h"
-  #include <ac_nonexistent.h>
-                             ^
-
-configure:7801: $? = 2
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "radx"
-| #define PACKAGE_TARNAME "radx"
-| #define PACKAGE_VERSION "1.0"
-| #define PACKAGE_STRING "radx 1.0"
-| #define PACKAGE_BUGREPORT "http://www.ral.ucar.edu/projects/titan/docs"
-| #define PACKAGE_URL ""
-| #define PACKAGE "radx"
-| #define VERSION "1.0"
-| /* end confdefs.h.  */
-| #include <ac_nonexistent.h>
-configure:7830: checking for ANSI C header files
-configure:7850: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:7850: $? = 0
-configure:7923: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib conftest.c  >&5
-configure:7923: $? = 0
-configure:7923: ./conftest
-configure:7923: $? = 0
-configure:7934: result: yes
-configure:7947: checking for sys/types.h
-configure:7947: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:7947: $? = 0
-configure:7947: result: yes
-configure:7947: checking for sys/stat.h
-configure:7947: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:7947: $? = 0
-configure:7947: result: yes
-configure:7947: checking for stdlib.h
-configure:7947: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:7947: $? = 0
-configure:7947: result: yes
-configure:7947: checking for string.h
-configure:7947: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:7947: $? = 0
-configure:7947: result: yes
-configure:7947: checking for memory.h
-configure:7947: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:7947: $? = 0
-configure:7947: result: yes
-configure:7947: checking for strings.h
-configure:7947: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:7947: $? = 0
-configure:7947: result: yes
-configure:7947: checking for inttypes.h
-configure:7947: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:7947: $? = 0
-configure:7947: result: yes
-configure:7947: checking for stdint.h
-configure:7947: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:7947: $? = 0
-configure:7947: result: yes
-configure:7947: checking for unistd.h
-configure:7947: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:7947: $? = 0
-configure:7947: result: yes
-configure:7961: checking for dlfcn.h
-configure:7961: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:7961: $? = 0
-configure:7961: result: yes
-configure:8217: checking for objdir
-configure:8232: result: .libs
-configure:8496: checking if icc supports -fno-rtti -fno-exceptions
-configure:8514: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include -fno-rtti -fno-exceptions conftest.c >&5
-configure:8518: $? = 0
-configure:8531: result: yes
-configure:8889: checking for icc option to produce PIC
-configure:8896: result: -fPIC -DPIC
-configure:8904: checking if icc PIC flag -fPIC -DPIC works
-configure:8922: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include -fPIC -DPIC -DPIC conftest.c >&5
-configure:8926: $? = 0
-configure:8939: result: yes
-configure:8968: checking if icc static flag -static works
-configure:8996: result: no
-configure:9011: checking if icc supports -c -o file.o
-configure:9032: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include -o out/conftest2.o conftest.c >&5
-configure:9036: $? = 0
-configure:9058: result: yes
-configure:9066: checking if icc supports -c -o file.o
-configure:9113: result: yes
-configure:9146: checking whether the icc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries
-configure:10405: result: yes
-configure:10442: checking whether -lc should be explicitly linked in
-configure:10450: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:10453: $? = 0
-configure:10468: icc -shared  -fPIC -DPIC conftest.o  -v -Wl,-soname -Wl,conftest -o conftest 2\>\&1 \| /usr/bin/grep  -lc  \>/dev/null 2\>\&1
-configure:10471: $? = 0
-configure:10485: result: no
-configure:10645: checking dynamic linker characteristics
-configure:11226: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib -Wl,-rpath -Wl,/foo conftest.c  >&5
-configure:11226: $? = 0
-configure:11463: result: GNU/Linux ld.so
-configure:11585: checking how to hardcode library paths into programs
-configure:11610: result: immediate
-configure:12158: checking whether stripping libraries is possible
-configure:12163: result: yes
-configure:12198: checking if libtool supports shared libraries
-configure:12200: result: yes
-configure:12203: checking whether to build shared libraries
-configure:12228: result: yes
-configure:12231: checking whether to build static libraries
-configure:12235: result: yes
-configure:12324: checking for gcc
-configure:12351: result: icc
-configure:12580: checking for C compiler version
-configure:12589: icc --version >&5
-icc (ICC) 17.0.1 20161005
-Copyright (C) 1985-2016 Intel Corporation.  All rights reserved.
-
-configure:12600: $? = 0
-configure:12589: icc -v >&5
-icc version 17.0.1 (gcc version 4.8.5 compatibility)
-configure:12600: $? = 0
-configure:12589: icc -V >&5
-Intel(R) C Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 17.0.1.132 Build 20161005
-Copyright (C) 1985-2016 Intel Corporation.  All rights reserved.
-
-configure:12600: $? = 0
-configure:12589: icc -qversion >&5
-icc: command line warning #10006: ignoring unknown option '-qversion'
-icc: command line error: no files specified; for help type "icc -help"
-configure:12600: $? = 1
-configure:12604: checking whether we are using the GNU C compiler
-configure:12632: result: yes
-configure:12641: checking whether icc accepts -g
-configure:12702: result: yes
-configure:12719: checking for icc option to accept ISO C89
-configure:12795: result: none needed
-configure:12817: checking dependency style of icc
-configure:12928: result: gcc3
-configure:13055: checking for C++ compiler version
-configure:13064: icpc --version >&5
-icpc (ICC) 17.0.1 20161005
-Copyright (C) 1985-2016 Intel Corporation.  All rights reserved.
-
-configure:13075: $? = 0
-configure:13064: icpc -v >&5
-icpc version 17.0.1 (gcc version 4.8.5 compatibility)
-configure:13075: $? = 0
-configure:13064: icpc -V >&5
-Intel(R) C++ Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 17.0.1.132 Build 20161005
-Copyright (C) 1985-2016 Intel Corporation.  All rights reserved.
-
-configure:13075: $? = 0
-configure:13064: icpc -qversion >&5
-icpc: command line warning #10006: ignoring unknown option '-qversion'
-icpc: command line error: no files specified; for help type "icpc -help"
-configure:13075: $? = 1
-configure:13079: checking whether we are using the GNU C++ compiler
-configure:13098: icpc -c -std=c++14 -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.cpp >&5
-configure:13098: $? = 0
-configure:13107: result: yes
-configure:13116: checking whether icpc accepts -g
-configure:13136: icpc -c -g  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.cpp >&5
-configure:13136: $? = 0
-configure:13177: result: yes
-configure:13202: checking dependency style of icpc
-configure:13313: result: gcc3
-configure:13346: checking how to run the C++ preprocessor
-configure:13373: icpc -E  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.cpp
-configure:13373: $? = 0
-configure:13387: icpc -E  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.cpp
-conftest.cpp(23): error #2379: cannot open source file "ac_nonexistent.h"
-  #include <ac_nonexistent.h>
-                             ^
-
-configure:13387: $? = 2
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "radx"
-| #define PACKAGE_TARNAME "radx"
-| #define PACKAGE_VERSION "1.0"
-| #define PACKAGE_STRING "radx 1.0"
-| #define PACKAGE_BUGREPORT "http://www.ral.ucar.edu/projects/titan/docs"
-| #define PACKAGE_URL ""
-| #define PACKAGE "radx"
-| #define VERSION "1.0"
-| #define STDC_HEADERS 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_MEMORY_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_DLFCN_H 1
-| #define LT_OBJDIR ".libs/"
-| /* end confdefs.h.  */
-| #include <ac_nonexistent.h>
-configure:13412: result: icpc -E
-configure:13432: icpc -E  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.cpp
-configure:13432: $? = 0
-configure:13446: icpc -E  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.cpp
-conftest.cpp(23): error #2379: cannot open source file "ac_nonexistent.h"
-  #include <ac_nonexistent.h>
-                             ^
-
-configure:13446: $? = 2
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "radx"
-| #define PACKAGE_TARNAME "radx"
-| #define PACKAGE_VERSION "1.0"
-| #define PACKAGE_STRING "radx 1.0"
-| #define PACKAGE_BUGREPORT "http://www.ral.ucar.edu/projects/titan/docs"
-| #define PACKAGE_URL ""
-| #define PACKAGE "radx"
-| #define VERSION "1.0"
-| #define STDC_HEADERS 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_MEMORY_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_DLFCN_H 1
-| #define LT_OBJDIR ".libs/"
-| /* end confdefs.h.  */
-| #include <ac_nonexistent.h>
-configure:13608: checking for ld used by icpc
-configure:13675: result: /usr/bin/ld -m elf_x86_64
-configure:13682: checking if the linker (/usr/bin/ld -m elf_x86_64) is GNU ld
-configure:13697: result: yes
-configure:13752: checking whether the icpc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries
-configure:14825: result: yes
-configure:14861: icpc -c -std=c++14 -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.cpp >&5
-configure:14864: $? = 0
-configure:15345: checking for icpc option to produce PIC
-configure:15352: result: -fPIC -DPIC
-configure:15360: checking if icpc PIC flag -fPIC -DPIC works
-configure:15378: icpc -c -std=c++14 -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include -fPIC -DPIC -DPIC conftest.cpp >&5
-configure:15382: $? = 0
-configure:15395: result: yes
-configure:15418: checking if icpc static flag -static works
-configure:15446: result: no
-configure:15458: checking if icpc supports -c -o file.o
-configure:15479: icpc -c -std=c++14 -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include -o out/conftest2.o conftest.cpp >&5
-configure:15483: $? = 0
-configure:15505: result: yes
-configure:15510: checking if icpc supports -c -o file.o
-configure:15557: result: yes
-configure:15587: checking whether the icpc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries
-configure:15627: result: yes
-configure:15768: checking dynamic linker characteristics
-configure:16513: result: GNU/Linux ld.so
-configure:16578: checking how to hardcode library paths into programs
-configure:16603: result: immediate
-configure:16649: checking sys/time.h usability
-configure:16649: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:16649: $? = 0
-configure:16649: result: yes
-configure:16649: checking sys/time.h presence
-configure:16649: icc -E  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c
-configure:16649: $? = 0
-configure:16649: result: yes
-configure:16649: checking for sys/time.h
-configure:16649: result: yes
-configure:16661: checking for stdbool.h that conforms to C99
-configure:16728: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:16728: $? = 0
-configure:16735: result: yes
-configure:16737: checking for _Bool
-configure:16737: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:16737: $? = 0
-configure:16737: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-conftest.c(60): error: expected an expression
-  if (sizeof ((_Bool)))
-                     ^
-
-compilation aborted for conftest.c (code 2)
-configure:16737: $? = 2
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "radx"
-| #define PACKAGE_TARNAME "radx"
-| #define PACKAGE_VERSION "1.0"
-| #define PACKAGE_STRING "radx 1.0"
-| #define PACKAGE_BUGREPORT "http://www.ral.ucar.edu/projects/titan/docs"
-| #define PACKAGE_URL ""
-| #define PACKAGE "radx"
-| #define VERSION "1.0"
-| #define STDC_HEADERS 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_MEMORY_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_DLFCN_H 1
-| #define LT_OBJDIR ".libs/"
-| #define HAVE_SYS_TIME_H 1
-| /* end confdefs.h.  */
-| #include <stdio.h>
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef STDC_HEADERS
-| # include <stdlib.h>
-| # include <stddef.h>
-| #else
-| # ifdef HAVE_STDLIB_H
-| #  include <stdlib.h>
-| # endif
-| #endif
-| #ifdef HAVE_STRING_H
-| # if !defined STDC_HEADERS && defined HAVE_MEMORY_H
-| #  include <memory.h>
-| # endif
-| # include <string.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| int
-| main ()
-| {
-| if (sizeof ((_Bool)))
-| 	    return 0;
-|   ;
-|   return 0;
-| }
-configure:16737: result: yes
-configure:16754: checking for an ANSI C-conforming const
-configure:16820: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:16820: $? = 0
-configure:16827: result: yes
-configure:16835: checking for inline
-configure:16851: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:16851: $? = 0
-configure:16859: result: inline
-configure:16877: checking for size_t
-configure:16877: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:16877: $? = 0
-configure:16877: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-conftest.c(62): error: expected an expression
-  if (sizeof ((size_t)))
-                      ^
-
-compilation aborted for conftest.c (code 2)
-configure:16877: $? = 2
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "radx"
-| #define PACKAGE_TARNAME "radx"
-| #define PACKAGE_VERSION "1.0"
-| #define PACKAGE_STRING "radx 1.0"
-| #define PACKAGE_BUGREPORT "http://www.ral.ucar.edu/projects/titan/docs"
-| #define PACKAGE_URL ""
-| #define PACKAGE "radx"
-| #define VERSION "1.0"
-| #define STDC_HEADERS 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_MEMORY_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_DLFCN_H 1
-| #define LT_OBJDIR ".libs/"
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE__BOOL 1
-| #define HAVE_STDBOOL_H 1
-| /* end confdefs.h.  */
-| #include <stdio.h>
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef STDC_HEADERS
-| # include <stdlib.h>
-| # include <stddef.h>
-| #else
-| # ifdef HAVE_STDLIB_H
-| #  include <stdlib.h>
-| # endif
-| #endif
-| #ifdef HAVE_STRING_H
-| # if !defined STDC_HEADERS && defined HAVE_MEMORY_H
-| #  include <memory.h>
-| # endif
-| # include <string.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| int
-| main ()
-| {
-| if (sizeof ((size_t)))
-| 	    return 0;
-|   ;
-|   return 0;
-| }
-configure:16877: result: yes
-configure:16888: checking whether time.h and sys/time.h may both be included
-configure:16908: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:16908: $? = 0
-configure:16915: result: yes
-configure:16923: checking whether struct tm is in sys/time.h or time.h
-configure:16943: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:16943: $? = 0
-configure:16950: result: time.h
-configure:16960: checking for ANSI C header files
-configure:17064: result: yes
-configure:17072: checking whether lstat correctly handles trailing slash
-configure:17098: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib conftest.c  >&5
-configure:17098: $? = 0
-configure:17098: ./conftest
-configure:17098: $? = 0
-configure:17115: result: yes
-configure:17134: checking whether stat accepts an empty string
-configure:17154: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib conftest.c  >&5
-configure:17154: $? = 0
-configure:17154: ./conftest
-configure:17154: $? = 0
-configure:17164: result: no
-configure:17186: checking for utime.h
-configure:17186: icc -c -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include conftest.c >&5
-configure:17186: $? = 0
-configure:17186: result: yes
-configure:17200: checking whether utime accepts a null argument
-configure:17229: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib conftest.c  >&5
-configure:17229: $? = 0
-configure:17229: ./conftest
-configure:17229: $? = 0
-configure:17239: result: yes
-configure:17252: checking for floor
-configure:17252: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib conftest.c  >&5
-configure:17252: $? = 0
-configure:17252: result: yes
-configure:17252: checking for gettimeofday
-configure:17252: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib conftest.c  >&5
-configure:17252: $? = 0
-configure:17252: result: yes
-configure:17252: checking for memset
-configure:17252: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib conftest.c  >&5
-configure:17252: $? = 0
-configure:17252: result: yes
-configure:17252: checking for modf
-configure:17252: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib conftest.c  >&5
-configure:17252: $? = 0
-configure:17252: result: yes
-configure:17252: checking for pow
-configure:17252: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib conftest.c  >&5
-configure:17252: $? = 0
-configure:17252: result: yes
-configure:17252: checking for strerror
-configure:17252: icc -o conftest -O3 -xMIC-AVX512 -ip  -I/home/jtang8756/build/include -I/home/jtang8756/build/include  -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib conftest.c  >&5
-configure:17252: $? = 0
-configure:17252: result: yes
-configure:17380: checking that generated files are newer than configure
-configure:17386: result: done
-configure:17417: creating ./config.status
-
-## ---------------------- ##
-## Running config.status. ##
-## ---------------------- ##
-
-This file was extended by radx config.status 1.0, which was
-generated by GNU Autoconf 2.69.  Invocation command line was
-
-  CONFIG_FILES    = 
-  CONFIG_HEADERS  = 
-  CONFIG_LINKS    = 
-  CONFIG_COMMANDS = 
-  $ ./config.status 
-
-on knl-data.ufhpc
-
-config.status:1166: creating makefile
-config.status:1166: creating apps/makefile
-config.status:1166: creating apps/Radx/makefile
-config.status:1166: creating apps/Radx/src/makefile
-config.status:1166: creating apps/Radx/src/Radx2Grid/makefile
-config.status:1166: creating config.h
-config.status:1347: config.h is unchanged
-config.status:1395: executing depfiles commands
-config.status:1395: executing libtool commands
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -758,9 +197,6 @@ config.status:1395: executing libtool commands
 
 ac_cv_build=x86_64-unknown-linux-gnu
 ac_cv_c_compiler_gnu=yes
-ac_cv_c_const=yes
-ac_cv_c_inline=inline
-ac_cv_cxx_compiler_gnu=yes
 ac_cv_env_CCC_set=
 ac_cv_env_CCC_value=
 ac_cv_env_CC_set=set
@@ -789,30 +225,6 @@ ac_cv_env_host_alias_set=
 ac_cv_env_host_alias_value=
 ac_cv_env_target_alias_set=
 ac_cv_env_target_alias_value=
-ac_cv_func_floor=yes
-ac_cv_func_gettimeofday=yes
-ac_cv_func_lstat_dereferences_slashed_symlink=yes
-ac_cv_func_memset=yes
-ac_cv_func_modf=yes
-ac_cv_func_pow=yes
-ac_cv_func_stat_empty_string_bug=no
-ac_cv_func_strerror=yes
-ac_cv_func_utime_null=yes
-ac_cv_header_dlfcn_h=yes
-ac_cv_header_inttypes_h=yes
-ac_cv_header_memory_h=yes
-ac_cv_header_stdbool_h=yes
-ac_cv_header_stdc=yes
-ac_cv_header_stdint_h=yes
-ac_cv_header_stdlib_h=yes
-ac_cv_header_string_h=yes
-ac_cv_header_strings_h=yes
-ac_cv_header_sys_stat_h=yes
-ac_cv_header_sys_time_h=yes
-ac_cv_header_sys_types_h=yes
-ac_cv_header_time=yes
-ac_cv_header_unistd_h=yes
-ac_cv_header_utime_h=yes
 ac_cv_host=x86_64-unknown-linux-gnu
 ac_cv_objext=o
 ac_cv_path_EGREP='/usr/bin/grep -E'
@@ -820,11 +232,8 @@ ac_cv_path_FGREP='/usr/bin/grep -F'
 ac_cv_path_GREP=/usr/bin/grep
 ac_cv_path_SED=/usr/bin/sed
 ac_cv_path_install='/usr/bin/install -c'
-ac_cv_path_lt_DD=/usr/bin/dd
 ac_cv_path_mkdir=/usr/bin/mkdir
 ac_cv_prog_AWK=gawk
-ac_cv_prog_CPP='icc -E'
-ac_cv_prog_CXXCPP='icpc -E'
 ac_cv_prog_ac_ct_AR=ar
 ac_cv_prog_ac_ct_CC=icc
 ac_cv_prog_ac_ct_OBJDUMP=objdump
@@ -832,40 +241,20 @@ ac_cv_prog_ac_ct_RANLIB=ranlib
 ac_cv_prog_ac_ct_STRIP=strip
 ac_cv_prog_cc_c89=
 ac_cv_prog_cc_g=yes
-ac_cv_prog_cxx_g=yes
 ac_cv_prog_make_make_set=yes
-ac_cv_struct_tm=time.h
-ac_cv_type__Bool=yes
-ac_cv_type_size_t=yes
 am_cv_CC_dependencies_compiler_type=gcc3
-am_cv_CXX_dependencies_compiler_type=gcc3
 am_cv_ar_interface=ar
 am_cv_make_support_nested_variables=yes
 lt_cv_ar_at_file=@
-lt_cv_archive_cmds_need_lc=no
 lt_cv_deplibs_check_method=pass_all
 lt_cv_file_magic_cmd='$MAGIC_CMD'
 lt_cv_file_magic_test_file=
 lt_cv_ld_reload_flag=-r
 lt_cv_nm_interface='BSD nm'
-lt_cv_objdir=.libs
 lt_cv_path_LD=/usr/bin/ld
-lt_cv_path_LDCXX='/usr/bin/ld -m elf_x86_64'
 lt_cv_path_NM='/usr/bin/nm -B'
-lt_cv_path_mainfest_tool=no
-lt_cv_prog_compiler_c_o=yes
-lt_cv_prog_compiler_c_o_CXX=yes
-lt_cv_prog_compiler_pic='-fPIC -DPIC'
-lt_cv_prog_compiler_pic_CXX='-fPIC -DPIC'
-lt_cv_prog_compiler_pic_works=yes
-lt_cv_prog_compiler_pic_works_CXX=yes
-lt_cv_prog_compiler_rtti_exceptions=yes
-lt_cv_prog_compiler_static_works=no
-lt_cv_prog_compiler_static_works_CXX=no
 lt_cv_prog_gnu_ld=yes
-lt_cv_prog_gnu_ldcxx=yes
 lt_cv_sharedlib_from_linklib_cmd='printf %s\n'
-lt_cv_shlibpath_overrides_runpath=no
 lt_cv_sys_global_symbol_pipe='sed -n -e '\''s/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p'\'' | sed '\''/ __gnu_lto/d'\'''
 lt_cv_sys_global_symbol_to_c_name_address='sed -n -e '\''s/^: \(.*\) .*$/  {"\1", (void *) 0},/p'\'' -e '\''s/^[ABCDGIRSTW][ABCDGIRSTW]* .* \(.*\)$/  {"\1", (void *) \&\1},/p'\'''
 lt_cv_sys_global_symbol_to_c_name_address_lib_prefix='sed -n -e '\''s/^: \(.*\) .*$/  {"\1", (void *) 0},/p'\'' -e '\''s/^[ABCDGIRSTW][ABCDGIRSTW]* .* \(lib.*\)$/  {"\1", (void *) \&\1},/p'\'' -e '\''s/^[ABCDGIRSTW][ABCDGIRSTW]* .* \(.*\)$/  {"lib\1", (void *) \&\1},/p'\'''
@@ -874,7 +263,6 @@ lt_cv_sys_global_symbol_to_import=
 lt_cv_sys_max_cmd_len=3458764513820540925
 lt_cv_to_host_file_cmd=func_convert_file_noop
 lt_cv_to_tool_file_cmd=func_convert_file_noop
-lt_cv_truncate_bin='/usr/bin/dd bs=4096 count=1'
 
 ## ----------------- ##
 ## Output variables. ##
@@ -897,14 +285,14 @@ AWK='gawk'
 CC='icc'
 CCDEPMODE='depmode=gcc3'
 CFLAGS='-O3 -xMIC-AVX512 -ip'
-CPP='icc -E'
+CPP=''
 CPPFLAGS=' -I/home/jtang8756/build/include -I/home/jtang8756/build/include'
 CXX='icpc'
-CXXCPP='icpc -E'
-CXXDEPMODE='depmode=gcc3'
+CXXCPP=''
+CXXDEPMODE=''
 CXXFLAGS='-std=c++14 -O3 -xMIC-AVX512 -ip'
 CYGPATH_W='echo'
-DEFS='-DHAVE_CONFIG_H'
+DEFS=''
 DEPDIR='.deps'
 DLLTOOL='false'
 DSYMUTIL=''
@@ -921,17 +309,17 @@ INSTALL_DATA='${INSTALL} -m 644'
 INSTALL_PROGRAM='${INSTALL}'
 INSTALL_SCRIPT='${INSTALL}'
 INSTALL_STRIP_PROGRAM='$(install_sh) -c -s'
-LD='/usr/bin/ld -m elf_x86_64'
+LD='/usr/bin/ld'
 LDFLAGS=' -L/home/jtang8756/build/lib -L/home/jtang8756/build/lib'
 LIBOBJS=''
 LIBS=''
-LIBTOOL='$(SHELL) $(top_builddir)/libtool'
+LIBTOOL=''
 LIPO=''
 LN_S='ln -s'
 LTLIBOBJS=''
 LT_SYS_LIBRARY_PATH=''
 MAKEINFO='${SHELL} /home/jtang8756/radx2grid/missing makeinfo'
-MANIFEST_TOOL=':'
+MANIFEST_TOOL=''
 MKDIR_P='/usr/bin/mkdir -p'
 NETCDFDIR='/home/jtang8756/build'
 NM='/usr/bin/nm -B'
@@ -959,10 +347,10 @@ ac_ct_CC='icc'
 ac_ct_CXX=''
 ac_ct_DUMPBIN=''
 am__EXEEXT_FALSE=''
-am__EXEEXT_TRUE='#'
+am__EXEEXT_TRUE=''
 am__fastdepCC_FALSE='#'
 am__fastdepCC_TRUE=''
-am__fastdepCXX_FALSE='#'
+am__fastdepCXX_FALSE=''
 am__fastdepCXX_TRUE=''
 am__include='include'
 am__isrc=''
@@ -981,7 +369,7 @@ datadir='${datarootdir}'
 datarootdir='${prefix}/share'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
 dvidir='${docdir}'
-exec_prefix='${prefix}'
+exec_prefix='NONE'
 host='x86_64-unknown-linux-gnu'
 host_alias=''
 host_cpu='x86_64'
@@ -1020,31 +408,6 @@ target_alias=''
 #define PACKAGE_URL ""
 #define PACKAGE "radx"
 #define VERSION "1.0"
-#define STDC_HEADERS 1
-#define HAVE_SYS_TYPES_H 1
-#define HAVE_SYS_STAT_H 1
-#define HAVE_STDLIB_H 1
-#define HAVE_STRING_H 1
-#define HAVE_MEMORY_H 1
-#define HAVE_STRINGS_H 1
-#define HAVE_INTTYPES_H 1
-#define HAVE_STDINT_H 1
-#define HAVE_UNISTD_H 1
-#define HAVE_DLFCN_H 1
-#define LT_OBJDIR ".libs/"
-#define HAVE_SYS_TIME_H 1
-#define HAVE__BOOL 1
-#define HAVE_STDBOOL_H 1
-#define TIME_WITH_SYS_TIME 1
-#define STDC_HEADERS 1
-#define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
-#define HAVE_UTIME_H 1
-#define HAVE_UTIME_NULL 1
-#define HAVE_FLOOR 1
-#define HAVE_GETTIMEOFDAY 1
-#define HAVE_MEMSET 1
-#define HAVE_MODF 1
-#define HAVE_POW 1
-#define HAVE_STRERROR 1
 
-configure: exit 0
+configure: caught signal 15
+configure: exit 1
