@@ -102,5 +102,11 @@ Radx2Grid_SOURCES = \
 	ReorderInterp.cc \
 	SatInterp.cc \
 	SvdData.cc \
-	Thread.cc
+	Thread.cc \
+	Radx2GridPlus.cc \
+	VolumePointsSet.cc \
+	VolumeStream.cc \
+	GridSet.cc
+
+
 
