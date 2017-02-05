@@ -66,6 +66,25 @@ AC_ARG_WITH([netcdf],
 AC_MSG_RESULT([$NETCDFDIR])
 AC_SUBST(NETCDFDIR, [$NETCDFDIR])
 
+# Did the user specify a location for the Radx library?
+AC_MSG_CHECKING([whether a location for the Radx library was specified])
+AC_ARG_WITH([radx],
+              [AS_HELP_STRING([--with-radx=<directory>],
+                              [Specify location of Radx library. Configure will \
+                              expect to find subdirs include and lib.])],
+            [RADXDIR=$with_radx])
+AC_MSG_RESULT([$RADXDIR])
+AC_SUBST(RADXDIR, [$RADXDIR])
+
+# Add the RADX directory to includes and link flags
+if test ! "x$RADXDIR" = x; then
+   LDFLAGS="${LDFLAGS} -L${RADXDIR}/lib"
+   CPPFLAGS="${CPPFLAGS} -I${RADXDIR}/include"
+fi
+
+
+
+
 # Add the HDF5 directory to includes and link flags
 if test ! "x$HDF5DIR" = x; then
    LDFLAGS="${LDFLAGS} -L${HDF5DIR}/lib"
