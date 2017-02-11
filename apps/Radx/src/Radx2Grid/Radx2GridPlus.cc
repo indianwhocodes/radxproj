@@ -28,6 +28,7 @@ void Radx2GridPlus::processFile(const time_t &startTime, const time_t &endTime, 
 
     std::cout << "Radx2GridPlus processFile Function" << std::endl;
     std::cout << "input dir: " << params.input_dir << std::endl;
+    //startTime and endTime are the time converted to unix time.
 	std::cout << "start Time: " << startTime << " end Time: " << endTime << std::endl;
     
     // create function to get file names from the input_dir using startTime, endTime and params
