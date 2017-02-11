@@ -1,11 +1,11 @@
 /******************************************************* 
-*	Author: Amarjit Kumar Singh - amarnitdgp@gmail.com *		
-*	Date :  12/15/2016 								   *
-*   This Radx2Grid module that encapsulates `		   *
-*   		Step 1 : NetCdf file to volume			   *
-* 			Step 2 : Volume to Points				   *
-* 			Step 3 : Gridding						   *
-* 			Step 4 : Writing the grids to MDV File     *
+*	Author: Amarjit Kumar Singh - amarnitdgp@gmail.com 		
+*	Date :  12/15/2016 								   
+*   This Radx2Grid module that encapsulates `		   
+*   		Step 1 : NetCdf file to volume			   
+* 			Step 2 : Volume to Points				   
+* 			Step 3 : Gridding						   
+* 			Step 4 : Writing the grids to MDV File     
 ********************************************************/
 
 
@@ -24,11 +24,15 @@ Radx2GridPlus::Radx2GridPlus(std::string pname){
 }
 
 
-void Radx2GridPlus::processFile(const std::string filename, const Params &params ){
+void Radx2GridPlus::processFile(const time_t &startTime, const time_t &endTime, const Params &params ){
 
     std::cout << "Radx2GridPlus processFile Function" << std::endl;
+    std::cout << "input dir: " << params.input_dir << std::endl;
+	std::cout << "start Time: " << startTime << " end Time: " << endTime << std::endl;
+    
+    // create function to get file names from the input_dir using startTime, endTime and params
 	//Step 1 : NetCdf file to volume
-	VolumeStream vs(filename);
+	VolumeStream vs("");
 	vs.fillFromFile();
 
 	_no_of_fields = params.selected_fields_n;

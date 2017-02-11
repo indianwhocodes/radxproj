@@ -38,7 +38,7 @@ class Radx2GridPlus{
 		
 	public:
 		Radx2GridPlus(std::string pname);
-		void processFile(const std::string filename, const Params &params );
+		void processFile(const time_t &startTime, const time_t &endTime, const Params &params );
 		void mapping_field_names(Params::select_field_t * selected_fields);
         ~Radx2GridPlus();
 };

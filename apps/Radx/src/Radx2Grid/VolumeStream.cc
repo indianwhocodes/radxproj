@@ -10,6 +10,8 @@
 VolumeStream:: VolumeStream(const std::string input_file){
 
     std::cout << "VolumeStream constructor" << std::endl;
+    std::cout << "File Name : " << input_file << std::endl;
+
 	//Read n_points dimension from input netcdf file and the create arrays for _elevation, _azimuth, _azimuth, _gate, _time, _fields array
 	//Intialize all to INVALID_DATA	(macro above)
 }
