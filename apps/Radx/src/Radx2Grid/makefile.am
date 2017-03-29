@@ -106,7 +106,7 @@ Radx2Grid_SOURCES = \
 	Radx2GridPlus.cc \
 	VolumePointsSet.cc \
 	VolumeStream.cc \
-	GridSet.cc
-
-
-
+	GridSet.cc \
+	Cartesian2Grid.cpp \
+	Polar2Cartesian.cpp \
+	PolarDataStream.cpp 

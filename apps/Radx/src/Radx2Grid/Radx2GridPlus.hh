@@ -1,46 +1,36 @@
-/*******************************************************
-*	Author: Amarjit Kumar Singh - amarnitdgp@gmail.com *		
-*	Date :  12/15/2016 								   *
-********************************************************/
 
-#ifndef Radx2GridPlus_hh
-#define Radx2GridPlus_hh
+#ifndef Radx2GridPlus_h
+#define Radx2GridPlus_h
 
 #include <string>
-#include <list>
+#include "PolarDataStream.h"
+#include "Polar2Cartesian.h"
+#include "Cartesian2Grid.h"
 
-#include "VolumeStream.hh"
-#include "VolumePointsSet.hh"
-#include "GridSet.hh"
+class Radx2GridPlus
+{
+public:
+    Radx2GridPlus(std::string pName);
+    ~Radx2GridPlus();
+    void processFiles(const time_t& startTime, const time_t& endTime, const Params& params);
+    std::string* findFileNames();
 
-typedef enum {
-  REF = 0,
-  VEL = 1,
-  SW = 2,
-  ZDR = 3,
-  RHO = 4,
-  PHI = 5,
-  KDP = 6,
-  U = 7,
-  V = 8,
-  W = 9,
-}fields_t;
-
-
-class Radx2GridPlus{
-
-	private: 
-		std::string _program_name;
-		std::list<int> _fields;
-		int _no_of_fields;
+    // setter, getter
+    std::string getInputDir();
+    std::string getOutputDir();
+    
+    void setTime(const time_t& startTime, const time_t& endTime);
 
 
-		
-	public:
-		Radx2GridPlus(std::string pname);
-		void processFile(const time_t &startTime, const time_t &endTime, const Params &params );
-		void mapping_field_names(Params::select_field_t * selected_fields);
-        ~Radx2GridPlus();
+private: 
+    std::string _programName;
+    std::string _inputDir;
+    std::string _outputDir;
+    time_t _startTime;
+    time_t _endTime;
+    
 };
 
 #endif
+
+

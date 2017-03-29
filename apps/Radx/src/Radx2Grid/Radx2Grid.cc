@@ -372,7 +372,7 @@ int Radx2Grid::_processFile(const string &filePath)
       _cartInterp->interpVol();
     } else {
       Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Grid");
-      radx2GridPlus.processFile(_args.startTime, _args.endTime, _params);
+      radx2GridPlus.processFiles(_args.startTime, _args.endTime, _params);
       exit(0);
 
     }

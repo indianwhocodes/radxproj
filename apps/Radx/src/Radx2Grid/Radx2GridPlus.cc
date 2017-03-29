@@ -1,73 +1,64 @@
-/******************************************************* 
-*	Author: Amarjit Kumar Singh - amarnitdgp@gmail.com 		
-*	Date :  12/15/2016 								   
-*   This Radx2Grid module that encapsulates `		   
-*   		Step 1 : NetCdf file to volume			   
-* 			Step 2 : Volume to Points				   
-* 			Step 3 : Gridding						   
-* 			Step 4 : Writing the grids to MDV File     
-********************************************************/
 
-
-#include "Radx2GridPlus.hh"
 #include "Params.hh"
+#include "Radx2GridPlus.hh"
 
-
-/*Radx2GridPlus encapsulates 
-
-
-*/
-
-Radx2GridPlus::Radx2GridPlus(std::string pname){
-	_program_name = pname;
-    std::cout << "Radx2GridPlus Constructor" << std::endl;
+Radx2GridPlus::Radx2GridPlus(std::string pName) 
+{
+    _programName = pName;
 }
 
+Radx2GridPlus::~Radx2GridPlus() 
+{
 
-void Radx2GridPlus::processFile(const time_t &startTime, const time_t &endTime, const Params &params ){
+}
 
-    std::cout << "Radx2GridPlus processFile Function" << std::endl;
-    std::cout << "input dir: " << params.input_dir << std::endl;
-    //startTime and endTime are the time converted to unix time.
-	std::cout << "start Time: " << startTime << " end Time: " << endTime << std::endl;
+void Radx2GridPlus::processFiles(const time_t& startTime, const time_t& endTime, const Params& params) 
+{
+    setTime(startTime, endTime);
+    _inputDir = params.input_dir; _outputDir = params.output_dir;
+    std::cout << "input dir : " << _inputDir << std::endl;
+    std::string* fileNames = findFileNames();
+    std::string tempFile = "test file name";
     
-    // create function to get file names from the input_dir using startTime, endTime and params
-	//Step 1 : NetCdf file to volume
-	VolumeStream vs("");
-	vs.fillFromFile();
 
-	_no_of_fields = params.selected_fields_n;
+    // step 1 : Convert netcdf file to PolarDataStream
+    // loop the number of files
+    
+//  PolarDataStream pds(fileNames[0]); 
+    PolarDataStream pds(tempFile); 
+    pds.LoadDataFromNetCDFFilesIntoRepository();
+    pds.populateOutputValues();
 
-	//Map input selected fields and fill _fields using feilds enum
-	this->mapping_field_names(params._selected_fields);
+    // step 2 : PolarDataStream to Cartesian coordinates
+    Polar2Cartesian pc(pds.getRepository());
+    pc.calculateCartesianCoords();
 
-	//Step 2 : Volume to Points
-	// VolumePointSets are multiple points populated using different feilds from VolumeStream
-	VolumePointsSet vp_set(vs, _fields, _no_of_fields);
-	std::vector<VolumePoint *> vp_res = vp_set.populate_volume_points();
+    // step 3 : Gridding
+    Cartesian2Grid cg(pds.getRepository());
+    cg.calculateGridSize(params);
+    cg.calculateRefGrid();
 
-    //Step 3 : Gridding
-	//vp_set is then used to form grid set where each VolumePoint corresponds to each Grid in a GridSet.
-	GridSet g = GridSet(vp_res, params.grid_xy_geom, params.grid_z_geom);
-	std::vector<Grid *> gcell_res = g.fill();
-
-	//Step 4 : Writing the grids to MDV File 
-	//gcell_res need to be written into final output file.
-	//Logic for this should be added here.
+    // step 4 :  Writing the grids to MDV File 
 
 
-	
+}
+// search for the files from the directory
+std::string* Radx2GridPlus::findFileNames()
+{
+
 }
 
-void Radx2GridPlus::mapping_field_names(Params::select_field_t * selected_fields){
-
-    std::cout << "Radx2GridPlus mapping_field_names function" << std::endl;
-	//Fill fields based on _selected_fields and fields_t. fields member variable to contain enum elements from fields_t.
-	//e.g if(selected_fields.input_name=='reflectivty') fields.push(REF);
+void Radx2GridPlus::setTime(const time_t& startTime, const time_t& endTime)
+{
+    _startTime = startTime;
+    _endTime = endTime;
 }
 
-
-Radx2GridPlus::~Radx2GridPlus(){
-   //Free any allocated memory.
+std::string Radx2GridPlus::getInputDir()
+{ 
+    
 }
+std::string Radx2GridPlus::getOutputDir()
+{
 
+}
