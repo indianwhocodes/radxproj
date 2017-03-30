@@ -39,17 +39,6 @@ void Radx2GridPlus::processFiles(const string& filePath, const Params& params)
 
 
 }
-// search for the files from the directory
-std::string* Radx2GridPlus::findFileNames()
-{
-
-}
-
-void Radx2GridPlus::setTime(const time_t& startTime, const time_t& endTime)
-{
-    _startTime = startTime;
-    _endTime = endTime;
-}
 
 std::string Radx2GridPlus::getInputDir()
 { 
