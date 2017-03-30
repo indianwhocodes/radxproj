@@ -240,6 +240,12 @@ int Radx2Grid::_runArchive()
   // loop through the input file list
   
   int iret = 0;
+    // modified by kyu start
+    cout << " path size " << paths.size() << endl;
+    for (size_t ipath = 0; ipath < paths.size(); ipath++) {
+        cout << paths[ipath] << endl;
+    }
+    // modified to here
   for (size_t ipath = 0; ipath < paths.size(); ipath++) {
     if (_processFile(paths[ipath])) {
       iret = -1;
@@ -320,7 +326,6 @@ int Radx2Grid::_processFile(const string &filePath)
   }
   
   // read in file
-  
   if (_readFile(filePath)) {
     cerr << "ERROR - Radx2Grid::_processFile" << endl;
     return -1;
@@ -372,8 +377,9 @@ int Radx2Grid::_processFile(const string &filePath)
       _cartInterp->interpVol();
     } else {
       Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Grid");
-      radx2GridPlus.processFiles(_args.startTime, _args.endTime, _params);
-      exit(0);
+//        cout<<"file path" << filePath << endl;
+      radx2GridPlus.processFiles(filePath, _params);
+//      exit(0);
 
     }
   }

@@ -12,12 +12,9 @@ Radx2GridPlus::~Radx2GridPlus()
 
 }
 
-void Radx2GridPlus::processFiles(const time_t& startTime, const time_t& endTime, const Params& params) 
+void Radx2GridPlus::processFiles(const string& filePath, const Params& params)
 {
-    setTime(startTime, endTime);
     _inputDir = params.input_dir; _outputDir = params.output_dir;
-    std::cout << "input dir : " << _inputDir << std::endl;
-    std::string* fileNames = findFileNames();
     std::string tempFile = "test file name";
     
 
