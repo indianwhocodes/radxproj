@@ -70,6 +70,7 @@ LDADD += -ltoolsa
 LDADD += -ldataport
 LDADD += -ltdrp
 LDADD += -lkd
+LDADD += -lnetcdf_c++4
 LDADD += -lnetcdf_c++
 LDADD += -lnetcdf
 LDADD += -lhdf5_cpp
