@@ -139,6 +139,8 @@ private:
     
   void _freeInterpRays();
 
+  bool _isSafeToCallRadx2GridPlus();
+
 };
 
 #endif

@@ -252,6 +252,14 @@ int Radx2Grid::_runArchive()
     }
   }
 
+  if(_isSafeToCallRadx2GridPlus())
+  {
+		Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Grid");
+  //        cout<<"file path" << filePath << endl;
+		radx2GridPlus.processFiles(paths, _params);
+  //      exit(0);
+  }
+
   return iret;
 
 }
@@ -376,10 +384,12 @@ int Radx2Grid::_processFile(const string &filePath)
       _cartInterp->setRhiMode(false);
       _cartInterp->interpVol();
     } else {
-      Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Grid");
-//        cout<<"file path" << filePath << endl;
-      radx2GridPlus.processFiles(filePath, _params);
-//      exit(0);
+    	//FIXME: Might have to revert by calling back
+
+//      Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Grid");
+////        cout<<"file path" << filePath << endl;
+//      radx2GridPlus.processFiles(filePath, _params);
+////      exit(0);
 
     }
   }
@@ -1390,3 +1400,19 @@ void Radx2Grid::_freeInterpRays()
   _interpRays.clear();
 }
 
+
+bool Radx2Grid::_isSafeToCallRadx2GridPlus(){
+
+	bool is_safe=false;
+	 if (!_rhiMode &&
+			 (_params.interp_mode != Params::INTERP_MODE_PPI &&
+					 _params.interp_mode != Params::INTERP_MODE_POLAR  &&
+					 _params.interp_mode != Params::INTERP_MODE_CART_REORDER &&
+					 _params.interp_mode != Params::INTERP_MODE_CART_SAT &&
+					 _params.interp_mode != Params::INTERP_MODE_CART)){
+		 is_safe=true;
+	 }
+
+
+	return is_safe;
+}

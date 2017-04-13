@@ -1,6 +1,7 @@
 
 #include "Params.hh"
 #include "Radx2GridPlus.hh"
+#include "tbb/task_group.h"
 
 Radx2GridPlus::Radx2GridPlus(std::string pName) 
 {
@@ -12,11 +13,15 @@ Radx2GridPlus::~Radx2GridPlus()
 
 }
 
-void Radx2GridPlus::processFiles(const string& filePath, const Params& params)
+void Radx2GridPlus::processFiles(const vector<string> &filepaths, const Params& params)
 {
     _inputDir = params.input_dir; _outputDir = params.output_dir;
     std::string tempFile = "test file name";
     
+//TODO: use vectors to make a tbb::parallel_for.
+//    std::vector<PolarDataStream> pds(filepaths.size());
+//    std::vector<Cartesian2Grid> cg(filepaths.size())
+
 
     // step 1 : Convert netcdf file to PolarDataStream
     // loop the number of files
