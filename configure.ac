@@ -76,6 +76,17 @@ AC_ARG_WITH([radx],
 AC_MSG_RESULT([$RADXDIR])
 AC_SUBST(RADXDIR, [$RADXDIR])
 
+# Did the user specify a location for the TBB library?
+AC_MSG_CHECKING([whether a location for the tbb library was specified])
+AC_ARG_WITH([tbb],
+              [AS_HELP_STRING([--with-tbb=<directory>],
+                              [Specify location of tbb library. Configure will \
+			      expect to find subdirs include and lib.])],
+            [TBBDIR=$with_tbb])
+AC_MSG_RESULT([$TBBDIR])
+AC_SUBST(TBBDIR, [$TBBDIR])
+
+
 # Add the RADX directory to includes and link flags
 if test ! "x$RADXDIR" = x; then
    LDFLAGS="${LDFLAGS} -L${RADXDIR}/lib"
@@ -95,6 +106,13 @@ fi
 if test ! "x$NETCDFDIR" = x; then
    LDFLAGS="${LDFLAGS} -L${NETCDFDIR}/lib"
    CPPFLAGS="${CPPFLAGS} -I${NETCDFDIR}/include"
+fi    
+
+# Add the TBB directory to includes and link flags
+
+if test ! "x$TBBDIR" = x; then
+   LDFLAGS="${LDFLAGS} -L${TBBDIR}/lib/intel64/gcc4.7"
+   CPPFLAGS="${CPPFLAGS} -I${TBBDIR}/include"
 fi    
 
 # Check for the existance of this file before proceeding.

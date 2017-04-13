@@ -1,4 +1,4 @@
-
+#include <vector>
 #include "PolarDataStream.h"
 #include "netcdf" 
 
@@ -15,40 +15,41 @@ struct Repository // PolarDataStream::Repository
     float _altitude;
     float _altitudeAgl;
 
-    float* _gateSize;
-    int* _rayNGates;
-    int* _rayStartIndex;
-    int* _rayStartRange;
+    std::vector<float> _gateSize;
+    std::vector<int> _rayNGates;
+    std::vector<int> _rayStartIndex;
+    std::vector<int> _rayStartRange;
 
-    float* _azimuth;
-    float* _elevation;
-    float* _timeVar;
-    float* _rangeVar;
+    std::vector<float> _azimuth;
+    std::vector<float> _elevation;
+    std::vector<float> _timeVar;
+    std::vector<float> _rangeVar;
 
-    float* _reflectivity;       //name change. Accomodate multiple values.
+    std::vector<float> _reflectivity;       //name change. Accomodate multiple values.
     
     // input file name;
     std::string _inputFile;
 
     // output values
-    float* _outElevation;
-    float* _outAzimuth;
-    float* _outGate;	
+    std::vector<float> _outElevation;
+    std::vector<float> _outAzimuth;
+    std::vector<float> _outGate;	
 
     float _scalingFactor;
     short _fillValue;
     float _addOffset;
 
-    float* _outRef;
+    std::vector<float> _outRef;
 
     // Cartesian Coords
-    float* _gateX;
-    float* _gateY;
-    float* _gateZ;
+    std::vector<float> _gateX;
+    std::vector<float> _gateY;
+    std::vector<float> _gateZ;
 
-    float* _gateRoI;
+    std::vector<float> _gateRoI;
 
 };
+
 // constructor
 PolarDataStream::PolarDataStream(const std::string& inputFile) 
 {
@@ -86,49 +87,60 @@ void PolarDataStream::LoadDataFromNetCDFFilesIntoRepository()
     netCDF::NcVar alt_agl = dataFile.getVar("altitude_agl");
     alt_agl.getVar(&_store->_altitudeAgl);
         
-    _store->_timeVar = new float[_store->_timeDim];
+   
+    _store->_timeVar.resize(_store->_timeDim);
+     float* timeVarPtr=_store->_timeVar.data();
     netCDF::NcVar timeVar = dataFile.getVar("time");
-    timeVar.getVar(_store->_timeVar);
+    timeVar.getVar(timeVarPtr);
 
-    _store->_rangeVar = new float[_store->_rangeDim];
+    _store->_rangeVar.resize(_store->_timeDim);
+    float* rangeVarPtr=_store->_rangeVar.data();
     netCDF::NcVar range = dataFile.getVar("range");
-    range.getVar(_store->_rangeVar);
+    range.getVar(rangeVarPtr);
        
-    _store->_rayNGates = new int[_store->_timeDim];
+    _store->_rayNGates.resize(_store->_timeDim);
+    int *rayNGatesPtr=_store->_rayNGates.data();
     netCDF::NcVar ray_n_gates = dataFile.getVar("ray_n_gates");
-    ray_n_gates.getVar(_store->_rayNGates);
+    ray_n_gates.getVar(rayNGatesPtr);
         
 
-    //_store->_gateSize.resize(_store->_timeDim);
-    //int* gateSizePtr = _store->_gateSize.data();
-        
-    _store->_gateSize=new float[_store->_timeDim];
+    _store->_gateSize.resize(_store->_timeDim);
+    float* gateSizePtr = _store->_gateSize.data();        
     netCDF::NcVar gateSize = dataFile.getVar("ray_gate_spacing");
-    gateSize.getVar(_store->_gateSize);
+    gateSize.getVar(gateSizePtr);
+   
+// _store->_gateSize=new float[_store->_timeDim];
+   // netCDF::NcVar gateSize = dataFile.getVar("ray_gate_spacing");
+   // gateSize.getVar(_store->_gateSize);
 
         
-    _store->_rayStartIndex = new int[_store->_timeDim];
+    _store->_rayStartIndex.resize(_store->_timeDim);
+    int* rayStartIndexPtr=_store->_rayStartIndex.data();
     netCDF::NcVar ray_start_index = dataFile.getVar("ray_start_index");
-    ray_start_index.getVar(_store->_rayStartIndex);
+    ray_start_index.getVar(rayStartIndexPtr);
         
 
-    _store->_rayStartRange = new int[_store->_timeDim];
+    _store->_rayStartRange.resize(_store->_timeDim);
+    int* rayStartRangePtr=_store->_rayStartRange.data();
     netCDF::NcVar ray_start_range = dataFile.getVar("ray_start_range");
-    ray_start_range.getVar(_store->_rayStartRange);
+    ray_start_range.getVar(rayStartRangePtr);
         
 
-    _store->_azimuth = new float[_store->_timeDim];
+    _store->_azimuth.resize(_store->_timeDim);
+    float* azimuthPtr=_store->_azimuth.data();
     netCDF::NcVar azimuth = dataFile.getVar("azimuth");
-    azimuth.getVar(_store->_azimuth);
+    azimuth.getVar(azimuthPtr);
 
-    _store->_elevation = new float[_store->_timeDim];
+    _store->_elevation.resize(_store->_timeDim);
+    float* elevationPtr= _store->_elevation.data();
     netCDF::NcVar elevation = dataFile.getVar("elevation");
-    elevation.getVar(_store->_elevation);
+    elevation.getVar(elevationPtr);
         
     // store all the values of reflectivity and copy htem by indexing
-    _store->_reflectivity = new float[_store->_timeDim * _store->_rangeDim];
+    _store->_reflectivity.resize(_store->_timeDim * _store->_rangeDim);
+    float* reflectivityPtr=_store->_reflectivity.data();
     netCDF::NcVar ref = dataFile.getVar("REF");
-    ref.getVar(_store->_reflectivity);
+    ref.getVar(reflectivityPtr);
         
     netCDF::NcVarAtt scale_factor = ref.getAtt("scale_factor");
     scale_factor.getValues(&_store->_scalingFactor);
@@ -148,10 +160,10 @@ void PolarDataStream::populateOutputValues()
     //Pre-allocate for speed. 
     
     //std::cout<<"DEBUG: in populateValues"<<std::endl;
-    _store->_outGate = new float[_store->_nPoints];
-    _store->_outElevation = new float[_store->_nPoints];
-    _store->_outAzimuth = new float[_store->_nPoints];
-    _store->_outRef = new float[_store->_nPoints];
+    _store->_outGate.resize(_store->_nPoints);
+    _store->_outElevation.resize(_store->_nPoints);
+    _store->_outAzimuth.resize(_store->_nPoints);
+    _store->_outRef.resize(_store->_nPoints);
     
     for(size_t i=0; i < _store->_timeDim; i++)
     {
@@ -185,25 +197,25 @@ void PolarDataStream::populateOutputValues()
 }
 
 // getter for output values
-float* PolarDataStream::getOutElevation()
+std::vector<float> PolarDataStream::getOutElevation()
 {
 
     return _store->_outElevation;
 }
 
-float* PolarDataStream::getOutAzimuth()
+std::vector<float> PolarDataStream::getOutAzimuth()
 {
     return _store->_azimuth;
     // return _store->_outAzimuth; // which one is rignt?
 }
 
-float* PolarDataStream::getOutGate()
+std::vector<float> PolarDataStream::getOutGate()
 {
 
     return _store->_outGate;
 }
 
-float* PolarDataStream::getOutRef()
+std::vector<float> PolarDataStream::getOutRef()
 {
 
     return _store->_outRef;

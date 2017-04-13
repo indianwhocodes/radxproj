@@ -1,7 +1,7 @@
 
 #ifndef PolarDataStream_h
 #define PolarDataStream_h
-
+#include<vector>
 #include <string>
 #include <iostream> 
 
@@ -20,10 +20,10 @@ public:
     void populateOutputValues();
 
     // setter, getter
-    float* getOutElevation();
-    float* getOutAzimuth();
-    float* getOutGate();
-    float* getOutRef();
+    std::vector<float> getOutElevation();
+    std::vector<float> getOutAzimuth();
+    std::vector<float> getOutGate();
+    std::vector<float> getOutRef();
 
     Repository* getRepository();
 
