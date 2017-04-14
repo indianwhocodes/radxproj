@@ -45,7 +45,7 @@ std::vector<VolumePoint *> VolumePointsSet :: populate_volume_points(){
 float * VolumePointsSet :: getROI(float * ele, float * azimuth, float * gate){
 	std::cout << "VolumePointsSet getROI function" << std::endl;
 	//Calculate ROI from VS receieved in constructor.
-	return ;
+	throw "Not Implemented";
 }
 
 VolumePointsSet :: ~VolumePointsSet(){
