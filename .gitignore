@@ -39,14 +39,14 @@
 
 # Some files don't want to see
 .cvsignore
-Makefile
+**/Makefile
 __makefile.template
-makefile
+**/makefile
 
 # http://www.gnu.org/software/automake
 
-makefile.in
-Makefile.in
+**/makefile.in
+**/Makefile.in
 ar-lib
 mdate-sh
 py-compile
@@ -69,6 +69,7 @@ depcomp
 install-sh
 missing
 stamp-h1
+.deps
 
 # https://www.gnu.org/software/libtool/
 
@@ -77,3 +78,8 @@ ltmain.sh
 # http://www.gnu.org/software/texinfo
 
 texinfo.tex
+/VERSION
+/config.h
+/config.log
+/config.status
+/libtool
