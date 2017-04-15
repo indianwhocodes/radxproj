@@ -3,9 +3,9 @@
 #define Radx2GridPlus_h
 
 #include <string>
-#include "PolarDataStream.h"
-#include "Polar2Cartesian.h"
-#include "Cartesian2Grid.h"
+#include "PolarDataStream.hh"
+#include "Polar2Cartesian.hh"
+#include "Cartesian2Grid.hh"
 
 class Radx2GridPlus
 {

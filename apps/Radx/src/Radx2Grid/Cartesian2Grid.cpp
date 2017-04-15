@@ -1,5 +1,5 @@
 
-#include "Cartesian2Grid.h"
+#include "Cartesian2Grid.hh"
 
 struct Grid // Cartesian2Grid::Cartesian2GridImpl
 {

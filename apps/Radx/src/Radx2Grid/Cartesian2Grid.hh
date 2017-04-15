@@ -2,7 +2,7 @@
 #ifndef Cartesian2Grid_h
 #define Cartesian2Grid_h
 
-#include "Polar2Cartesian.h"
+#include "Polar2Cartesian.hh"
 #include "Params.hh"
 
 struct Grid;

@@ -2,7 +2,7 @@
 #ifndef Polar2Cartesian_h
 #define Polar2Cartesian_h
 
-#include "PolarDataStream.h"
+#include "PolarDataStream.hh"
 
 class Polar2Cartesian
 {
