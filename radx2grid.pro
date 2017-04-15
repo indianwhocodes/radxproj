@@ -93,3 +93,13 @@ macx:{
     #LIBS += -L/opt/intel/compilers_and_libraries/mac/tbb/lib
     #INCLUDEPATH += /opt/intel/compilers_and_libraries/mac/tbb/include
 }
+
+unix:{
+    T1 = $$(RADX_RUNTIME)
+    isEmpty(T1) {
+        message(RADX_RUNTIME is empty)
+    } else {
+        INCLUDEPATH += $$(RADX_RUNTIME)/include
+        LIBS += -L$$(RADX_RUNTIME)/lib
+    }
+}

@@ -17,6 +17,7 @@ struct Cell {
 };
 
 class Grid {
+
 public:
   int _ni;
   int _nj;
@@ -33,17 +34,24 @@ public:
 };
 
 class GridSet {
+
+private:
   // Input VolumePoints
-  std::vector<VolumePoint *> _vps;
+  std::vector<VolumePoint> _vps;
   // Output grids
-  std::vector<Grid *> grid_set;
+  std::vector<Grid> grid_set;
+
+  Params::grid_xy_geom_t _xy_geom;
+  Params::grid_z_geom_t _z_geom;
 
 public:
-  GridSet(std::vector<VolumePoint *> vps, Params::grid_xy_geom_t xy,
+  GridSet(const std::vector<VolumePoint> &vps, Params::grid_xy_geom_t xy,
           Params::grid_z_geom_t z);
   void interpolateEachVolumePoints();
+
   // function to fill the grid set
-  std::vector<Grid *> fill();
+  std::vector<Grid> fill();
+
   ~GridSet();
 };
 
