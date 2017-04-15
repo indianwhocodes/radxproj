@@ -83,3 +83,6 @@ texinfo.tex
 /config.log
 /config.status
 /libtool
+*.qmake.stash
+*.pro.user
+/tags

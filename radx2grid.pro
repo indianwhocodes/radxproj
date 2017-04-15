@@ -8,8 +8,7 @@ CONFIG -= qt
 CONFIG -= app_bundle
 
 INCLUDEPATH += \
-    /usr/local/include \
-    /usr/include
+    /usr/local/include
 
 # Input
 HEADERS += \
@@ -30,9 +29,10 @@ HEADERS += \
            apps/Radx/src/Radx2Grid/Thread.hh \
            apps/Radx/src/Radx2Grid/VolumePointsSet.hh \
            apps/Radx/src/Radx2Grid/VolumeStream.hh \
-    apps/Radx/src/Radx2Grid/PolarDataStream.hh \
-    apps/Radx/src/Radx2Grid/Polar2Cartesian.hh \
-    apps/Radx/src/Radx2Grid/Cartesian2Grid.hh
+           apps/Radx/src/Radx2Grid/PolarDataStream.hh \
+           apps/Radx/src/Radx2Grid/Polar2Cartesian.hh \
+           apps/Radx/src/Radx2Grid/Cartesian2Grid.hh
+
 SOURCES += apps/Radx/src/Radx2Grid/Args.cc \
            apps/Radx/src/Radx2Grid/Cartesian2Grid.cpp \
            apps/Radx/src/Radx2Grid/CartInterp.cc \
