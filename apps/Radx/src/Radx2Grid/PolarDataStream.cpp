@@ -41,6 +41,8 @@ struct Repository // PolarDataStream::Repository
   std::vector<float> _outRef;
 
   // Cartesian Coords
+  std::vector<float> _gateDistance;
+  std::vector<float> _gateZr;
   std::vector<float> _gateX;
   std::vector<float> _gateY;
   std::vector<float> _gateZ;
@@ -53,7 +55,7 @@ PolarDataStream::PolarDataStream(const std::string &inputFile) {
   _store->_inputFile = inputFile;
 }
 
-PolarDataStream::~PolarDataStream() {}
+PolarDataStream::~PolarDataStream() { delete _store;}
 
 // read dimenssions, variables from NetCDF file and fill the repository
 void PolarDataStream::LoadDataFromNetCDFFilesIntoRepository() {
