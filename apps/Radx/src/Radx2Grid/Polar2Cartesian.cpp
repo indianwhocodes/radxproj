@@ -58,7 +58,20 @@ Polar2Cartesian::~Polar2Cartesian() {}
 
 void Polar2Cartesian::calculateCartesianCoords() {
     calculateHeight();
+    for(size_t i = 0 ; i < _store->_outAzimuth.size(); i++)
+    {
+        float gateAngleRad = (90 - _store->_outAzimuth[i]) * M_PI / 180.0 ;
+        _store->_gateX.push_back( _store->_gateDistance[i] * cos(gateAngleRad));
+        _store->_gateY.push_back( _store->_gateDistance[i] * sin(gateAngleRad));
+        _store->_gateZ.push_back( _store->_gateZr[i] + _store->_altitudeAgl);
+    }
     calculateRoI();
+    float minimalRoI = 500.0;
+    for(size_t i = 0 ; i < _store->_gateRoI.size(); i++)
+    {
+        float current = _store->_gateRoI[i];
+        _store->_gateRoI[i] = std::max(minimalRoI, current);
+    }
 }
 
 void Polar2Cartesian::calculateHeight() {
@@ -85,7 +98,12 @@ void Polar2Cartesian::calculateHeight() {
 
 }
 
-void Polar2Cartesian::calculateRoI() {}
+void Polar2Cartesian::calculateRoI() {
+    for(size_t i = 0 ; i < _store->_gateDistance.size(); i++)
+    {
+        _store->_gateRoI.push_back(std::max(2000.0, _store->_gateDistance[i] * 1.5 / 180.0 * M_PI + _store->_gateZr[i] * 0.02));
+    }
+}
 
 // getter
 float *Polar2Cartesian::getGateX() {
