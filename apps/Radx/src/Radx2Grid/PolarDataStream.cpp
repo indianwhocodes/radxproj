@@ -55,7 +55,7 @@ PolarDataStream::PolarDataStream(const std::string &inputFile) {
   _store->_inputFile = inputFile;
 }
 
-PolarDataStream::~PolarDataStream() { delete _store;}
+PolarDataStream::~PolarDataStream() { /*delete _store;*/}
 
 // read dimenssions, variables from NetCDF file and fill the repository
 void PolarDataStream::LoadDataFromNetCDFFilesIntoRepository() {
@@ -109,6 +109,8 @@ void PolarDataStream::LoadDataFromNetCDFFilesIntoRepository() {
   int *rayStartIndexPtr = _store->_rayStartIndex.data();
   netCDF::NcVar ray_start_index = dataFile.getVar("ray_start_index");
   ray_start_index.getVar(rayStartIndexPtr);
+
+
 
   _store->_rayStartRange.resize(_store->_timeDim);
   int *rayStartRangePtr = _store->_rayStartRange.data();
