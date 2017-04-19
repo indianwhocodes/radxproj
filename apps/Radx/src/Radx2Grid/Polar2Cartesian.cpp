@@ -1,6 +1,55 @@
 
 #include "Polar2Cartesian.hh"
+#include <vector>
 #include <cmath>
+
+struct Repository // PolarDataStream::Repository
+{
+    // dimenssions
+    int _nPoints;
+    int _timeDim;
+    int _rangeDim;
+
+    // variables
+    float _latitude;
+    float _longitude;
+    float _altitude;
+    float _altitudeAgl;
+
+    float _scalingFactor;
+    short _fillValue;
+    float _addOffset;
+
+    std::vector<float> _gateSize;
+    std::vector<int> _rayNGates;
+    std::vector<int> _rayStartIndex;
+    std::vector<int> _rayStartRange;
+
+    std::vector<float> _azimuth;
+    std::vector<float> _elevation;
+    std::vector<float> _timeVar;
+    std::vector<float> _rangeVar;
+
+    std::vector<float> _reflectivity; // name change. Accomodate multiple values.
+
+    // input file name;
+    std::string _inputFile;
+
+    // output values
+    std::vector<float> _outElevation;
+    std::vector<float> _outAzimuth;
+    std::vector<float> _outGate;
+    std::vector<float> _outRef;
+
+    // Cartesian Coords
+    std::vector<float> _gateDistance;
+    std::vector<float> _gateZr;
+    std::vector<float> _gateX;
+    std::vector<float> _gateY;
+    std::vector<float> _gateZ;
+    std::vector<float> _gateRoI;
+};
+
 
 // constructor
 Polar2Cartesian::Polar2Cartesian(Repository *store) { _store = store; }
