@@ -7,6 +7,10 @@ TARGET = radx2grid
 CONFIG -= qt
 CONFIG -= app_bundle
 
+QMAKE_CXXFLAGS += -fstrict-aliasing
+QMAKE_CXXFLAGS_RELEASE -= -O2 -mtune=generic
+QMAKE_CXXFLAGS_RELEASE += -O3 -ftree-vectorize -ftree-vectorizer-verbose=2 -ffast-math -mtune=ivybridge -fopt-info-loop
+
 INCLUDEPATH += \
     /usr/local/include
 
@@ -31,7 +35,8 @@ HEADERS += \
            apps/Radx/src/Radx2Grid/VolumeStream.hh \
            apps/Radx/src/Radx2Grid/PolarDataStream.hh \
            apps/Radx/src/Radx2Grid/Polar2Cartesian.hh \
-           apps/Radx/src/Radx2Grid/Cartesian2Grid.hh
+           apps/Radx/src/Radx2Grid/Cartesian2Grid.hh \
+    apps/Radx/src/Radx2Grid/ThreadQueue.hh
 
 SOURCES += apps/Radx/src/Radx2Grid/Args.cc \
            apps/Radx/src/Radx2Grid/Cartesian2Grid.cpp \

@@ -1,26 +1,26 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=* 
-// ** Copyright UCAR (c) 1990 - 2016                                         
-// ** University Corporation for Atmospheric Research (UCAR)                 
-// ** National Center for Atmospheric Research (NCAR)                        
-// ** Boulder, Colorado, USA                                                 
-// ** BSD licence applies - redistribution and use in source and binary      
-// ** forms, with or without modification, are permitted provided that       
-// ** the following conditions are met:                                      
-// ** 1) If the software is modified to produce derivative works,            
-// ** such modified software should be clearly marked, so as not             
-// ** to confuse it with the version available from UCAR.                    
-// ** 2) Redistributions of source code must retain the above copyright      
-// ** notice, this list of conditions and the following disclaimer.          
-// ** 3) Redistributions in binary form must reproduce the above copyright   
-// ** notice, this list of conditions and the following disclaimer in the    
-// ** documentation and/or other materials provided with the distribution.   
-// ** 4) Neither the name of UCAR nor the names of its contributors,         
-// ** if any, may be used to endorse or promote products derived from        
-// ** this software without specific prior written permission.               
-// ** DISCLAIMER: THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS  
-// ** OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED      
-// ** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.    
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=* 
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1990 - 2016
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Boulder, Colorado, USA
+// ** BSD licence applies - redistribution and use in source and binary
+// ** forms, with or without modification, are permitted provided that
+// ** the following conditions are met:
+// ** 1) If the software is modified to produce derivative works,
+// ** such modified software should be clearly marked, so as not
+// ** to confuse it with the version available from UCAR.
+// ** 2) Redistributions of source code must retain the above copyright
+// ** notice, this list of conditions and the following disclaimer.
+// ** 3) Redistributions in binary form must reproduce the above copyright
+// ** notice, this list of conditions and the following disclaimer in the
+// ** documentation and/or other materials provided with the distribution.
+// ** 4) Neither the name of UCAR nor the names of its contributors,
+// ** if any, may be used to endorse or promote products derived from
+// ** this software without specific prior written permission.
+// ** DISCLAIMER: THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS
+// ** OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+// ** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ///////////////////////////////////////////////////////////////
 // Radx2Grid.cc
 //
@@ -37,28 +37,28 @@
 ///////////////////////////////////////////////////////////////
 
 #include "Radx2Grid.hh"
-#include "Radx2GridPlus.hh"
 #include "OutputMdv.hh"
-#include <toolsa/umisc.h>
-#include <toolsa/pmu.h>
-#include <toolsa/pjg.h>
-#include <toolsa/mem.h>
-#include <toolsa/toolsa_macros.h>
-#include <didss/LdataInfo.hh>
-#include <radar/BeamHeight.hh>
+#include "Radx2GridPlus.hh"
+#include <Mdv/GenericRadxFile.hh>
+#include <Radx/RadxField.hh>
+#include <Radx/RadxPath.hh>
 #include <Radx/RadxRay.hh>
 #include <Radx/RadxSweep.hh>
-#include <Radx/RadxField.hh>
 #include <Radx/RadxTime.hh>
 #include <Radx/RadxTimeList.hh>
-#include <Radx/RadxPath.hh>
-#include <Mdv/GenericRadxFile.hh>
+#include <didss/LdataInfo.hh>
+#include <radar/BeamHeight.hh>
+#include <toolsa/mem.h>
+#include <toolsa/pjg.h>
+#include <toolsa/pmu.h>
+#include <toolsa/toolsa_macros.h>
+#include <toolsa/umisc.h>
 using namespace std;
 
 // Constructor
 
 Radx2Grid::Radx2Grid(int argc, char **argv)
-  
+
 {
 
   OK = TRUE;
@@ -73,22 +73,21 @@ Radx2Grid::Radx2Grid(int argc, char **argv)
   // set programe name
 
   _progName = "Radx2Grid";
-  ucopyright((char *) _progName.c_str());
-  
+  ucopyright((char *)_progName.c_str());
+
   // parse command line args
-  
+
   if (_args.parse(argc, argv, _progName)) {
     cerr << "ERROR: " << _progName << endl;
     cerr << "Problem with command line args." << endl;
     OK = FALSE;
     return;
   }
-  
+
   // get TDRP params
-  
-  _paramsPath = (char *) "unknown";
-  if (_params.loadFromArgs(argc, argv,
-			   _args.override.list, &_paramsPath)) {
+
+  _paramsPath = (char *)"unknown";
+  if (_params.loadFromArgs(argc, argv, _args.override.list, &_paramsPath)) {
     cerr << "ERROR: " << _progName << endl;
     cerr << "Problem with TDRP parameters." << endl;
     OK = FALSE;
@@ -112,11 +111,9 @@ Radx2Grid::Radx2Grid(int argc, char **argv)
 
   // volume number
 
-  if (_params.override_volume_number ||
-      _params.autoincrement_volume_number) {
+  if (_params.override_volume_number || _params.autoincrement_volume_number) {
     _volNum = _params.starting_volume_number;
   }
-
 }
 
 //////////////////////////////////////
@@ -148,14 +145,12 @@ Radx2Grid::~Radx2Grid()
   // unregister process
 
   PMU_auto_unregister();
-
 }
 
 //////////////////////////////////////////////////
 // Run
 
-int Radx2Grid::Run()
-{
+int Radx2Grid::Run() {
 
   if (_params.mode == Params::ARCHIVE) {
     return _runArchive();
@@ -169,14 +164,12 @@ int Radx2Grid::Run()
 //////////////////////////////////////////////////
 // Run in filelist mode
 
-int Radx2Grid::_runFilelist()
-{
+int Radx2Grid::_runFilelist() {
 
   // init process mapper registration
 
   if (_params.register_with_procmap) {
-    PMU_auto_init(_progName.c_str(),
-                  _params.instance,
+    PMU_auto_init(_progName.c_str(), _params.instance,
                   _params.procmap_register_interval);
     PMU_auto_register("Init fileList mode");
   }
@@ -185,30 +178,26 @@ int Radx2Grid::_runFilelist()
 
   int iret = 0;
 
-  for (int ifile = 0; ifile < (int) _args.inputFileList.size(); ifile++) {
+  for (int ifile = 0; ifile < (int)_args.inputFileList.size(); ifile++) {
 
     string inputPath = _args.inputFileList[ifile];
     if (_processFile(inputPath)) {
       iret = -1;
     }
-
   }
 
   return iret;
-
 }
 
 //////////////////////////////////////////////////
 // Run in archive mode
 
-int Radx2Grid::_runArchive()
-{
+int Radx2Grid::_runArchive() {
 
   // init process mapper registration
 
   if (_params.register_with_procmap) {
-    PMU_auto_init(_progName.c_str(),
-                  _params.instance,
+    PMU_auto_init(_progName.c_str(), _params.instance,
                   _params.procmap_register_interval);
     PMU_auto_register("Init archive mode");
   }
@@ -236,58 +225,53 @@ int Radx2Grid::_runArchive()
     cerr << "  No files found, dir: " << _params.input_dir << endl;
     return -1;
   }
-  
+
   // loop through the input file list
-  
+
   int iret = 0;
-    // modified by kyu start
+  if (_params.debug) {
     cout << " path size " << paths.size() << endl;
     for (size_t ipath = 0; ipath < paths.size(); ipath++) {
-        cout << paths[ipath] << endl;
-    }
-    // modified to here
-  for (size_t ipath = 0; ipath < paths.size(); ipath++) {
-    if (_processFile(paths[ipath])) {
-      iret = -1;
+      cout << paths[ipath] << endl;
     }
   }
+  // modified to here
 
-  if(_isSafeToCallRadx2GridPlus())
-  {
-		Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Grid");
-  //        cout<<"file path" << filePath << endl;
-		radx2GridPlus.processFiles(paths, _params);
-  //      exit(0);
+  if (_isSafeToCallRadx2GridPlus()) {
+    Radx2GridPlus radx2GridPlus =
+        Radx2GridPlus("Radx2Grid") radx2GridPlus.processFiles(paths, _params);
+  } else {
+    for (size_t ipath = 0; ipath < paths.size(); ipath++) {
+      if (_processFile(paths[ipath])) {
+        iret = -1;
+      }
+    }
   }
 
   return iret;
-
 }
 
 //////////////////////////////////////////////////
 // Run in realtime mode
 
-int Radx2Grid::_runRealtime()
-{
+int Radx2Grid::_runRealtime() {
 
   // init process mapper registration
 
-  PMU_auto_init(_progName.c_str(),
-                _params.instance,
+  PMU_auto_init(_progName.c_str(), _params.instance,
                 _params.procmap_register_interval);
   PMU_auto_register("Init realtime mode");
 
   // watch for new data to arrive
 
-  LdataInfo ldata(_params.input_dir,
-                  _params.debug >= Params::DEBUG_VERBOSE);
-  
+  LdataInfo ldata(_params.input_dir, _params.debug >= Params::DEBUG_VERBOSE);
+
   int iret = 0;
 
   while (true) {
-    ldata.readBlocking(_params.max_realtime_data_age_secs,
-                       1000, PMU_auto_register);
-    
+    ldata.readBlocking(_params.max_realtime_data_age_secs, 1000,
+                       PMU_auto_register);
+
     const string path = ldata.getDataPath();
     if (_processFile(path)) {
       iret = -1;
@@ -295,20 +279,18 @@ int Radx2Grid::_runRealtime()
   }
 
   return iret;
-
 }
 
 //////////////////////////////////////////////////
 // Process a file
 // Returns 0 on success, -1 on failure
 
-int Radx2Grid::_processFile(const string &filePath)
-{
+int Radx2Grid::_processFile(const string &filePath) {
 
   PMU_auto_register("Processing file");
 
   // ensure memory is freed up
-  
+
   _readVol.clear();
   _freeInterpRays();
 
@@ -326,13 +308,13 @@ int Radx2Grid::_processFile(const string &filePath)
       return 0;
     }
   }
-  
+
   if (_params.debug) {
     cerr << "INFO - Radx2Grid::_processFile" << endl;
     cerr << "  Input file path: " << filePath << endl;
     cerr << "  Reading in file ..." << endl;
   }
-  
+
   // read in file
   if (_readFile(filePath)) {
     cerr << "ERROR - Radx2Grid::_processFile" << endl;
@@ -352,7 +334,7 @@ int Radx2Grid::_processFile(const string &filePath)
   _readVol.remapToFinestGeom();
 
   // interpolate and write out
-  
+
   if (_rhiMode) {
     if (_params.debug) {
       cerr << "  NOTE: data is in RHI mode" << endl;
@@ -384,13 +366,12 @@ int Radx2Grid::_processFile(const string &filePath)
       _cartInterp->setRhiMode(false);
       _cartInterp->interpVol();
     } else {
-    	//FIXME: Might have to revert by calling back
+      // FIXME: Might have to revert by calling back
 
-//      Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Grid");
-////        cout<<"file path" << filePath << endl;
-//      radx2GridPlus.processFiles(filePath, _params);
-////      exit(0);
-
+      //      Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Grid");
+      ////        cout<<"file path" << filePath << endl;
+      //      radx2GridPlus.processFiles(filePath, _params);
+      ////      exit(0);
     }
   }
 
@@ -402,36 +383,34 @@ int Radx2Grid::_processFile(const string &filePath)
   }
 
   return 0;
-
 }
 
 //////////////////////////////////////////////////
 // Read in a RADX file
 // Returns 0 on success, -1 on failure
 
-int Radx2Grid::_readFile(const string &filePath)
-{
+int Radx2Grid::_readFile(const string &filePath) {
 
   GenericRadxFile inFile;
   _setupRead(inFile);
-  
+
   // read in file
-  
+
   if (inFile.readFromPath(filePath, _readVol)) {
     cerr << "ERROR - Radx2Grid::_readFile" << endl;
     cerr << inFile.getErrStr() << endl;
     return -1;
   }
   _readPaths = inFile.getReadPaths();
-  
+
   // apply angle corrections as appropriate
   // side effect - forces el between -180 and 180
-  
+
   _readVol.applyAzimuthOffset(_params.azimuth_correction_deg);
   _readVol.applyElevationOffset(_params.elevation_correction_deg);
-  
+
   //  check for rhi
-  
+
   _rhiMode = _isRhi();
   if (_params.interp_mode == Params::INTERP_MODE_CART_SAT) {
     _rhiMode = false;
@@ -446,9 +425,8 @@ int Radx2Grid::_readFile(const string &filePath)
   }
 
   // volume number
-  
-  if (_params.override_volume_number ||
-      _params.autoincrement_volume_number) {
+
+  if (_params.override_volume_number || _params.autoincrement_volume_number) {
     _readVol.setVolumeNumber(_volNum);
   }
   if (_params.autoincrement_volume_number) {
@@ -456,23 +434,23 @@ int Radx2Grid::_readFile(const string &filePath)
   }
 
   // override radar name and site name if requested
-  
+
   if (_params.override_instrument_name) {
     _readVol.setInstrumentName(_params.instrument_name);
   }
   if (_params.override_site_name) {
     _readVol.setSiteName(_params.site_name);
   }
-    
+
   // override beam width if requested
-  
+
   if (_params.override_beam_width) {
     _readVol.setRadarBeamWidthDegH(_params.beam_width_deg_h);
     _readVol.setRadarBeamWidthDegV(_params.beam_width_deg_v);
   }
 
   // override gate geometry if requested
-  
+
   if (_params.interp_mode == Params::INTERP_MODE_CART_SAT) {
     if (_params.sat_data_set_range_geom_from_fields) {
       _readVol.copyRangeGeomFromFieldsToRays();
@@ -505,20 +483,20 @@ int Radx2Grid::_readFile(const string &filePath)
   _setupTransformFields();
 
   // add test and coverage fields to input rays as required
-  
+
   _addTestAndCoverageInputFields();
-  
+
   // for reorder, add in extra sweep at start and end
   // so that we can require boundedness
 
   if (_params.interp_mode == Params::INTERP_MODE_CART_REORDER) {
     _addBoundingSweeps();
   }
-  
+
   // set up interp fields
-  
+
   _initInterpFields();
-  
+
   // load up the input ray data vector
 
   _loadInterpRays();
@@ -529,14 +507,12 @@ int Radx2Grid::_readFile(const string &filePath)
   _checkFields(filePath);
 
   return 0;
-
 }
 
 //////////////////////////////////////////////////
 // set up read
 
-void Radx2Grid::_setupRead(RadxFile &file)
-{
+void Radx2Grid::_setupRead(RadxFile &file) {
 
   if (_params.debug >= Params::DEBUG_VERBOSE) {
     file.setDebug(true);
@@ -597,22 +573,20 @@ void Radx2Grid::_setupRead(RadxFile &file)
       }
     }
   }
-  
+
   if (_params.debug >= Params::DEBUG_VERBOSE) {
     file.printReadRequest(cerr);
   }
-  
 }
 
 //////////////////////////////////////////////////
 // check all fields are present
 // set standard names etc
 
-void Radx2Grid::_checkFields(const string &filePath)
-{
-  
+void Radx2Grid::_checkFields(const string &filePath) {
+
   vector<RadxRay *> &rays = _readVol.getRays();
-  
+
   for (size_t ifield = 0; ifield < _interpFields.size(); ifield++) {
     bool found = false;
     string fieldName = _interpFields[ifield].radxName;
@@ -632,19 +606,17 @@ void Radx2Grid::_checkFields(const string &filePath)
       cerr << "  File: " << filePath << endl;
     }
   } // ifield
-
 }
 
 //////////////////////////////////////////////////
 // load up the input ray data vector
 
-void Radx2Grid::_loadInterpRays()
-{
+void Radx2Grid::_loadInterpRays() {
 
   // loop through the rays in the read volume,
   // making some checks and then adding the rays
   // to the interp rays array as appropriate
-  
+
   vector<RadxRay *> &rays = _readVol.getRays();
   for (size_t isweep = 0; isweep < _readVol.getNSweeps(); isweep++) {
 
@@ -656,7 +628,7 @@ void Radx2Grid::_loadInterpRays()
       const RadxRay *ray = rays[iray];
 
       // check elevation limits if required
-      
+
       if (_params.interp_mode != Params::INTERP_MODE_POLAR &&
           _params.interp_mode != Params::INTERP_MODE_PPI) {
         if (_params.set_elevation_angle_limits) {
@@ -688,7 +660,7 @@ void Radx2Grid::_loadInterpRays()
       }
 
       // check fixed angle error?
-      
+
       if (_params.check_fixed_angle_error) {
         double fixedAngle = ray->getFixedAngleDeg();
         double maxError = _params.max_fixed_angle_error;
@@ -711,13 +683,11 @@ void Radx2Grid::_loadInterpRays()
       }
 
       // accept ray
-      
-      Interp::Ray *interpRay = 
-        new Interp::Ray(rays[iray],
-                        isweep,
-                        _interpFields,
-                        _params.use_fixed_angle_for_interpolation,
-                        _params.use_fixed_angle_for_data_limits);
+
+      Interp::Ray *interpRay =
+          new Interp::Ray(rays[iray], isweep, _interpFields,
+                          _params.use_fixed_angle_for_interpolation,
+                          _params.use_fixed_angle_for_data_limits);
       if (_params.apply_censoring) {
         _censorInterpRay(interpRay);
       }
@@ -726,10 +696,8 @@ void Radx2Grid::_loadInterpRays()
     } // iray
 
   } // isweep
-
-
 }
-  
+
 ////////////////////////////////////////////////////////////////////
 // censor an interp ray
 
@@ -745,7 +713,7 @@ void Radx2Grid::_censorInterpRay(Interp::Ray *interpRay)
 
   // initialize censoring flags to true to
   // turn censoring ON everywhere
-  
+
   vector<int> censorFlag;
   size_t nGates = ray->getNGates();
   for (size_t igate = 0; igate < nGates; igate++) {
@@ -777,20 +745,20 @@ void Radx2Grid::_censorInterpRay(Interp::Ray *interpRay)
       }
       continue;
     }
-    
+
     orFieldCount++;
-    
+
     double minValidVal = cfld.min_valid_value;
     double maxValidVal = cfld.max_valid_value;
 
-    const Radx::fl32 *fdata = (const Radx::fl32 *) field->getData();
+    const Radx::fl32 *fdata = (const Radx::fl32 *)field->getData();
     for (size_t igate = 0; igate < nGates; igate++) {
       double val = fdata[igate];
       if (val >= minValidVal && val <= maxValidVal) {
         censorFlag[igate] = 0;
       }
     }
-    
+
   } // ifield
 
   // if no OR fields were found, turn off ALL censoring at this stage
@@ -805,7 +773,7 @@ void Radx2Grid::_censorInterpRay(Interp::Ray *interpRay)
   // if any of these have INVALID data, we turn censoring ON
 
   for (int ifield = 0; ifield < _params.censoring_fields_n; ifield++) {
-    
+
     const Params::censoring_field_t &cfld = _params._censoring_fields[ifield];
     if (cfld.combination_method != Params::LOGICAL_AND) {
       continue;
@@ -815,18 +783,18 @@ void Radx2Grid::_censorInterpRay(Interp::Ray *interpRay)
     if (field == NULL) {
       continue;
     }
-    
+
     double minValidVal = cfld.min_valid_value;
     double maxValidVal = cfld.max_valid_value;
 
-    const Radx::fl32 *fdata = (const Radx::fl32 *) field->getData();
+    const Radx::fl32 *fdata = (const Radx::fl32 *)field->getData();
     for (size_t igate = 0; igate < nGates; igate++) {
       double val = fdata[igate];
       if (val < minValidVal || val > maxValidVal) {
         censorFlag[igate] = 1;
       }
     }
-    
+
   } // ifield
 
   // check that uncensored runs meet the minimum length
@@ -836,7 +804,7 @@ void Radx2Grid::_censorInterpRay(Interp::Ray *interpRay)
   if (minValidRun > 1) {
     int runLength = 0;
     bool doCheck = false;
-    for (int igate = 0; igate < (int) nGates; igate++) {
+    for (int igate = 0; igate < (int)nGates; igate++) {
       if (censorFlag[igate] == 0) {
         doCheck = false;
         runLength++;
@@ -844,7 +812,8 @@ void Radx2Grid::_censorInterpRay(Interp::Ray *interpRay)
         doCheck = true;
       }
       // last gate?
-      if (igate == (int) nGates - 1) doCheck = true;
+      if (igate == (int)nGates - 1)
+        doCheck = true;
       // check run length
       if (doCheck) {
         if (runLength < minValidRun) {
@@ -855,7 +824,7 @@ void Radx2Grid::_censorInterpRay(Interp::Ray *interpRay)
         }
         runLength = 0;
       } // if (doCheck ...
-    } // igate
+    }   // igate
   }
 
   // apply censoring by setting censored gates to missing for all fields
@@ -867,14 +836,13 @@ void Radx2Grid::_censorInterpRay(Interp::Ray *interpRay)
       // do not censor diagnostic fields
       continue;
     }
-    Radx::fl32 *fdata = (Radx::fl32 *) field->getData();
+    Radx::fl32 *fdata = (Radx::fl32 *)field->getData();
     for (size_t igate = 0; igate < nGates; igate++) {
       if (censorFlag[igate] == 1) {
         fdata[igate] = Radx::missingFl32;
       }
     } // igate
-  } // ifield
-  
+  }   // ifield
 }
 
 //////////////////////////////////////////////////
@@ -882,13 +850,10 @@ void Radx2Grid::_censorInterpRay(Interp::Ray *interpRay)
 // to the input data, so that they are available
 // for interpolation as needed.
 
-void Radx2Grid::_addTestAndCoverageInputFields()
-{
+void Radx2Grid::_addTestAndCoverageInputFields() {
 
-  if (!_params.output_test_fields &&
-      !_params.output_coverage_field &&
-      !_params.output_range_field &&
-      !_params.output_time_field) {
+  if (!_params.output_test_fields && !_params.output_coverage_field &&
+      !_params.output_range_field && !_params.output_time_field) {
     return;
   }
 
@@ -921,9 +886,9 @@ void Radx2Grid::_addTestAndCoverageInputFields()
     Radx::fl32 *data = data_.alloc(nGates);
 
     if (_params.output_test_fields) {
-      
+
       // add elevation field
-      
+
       RadxField *elevFld = new RadxField("el" + mode, "deg");
       elevFld->setLongName("diagnostic_field_elevation_angle" + mode);
       elevFld->setStandardName("elevation_angle" + mode);
@@ -937,7 +902,7 @@ void Radx2Grid::_addTestAndCoverageInputFields()
         elevFld->setIsDiscrete(true);
       }
       ray->addField(elevFld);
-      
+
       // add azimuth field
 
       RadxField *azFld = new RadxField("az" + mode, "deg");
@@ -988,7 +953,7 @@ void Radx2Grid::_addTestAndCoverageInputFields()
     }
     rangeFld->addDataFl32(nGates, data);
     if (!_params.interp_range_field) {
-        rangeFld->setIsDiscrete(true);
+      rangeFld->setIsDiscrete(true);
     }
     ray->addField(rangeFld);
 
@@ -1001,8 +966,8 @@ void Radx2Grid::_addTestAndCoverageInputFields()
       timeFld->setTypeFl32(-9999.0);
       time_t timeSecs = ray->getTimeSecs();
       double nanoSecs = ray->getNanoSecs();
-      double secsSinceStart = 
-        (double) (timeSecs - startTimeSecs) - ((nanoSecs - startNanoSecs) * 1.0e-9);
+      double secsSinceStart = (double)(timeSecs - startTimeSecs) -
+                              ((nanoSecs - startNanoSecs) * 1.0e-9);
       for (int ii = 0; ii < nGates; ii++) {
         data[ii] = secsSinceStart;
       }
@@ -1028,14 +993,12 @@ void Radx2Grid::_addTestAndCoverageInputFields()
     }
 
   } // iray
-
 }
 
 //////////////////////////////////////////////////
 // set up the transform fields, as needed
 
-void Radx2Grid::_setupTransformFields()
-{
+void Radx2Grid::_setupTransformFields() {
 
   if (!_params.transform_fields_for_interpolation) {
     return;
@@ -1047,13 +1010,14 @@ void Radx2Grid::_setupTransformFields()
   for (size_t iray = 0; iray < rays.size(); iray++) {
 
     RadxRay *ray = rays[iray];
-    
+
     // loop through fields to be transformed
 
     for (int jfield = 0; jfield < _params.transform_fields_n; jfield++) {
 
       bool makeCopy = true;
-      const Params::transform_field_t &transform = _params._transform_fields[jfield];
+      const Params::transform_field_t &transform =
+          _params._transform_fields[jfield];
       if (strcmp(transform.input_name, transform.output_name) == 0) {
         makeCopy = false;
       }
@@ -1066,7 +1030,7 @@ void Radx2Grid::_setupTransformFields()
       }
 
       // get working field
-      
+
       RadxField *xfield = rfield;
       if (makeCopy) {
         // copy field
@@ -1077,7 +1041,7 @@ void Radx2Grid::_setupTransformFields()
       // set units
 
       xfield->setUnits(transform.output_units);
-      
+
       // transform
 
       xfield->convertToFl32();
@@ -1085,7 +1049,8 @@ void Radx2Grid::_setupTransformFields()
           transform.transform == Params::TRANSFORM_DB_TO_LINEAR_AND_BACK) {
         xfield->transformDbToLinear();
       } else if (transform.transform == Params::TRANSFORM_LINEAR_TO_DB ||
-                 transform.transform == Params::TRANSFORM_LINEAR_TO_DB_AND_BACK) {
+                 transform.transform ==
+                     Params::TRANSFORM_LINEAR_TO_DB_AND_BACK) {
         xfield->transformLinearToDb();
       }
 
@@ -1097,17 +1062,15 @@ void Radx2Grid::_setupTransformFields()
     } // jfield
 
   } // iray
-
 }
 
 /////////////////////////////////////////////////////
 // check whether volume is predominantly in RHI mode
 
-bool Radx2Grid::_isRhi()
-{
-  
+bool Radx2Grid::_isRhi() {
+
   // check to see if we are in RHI mode, set flag accordingly
-  
+
   int nRaysRhi = 0;
   const vector<RadxRay *> &rays = _readVol.getRays();
   for (size_t ii = 0; ii < rays.size(); ii++) {
@@ -1116,20 +1079,19 @@ bool Radx2Grid::_isRhi()
       nRaysRhi++;
     }
   }
-  double fractionRhi = (double) nRaysRhi / (double) rays.size();
+  double fractionRhi = (double)nRaysRhi / (double)rays.size();
   if (fractionRhi > 0.5) {
     return true;
   } else {
     return false;
   }
-
 }
 
 ////////////////////////////////////////////////////////////
 // Add in sweeps to provide boundedness
 
 void Radx2Grid::_addBoundingSweeps()
-  
+
 {
 
   if (_rhiMode) {
@@ -1204,19 +1166,17 @@ void Radx2Grid::_addBoundingSweeps()
   } // ii
 
   _readVol.loadSweepInfoFromRays();
-  
 }
 
 //////////////////////////////////////////////////
 // initialize the fields for interpolation
 
-void Radx2Grid::_initInterpFields()
-{
-  
+void Radx2Grid::_initInterpFields() {
+
   _interpFields.clear();
-  
+
   // get field name list
-  
+
   vector<string> fieldNames = _readVol.getUniqueFieldNameList();
 
   // find an example of each field, by search through the rays
@@ -1245,7 +1205,7 @@ void Radx2Grid::_initInterpFields()
           interpField.foldLimitLower = field->getFoldLimitLower();
           interpField.foldLimitUpper = field->getFoldLimitUpper();
           interpField.foldRange =
-            interpField.foldLimitUpper - interpField.foldLimitLower;
+              interpField.foldLimitUpper - interpField.foldLimitLower;
         }
         if (field->getIsDiscrete()) {
           interpField.isDiscrete = true;
@@ -1286,16 +1246,16 @@ void Radx2Grid::_initInterpFields()
             _interpFields[ifld].foldLimitLower = foldLimitLower;
             _interpFields[ifld].foldLimitUpper = foldLimitUpper;
           }
-          _interpFields[ifld].foldRange =
-            _interpFields[ifld].foldLimitUpper - _interpFields[ifld].foldLimitLower;
+          _interpFields[ifld].foldRange = _interpFields[ifld].foldLimitUpper -
+                                          _interpFields[ifld].foldLimitLower;
           break;
         }
       } // ifld
-    } // ii
+    }   // ii
   }
 
   // override discrete flag from the parameters
-  
+
   if (_params.set_discrete_fields) {
     for (int ii = 0; ii < _params.discrete_fields_n; ii++) {
       string radxName = _params._discrete_fields[ii].input_name;
@@ -1306,12 +1266,12 @@ void Radx2Grid::_initInterpFields()
           break;
         }
       } // ifld
-    } // ii
+    }   // ii
   }
 
   // set bounded fields from the parameters (probably not in the radx data
   // anyway)
-  
+
   if (_params.bound_fields) {
     for (int ii = 0; ii < _params.bounded_fields_n; ii++) {
       string radxName = _params._bounded_fields[ii].input_name;
@@ -1320,12 +1280,12 @@ void Radx2Grid::_initInterpFields()
       for (size_t ifld = 0; ifld < _interpFields.size(); ifld++) {
         if (_interpFields[ifld].radxName == radxName) {
           _interpFields[ifld].isBounded = true;
-	  _interpFields[ifld].boundLimitLower = v0;
-	  _interpFields[ifld].boundLimitUpper = v1;
+          _interpFields[ifld].boundLimitLower = v0;
+          _interpFields[ifld].boundLimitUpper = v1;
           break;
         }
       } // ifld
-    } // ii
+    }   // ii
   }
 
   // rename fields
@@ -1340,51 +1300,45 @@ void Radx2Grid::_initInterpFields()
           break;
         }
       } // ifld
-    } // ii
-  } // if (_params.specify_field_names)
-
+    }   // ii
+  }     // if (_params.specify_field_names)
 }
 
 ////////////////////////////////////////////////////////////
 // Allocate interpolation objects as needed
 
-void Radx2Grid::_allocCartInterp()
-{
+void Radx2Grid::_allocCartInterp() {
   if (_cartInterp == NULL) {
-    _cartInterp = new CartInterp(_progName, _params, _readVol,
-                                 _interpFields, _interpRays);
+    _cartInterp = new CartInterp(_progName, _params, _readVol, _interpFields,
+                                 _interpRays);
   }
 }
 
-void Radx2Grid::_allocPpiInterp()
-{
+void Radx2Grid::_allocPpiInterp() {
   if (_ppiInterp == NULL) {
-    _ppiInterp = new PpiInterp(_progName, _params, _readVol,
-                               _interpFields, _interpRays);
+    _ppiInterp =
+        new PpiInterp(_progName, _params, _readVol, _interpFields, _interpRays);
   }
 }
 
-void Radx2Grid::_allocPolarInterp()
-{
+void Radx2Grid::_allocPolarInterp() {
   if (_polarInterp == NULL) {
-    _polarInterp = new PolarInterp(_progName, _params, _readVol,
-                                   _interpFields, _interpRays);
+    _polarInterp = new PolarInterp(_progName, _params, _readVol, _interpFields,
+                                   _interpRays);
   }
 }
 
-void Radx2Grid::_allocReorderInterp()
-{
+void Radx2Grid::_allocReorderInterp() {
   if (_reorderInterp == NULL) {
     _reorderInterp = new ReorderInterp(_progName, _params, _readVol,
                                        _interpFields, _interpRays);
   }
 }
 
-void Radx2Grid::_allocSatInterp()
-{
+void Radx2Grid::_allocSatInterp() {
   if (_satInterp == NULL) {
-    _satInterp = new SatInterp(_progName, _params, _readVol,
-                               _interpFields, _interpRays);
+    _satInterp =
+        new SatInterp(_progName, _params, _readVol, _interpFields, _interpRays);
   }
 }
 
@@ -1392,7 +1346,7 @@ void Radx2Grid::_allocSatInterp()
 // Free up input rays
 
 void Radx2Grid::_freeInterpRays()
-  
+
 {
   for (size_t ii = 0; ii < _interpRays.size(); ii++) {
     delete _interpRays[ii];
@@ -1400,19 +1354,6 @@ void Radx2Grid::_freeInterpRays()
   _interpRays.clear();
 }
 
-
-bool Radx2Grid::_isSafeToCallRadx2GridPlus(){
-
-	bool is_safe=false;
-	 if (!_rhiMode &&
-			 (_params.interp_mode != Params::INTERP_MODE_PPI &&
-					 _params.interp_mode != Params::INTERP_MODE_POLAR  &&
-					 _params.interp_mode != Params::INTERP_MODE_CART_REORDER &&
-					 _params.interp_mode != Params::INTERP_MODE_CART_SAT &&
-					 _params.interp_mode != Params::INTERP_MODE_CART)){
-		 is_safe=true;
-	 }
-
-
-	return is_safe;
+bool Radx2Grid::_isSafeToCallRadx2GridPlus() {
+  return (!_rhiMode) && (_params.interp_mode == Params::INTERP_MODE_CART_MAP);
 }
