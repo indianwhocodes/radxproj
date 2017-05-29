@@ -9,6 +9,14 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <Radx/RadxVol.hh>
+#include <toolsa/TaArray.hh>
+#include "Interp.hh"
+
+class RadxFile;
+class RadxRay;
+class RadxField;
+
 
 struct Repository {
   // dimenssions
@@ -78,12 +86,43 @@ public:
   std::vector<float> getOutRef();
 
   Repository *getRepository();
+  RadxVol& getRadxVol();
+  vector<Interp::Field>& getInterpFields();
+
+
+
+  int _readFile(const string &filePath);
+  void _setupRead(RadxFile &file);
+
+  void _setupTransformFields();
+  void _addTestAndCoverageInputFields();
+  void _addBoundingSweeps();
+  void _initInterpFields();
+  void _loadInterpRays();
+  void _checkFields(const string &filePath);
+  bool _isRhi();
+  void _censorInterpRay(Interp::Ray *interpRay);
+
+
 
 private:
   Repository *_store;
-  Params _params;
+  const Params& _params;
 
-  // class PolarDataStreamImpl;
+  RadxVol _readVol;
+  vector<string> _readPaths;
+  bool _rhiMode;
+  vector<Interp::Field> _interpFields;
+  vector<Interp::Ray *> _interpRays;
+
+  int _volNum;
+
+  // censoring
+   int _nWarnCensorPrint;
+
+
+
+    // class PolarDataStreamImpl;
   // PolarDataStreamImpl* _dataStreamHandle;
 };
 

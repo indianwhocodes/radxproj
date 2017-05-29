@@ -26,11 +26,13 @@ void Radx2GridPlus::processFiles(const vector<string> &filepaths,
   pds->reserve(n);
   // auto cg = std::make_shared<std::vector<Cartesian2Grid>>();
   // auto p2c = std::make_shared<std::vector<Polar2Cartesian>>();
+  // auto wo = std::make_shared<std::vector<WriteOutput>>();
 
   for (size_t i = 0; i < filepaths.size(); i++) {
     pds->push_back(PolarDataStream(filepaths[i], params));
     // p2c->at(i) = Polar2Cartesian(pds->at(i).getRepository());
     // cg->at(i) = Cartesian2Grid(pds->at(i).getRepository());
+    // wo->at(i) = WriteOutput(_programName, pds->at(i).getRepository(), pds->at(i).getRadxVol(), params, pds->at(i).getInterpFields());
   }
 
   clock_t start;
@@ -57,6 +59,9 @@ void Radx2GridPlus::processFiles(const vector<string> &filepaths,
     // step 3 : Gridding
     // cg->at(i).calculateGridSize(params);
     // cg->at(i).calculateRefGrid();
+
+    // step 4 : Output file
+    // wo->at(i).writeOutputFile();
   }
 }
 
