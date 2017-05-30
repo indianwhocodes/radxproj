@@ -38,7 +38,8 @@ HEADERS += \
            apps/Radx/src/Radx2Grid/PolarDataStream.hh \
            apps/Radx/src/Radx2Grid/Polar2Cartesian.hh \
            apps/Radx/src/Radx2Grid/Cartesian2Grid.hh \
-    apps/Radx/src/Radx2Grid/ThreadQueue.hh
+    apps/Radx/src/Radx2Grid/ThreadQueue.hh \
+    apps/Radx/src/Radx2Grid/WriteOutput.hh
 
 SOURCES += apps/Radx/src/Radx2Grid/Args.cc \
            apps/Radx/src/Radx2Grid/Cartesian2Grid.cpp \
@@ -60,7 +61,8 @@ SOURCES += apps/Radx/src/Radx2Grid/Args.cc \
            apps/Radx/src/Radx2Grid/SvdData.cc \
            apps/Radx/src/Radx2Grid/Thread.cc \
            apps/Radx/src/Radx2Grid/VolumePointsSet.cc \
-           apps/Radx/src/Radx2Grid/VolumeStream.cc
+           apps/Radx/src/Radx2Grid/VolumeStream.cc \
+    apps/Radx/src/Radx2Grid/WriteOutput.cpp
 
 OTHER_FILES += apps/Radx/src/Radx2Grid/makefile.am
 

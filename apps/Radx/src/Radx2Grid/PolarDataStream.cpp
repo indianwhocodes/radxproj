@@ -1,21 +1,20 @@
 #include "PolarDataStream.hh"
 #include "Params.hh"
 #include "netcdf"
-#include <tbb/tbb.h>
-#include <vector>
 #include <Mdv/GenericRadxFile.hh>
 #include <Radx/RadxField.hh>
 #include <Radx/RadxPath.hh>
 #include <Radx/RadxRay.hh>
 #include <Radx/RadxSweep.hh>
 #include <radar/BeamHeight.hh>
-
+#include <tbb/tbb.h>
+#include <vector>
 
 // constructor
 PolarDataStream::PolarDataStream(const std::string &inputFile,
-                                 const Params &params) : _params(params)
-{
-  _store = new Repository();
+                                 const Params &params)
+    : _params(params) {
+  _store = std::make_shared<Repository>();
   _store->_inputFile = inputFile;
 }
 
@@ -35,7 +34,6 @@ void PolarDataStream::LoadDataFromNetCDFFilesIntoRepository() {
 
   // make sure gate geom is constant
   _readVol.remapToFinestGeom();
-
 
   netCDF::NcFile dataFile(_store->_inputFile, netCDF::NcFile::read);
   netCDF::NcDim TimeDim = dataFile.getDim("time");
@@ -104,6 +102,7 @@ void PolarDataStream::populateOutputValues() {
   _store->_outAzimuth.resize(_store->_nPoints);
   _store->_outRef.resize(_store->_nPoints);
   tbb::parallel_for(0, _store->_timeDim, 1, [=](int i) {
+    // Start of Expansion function
     float r0 = _store->_rayStartRange[i];
     float g = _store->_gateSize[i];
     int start = _store->_rayStartIndex[i];
@@ -112,12 +111,12 @@ void PolarDataStream::populateOutputValues() {
     float replicateAz = _store->_azimuth[i];
     std::vector<float> outRangeGate(end - start + 1);
 
+#pragma ivdep
     for (size_t m = 0; m < outRangeGate.size(); m++) {
       outRangeGate[m] = m * g + r0;
     }
 
-#pragma GCC ivdep
-
+#pragma ivdep
     for (int j = start; j < end; j++) {
       _store->_outGate[j] = outRangeGate[j - start];
       _store->_outElevation[j] = replicateElevation;
@@ -131,6 +130,7 @@ void PolarDataStream::populateOutputValues() {
             _store->_addOffset;
       }
     }
+    // End of Expansion function
   });
 }
 
@@ -149,17 +149,17 @@ std::vector<float> PolarDataStream::getOutGate() { return _store->_outGate; }
 
 std::vector<float> PolarDataStream::getOutRef() { return _store->_outRef; }
 
-Repository *PolarDataStream::getRepository() { return _store; }
+std::shared_ptr<Repository> PolarDataStream::getRepository() { return _store; }
 
-RadxVol& PolarDataStream::getRadxVol() { return _readVol; }
+RadxVol &PolarDataStream::getRadxVol() { return _readVol; }
 
-vector<Interp::Field>& PolarDataStream::getInterpFields() {return _interpFields; }
-
+vector<Interp::Field> &PolarDataStream::getInterpFields() {
+  return _interpFields;
+}
 
 //////////////////////////////////////
 // code below is copied from Radx2Grid for output file
 //////////////////////////////////////
-
 
 //////////////////////////////////////////////////
 // Read in a RADX file
@@ -285,76 +285,75 @@ int PolarDataStream::_readFile(const string &filePath) {
   return 0;
 }
 
-
 //////////////////////////////////////////////////
 // set up read
 // RadxFile provides the methods for writing and reading RadxVol.
 
 void PolarDataStream::_setupRead(RadxFile &file) {
 
-    if (_params.debug >= Params::DEBUG_VERBOSE) {
-        file.setDebug(true);
-    }
+  if (_params.debug >= Params::DEBUG_VERBOSE) {
+    file.setDebug(true);
+  }
 
-    if (_params.aggregate_sweep_files_on_read) {
-        file.setReadAggregateSweeps(true);
-    } else {
-        file.setReadAggregateSweeps(false);
-    }
+  if (_params.aggregate_sweep_files_on_read) {
+    file.setReadAggregateSweeps(true);
+  } else {
+    file.setReadAggregateSweeps(false);
+  }
 
-    if (_params.ignore_idle_scan_mode_on_read) {
-        file.setReadIgnoreIdleMode(true);
-    } else {
-        file.setReadIgnoreIdleMode(false);
-    }
+  if (_params.ignore_idle_scan_mode_on_read) {
+    file.setReadIgnoreIdleMode(true);
+  } else {
+    file.setReadIgnoreIdleMode(false);
+  }
 
-    if (_params.remove_rays_with_antenna_transitions &&
-        !_params.trim_surveillance_sweeps_to_360deg) {
-        file.setReadIgnoreTransitions(true);
-        file.setReadTransitionNraysMargin(_params.transition_nrays_margin);
-    }
+  if (_params.remove_rays_with_antenna_transitions &&
+      !_params.trim_surveillance_sweeps_to_360deg) {
+    file.setReadIgnoreTransitions(true);
+    file.setReadTransitionNraysMargin(_params.transition_nrays_margin);
+  }
 
-    if (_params.remove_long_range_rays) {
-        file.setReadRemoveLongRange(true);
-    } else {
-        file.setReadRemoveLongRange(false);
-    }
+  if (_params.remove_long_range_rays) {
+    file.setReadRemoveLongRange(true);
+  } else {
+    file.setReadRemoveLongRange(false);
+  }
 
-    if (_params.remove_short_range_rays) {
-        file.setReadRemoveShortRange(true);
-    } else {
-        file.setReadRemoveShortRange(false);
-    }
+  if (_params.remove_short_range_rays) {
+    file.setReadRemoveShortRange(true);
+  } else {
+    file.setReadRemoveShortRange(false);
+  }
 
-    if (_params.interp_mode == Params::INTERP_MODE_POLAR ||
-        _params.interp_mode == Params::INTERP_MODE_PPI) {
-        if (_params.set_elevation_angle_limits) {
-            file.setReadFixedAngleLimits(_params.lower_elevation_angle_limit,
-                                         _params.upper_elevation_angle_limit);
-            file.setReadStrictAngleLimits(true);
-        }
+  if (_params.interp_mode == Params::INTERP_MODE_POLAR ||
+      _params.interp_mode == Params::INTERP_MODE_PPI) {
+    if (_params.set_elevation_angle_limits) {
+      file.setReadFixedAngleLimits(_params.lower_elevation_angle_limit,
+                                   _params.upper_elevation_angle_limit);
+      file.setReadStrictAngleLimits(true);
     }
+  }
 
-    if (_params.set_max_range) {
-        file.setReadMaxRangeKm(_params.max_range_km);
-    }
+  if (_params.set_max_range) {
+    file.setReadMaxRangeKm(_params.max_range_km);
+  }
 
-    if (_params.select_fields) {
-        for (int ii = 0; ii < _params.selected_fields_n; ii++) {
-            if (_params._selected_fields[ii].process_this_field) {
-                file.addReadField(_params._selected_fields[ii].input_name);
-            }
-        }
-        if (_params.apply_censoring) {
-            for (int ii = 0; ii < _params.censoring_fields_n; ii++) {
-                file.addReadField(_params._censoring_fields[ii].name);
-            }
-        }
+  if (_params.select_fields) {
+    for (int ii = 0; ii < _params.selected_fields_n; ii++) {
+      if (_params._selected_fields[ii].process_this_field) {
+        file.addReadField(_params._selected_fields[ii].input_name);
+      }
     }
+    if (_params.apply_censoring) {
+      for (int ii = 0; ii < _params.censoring_fields_n; ii++) {
+        file.addReadField(_params._censoring_fields[ii].name);
+      }
+    }
+  }
 
-    if (_params.debug >= Params::DEBUG_VERBOSE) {
-        file.printReadRequest(cerr);
-    }
+  if (_params.debug >= Params::DEBUG_VERBOSE) {
+    file.printReadRequest(cerr);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -379,7 +378,7 @@ void PolarDataStream::_setupTransformFields() {
 
       bool makeCopy = true;
       const Params::transform_field_t &transform =
-              _params._transform_fields[jfield];
+          _params._transform_fields[jfield];
       if (strcmp(transform.input_name, transform.output_name) == 0) {
         makeCopy = false;
       }
@@ -412,7 +411,7 @@ void PolarDataStream::_setupTransformFields() {
         xfield->transformDbToLinear();
       } else if (transform.transform == Params::TRANSFORM_LINEAR_TO_DB ||
                  transform.transform ==
-                 Params::TRANSFORM_LINEAR_TO_DB_AND_BACK) {
+                     Params::TRANSFORM_LINEAR_TO_DB_AND_BACK) {
         xfield->transformLinearToDb();
       }
 
@@ -694,7 +693,7 @@ void PolarDataStream::_initInterpFields() {
           interpField.foldLimitLower = field->getFoldLimitLower();
           interpField.foldLimitUpper = field->getFoldLimitUpper();
           interpField.foldRange =
-                  interpField.foldLimitUpper - interpField.foldLimitLower;
+              interpField.foldLimitUpper - interpField.foldLimitLower;
         }
         if (field->getIsDiscrete()) {
           interpField.isDiscrete = true;
@@ -870,9 +869,9 @@ void PolarDataStream::_loadInterpRays() {
       // accept ray
 
       Interp::Ray *interpRay =
-              new Interp::Ray(rays[iray], isweep, _interpFields,
-                              _params.use_fixed_angle_for_interpolation,
-                              _params.use_fixed_angle_for_data_limits);
+          new Interp::Ray(rays[iray], isweep, _interpFields,
+                          _params.use_fixed_angle_for_interpolation,
+                          _params.use_fixed_angle_for_data_limits);
       if (_params.apply_censoring) {
         _censorInterpRay(interpRay);
       }

@@ -4,19 +4,19 @@
 
 #define INVALID_DATA -99999.0F
 
+#include "Interp.hh"
 #include "Params.hh"
+#include <Radx/RadxVol.hh>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <string>
-#include <vector>
-#include <Radx/RadxVol.hh>
 #include <toolsa/TaArray.hh>
-#include "Interp.hh"
+#include <vector>
 
 class RadxFile;
 class RadxRay;
 class RadxField;
-
 
 struct Repository {
   // dimenssions
@@ -85,11 +85,9 @@ public:
   std::vector<float> getOutGate();
   std::vector<float> getOutRef();
 
-  Repository *getRepository();
-  RadxVol& getRadxVol();
-  vector<Interp::Field>& getInterpFields();
-
-
+  std::shared_ptr<Repository> getRepository();
+  RadxVol &getRadxVol();
+  vector<Interp::Field> &getInterpFields();
 
   int _readFile(const string &filePath);
   void _setupRead(RadxFile &file);
@@ -103,11 +101,9 @@ public:
   bool _isRhi();
   void _censorInterpRay(Interp::Ray *interpRay);
 
-
-
 private:
-  Repository *_store;
-  const Params& _params;
+  std::shared_ptr<Repository> _store;
+  const Params &_params;
 
   RadxVol _readVol;
   vector<string> _readPaths;
@@ -118,11 +114,9 @@ private:
   int _volNum;
 
   // censoring
-   int _nWarnCensorPrint;
+  int _nWarnCensorPrint;
 
-
-
-    // class PolarDataStreamImpl;
+  // class PolarDataStreamImpl;
   // PolarDataStreamImpl* _dataStreamHandle;
 };
 

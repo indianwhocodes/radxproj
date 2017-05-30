@@ -4,7 +4,9 @@
 #include <vector>
 
 // constructor
-Polar2Cartesian::Polar2Cartesian(Repository *store) { _store = store; }
+Polar2Cartesian::Polar2Cartesian(std::shared_ptr<Repository> store) {
+  _store = store;
+}
 
 Polar2Cartesian::~Polar2Cartesian() {}
 

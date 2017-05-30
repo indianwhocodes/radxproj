@@ -3,16 +3,43 @@
 #include "Params.hh"
 #include <ctime>
 #include <memory>
+#include <thread>
 
 Radx2GridPlus::Radx2GridPlus(std::string pName) { _programName = pName; }
 
 Radx2GridPlus::~Radx2GridPlus() {}
 
-ThreadQueue<PolarDataStream> Radx2GridPlus::polarDataStreamQueue;
+ThreadQueue<std::shared_ptr<PolarDataStream>>
+    Radx2GridPlus::polarDataStreamQueue;
 
-// ThreadQueue<PolarDataStream> Radx2GridPlus::polarDataStreamQueue();
+void _pushDataintoBuffer(const std::vector<string> &filepaths,
+                         const Params &params) {
 
-void Radx2GridPlus::processFiles(const vector<string> &filepaths,
+  // DONE: Make this across threads
+  for (size_t i = 0; i < filepaths.size(); i++) {
+    clock_t start = clock();
+    // Step 1: Read from netCDF
+    auto pds = std::make_shared<PolarDataStream>(filepaths[i], params);
+    pds->LoadDataFromNetCDFFilesIntoRepository();
+    std::cerr << "Loading data: " << 1.0 * (clock() - start) / CLOCKS_PER_SEC
+              << std::endl;
+    Radx2GridPlus::polarDataStreamQueue.push(pds);
+  }
+}
+
+void _popDatafromBuffer(size_t total_size) {
+
+  for (auto i = 0; i < total_size; i++) {
+    auto p = Radx2GridPlus::polarDataStreamQueue.pop();
+    clock_t start = clock();
+    p->populateOutputValues();
+    std::cerr << "Expanding data: " << 1.0 * (clock() - start) / CLOCKS_PER_SEC
+              << std::endl;
+    p.reset();
+  }
+}
+
+void Radx2GridPlus::processFiles(const std::vector<string> &filepaths,
                                  const Params &params) {
   _inputDir = params.input_dir;
   _outputDir = params.output_dir;
@@ -22,47 +49,35 @@ void Radx2GridPlus::processFiles(const vector<string> &filepaths,
 
   // Why we need these vectors on heap? Because we may pass them to another
   // thread!
-  auto pds = std::make_shared<std::vector<PolarDataStream>>();
-  pds->reserve(n);
+  // std::vector<PolarDataStream> pds{};
+  // pds.reserve(n);
   // auto cg = std::make_shared<std::vector<Cartesian2Grid>>();
-  // auto p2c = std::make_shared<std::vector<Polar2Cartesian>>();
+  // auto p2c = std::make_shard<std::vector<Polar2Cartesian>>();
   // auto wo = std::make_shared<std::vector<WriteOutput>>();
 
-  for (size_t i = 0; i < filepaths.size(); i++) {
-    pds->push_back(PolarDataStream(filepaths[i], params));
-    // p2c->at(i) = Polar2Cartesian(pds->at(i).getRepository());
-    // cg->at(i) = Cartesian2Grid(pds->at(i).getRepository());
-    // wo->at(i) = WriteOutput(_programName, pds->at(i).getRepository(), pds->at(i).getRadxVol(), params, pds->at(i).getInterpFields());
-  }
+  std::thread thread_read_nc(_pushDataintoBuffer, filepaths, params);
+  std::thread thread_process_polarstream(_popDatafromBuffer, n);
 
-  clock_t start;
-  // TODO: Make this across threads
-  for (size_t i = 0; i < filepaths.size(); i++) {
-    start = clock();
-    // Step 1: Read from netCDF
-    pds->at(i).LoadDataFromNetCDFFilesIntoRepository();
-    polarDataStreamQueue.push(pds->at(i));
-    std::cerr << "Loading data: " << 1.0 * (clock() - start) / CLOCKS_PER_SEC
-              << std::endl;
+  thread_read_nc.join();
+  thread_process_polarstream.join();
 
-    // Step 2: Expand tables. It should be in another threads
-    start = clock();
-    // pds->at(i).populateOutputValues();
-    auto p = polarDataStreamQueue.pop();
-    p.populateOutputValues();
-    std::cerr << "Expanding data: " << 1.0 * (clock() - start) / CLOCKS_PER_SEC
-              << std::endl;
+  // for (size_t i = 0; i < filepaths.size(); i++) {
+  // pds.push_back(PolarDataStream(filepaths[i], params));
+  // p2c->at(i) = Polar2Cartesian(pds->at(i).getRepository());
+  // cg->at(i) = Cartesian2Grid(pds->at(i).getRepository());
+  // wo->at(i) = WriteOutput(_programName, pds->at(i).getRepository(),
+  // pds->at(i).getRadxVol(), params, pds->at(i).getInterpFields());
+  //}
 
-    // step 2 : PolarDataStream to Cartesian coordinates
-    // p2c->at(i).calculateCartesianCoords();
+  // step 2 : PolarDataStream to Cartesian coordinates
+  // p2c->at(i).calculateCartesianCoords();
 
-    // step 3 : Gridding
-    // cg->at(i).calculateGridSize(params);
-    // cg->at(i).calculateRefGrid();
+  // step 3 : Gridding
+  // cg->at(i).calculateGridSize(params);
+  // cg->at(i).calculateRefGrid();
 
-    // step 4 : Output file
-    // wo->at(i).writeOutputFile();
-  }
+  // step 4 : Output file
+  // wo->at(i).writeOutputFile();
 }
 
 std::string Radx2GridPlus::getInputDir() { throw "Not Implemented"; }
