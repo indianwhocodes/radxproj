@@ -238,8 +238,8 @@ int Radx2Grid::_runArchive() {
   // modified to here
 
   if (_isSafeToCallRadx2GridPlus()) {
-    Radx2GridPlus radx2GridPlus =
-        Radx2GridPlus("Radx2Grid") radx2GridPlus.processFiles(paths, _params);
+    Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Grid");
+    radx2GridPlus.processFiles(paths, _params);
   } else {
     for (size_t ipath = 0; ipath < paths.size(); ipath++) {
       if (_processFile(paths[ipath])) {

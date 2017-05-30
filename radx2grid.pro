@@ -7,9 +7,11 @@ TARGET = radx2grid
 CONFIG -= qt
 CONFIG -= app_bundle
 
-QMAKE_CXXFLAGS += -fstrict-aliasing
-QMAKE_CXXFLAGS_RELEASE -= -O2 -mtune=generic
-QMAKE_CXXFLAGS_RELEASE += -O3 -ftree-vectorize -ftree-vectorizer-verbose=2 -ffast-math -mtune=ivybridge -fopt-info-loop
+*-g++* {
+    QMAKE_CXXFLAGS += -fstrict-aliasing
+    QMAKE_CXXFLAGS_RELEASE -= -O2 -mtune=generic
+    QMAKE_CXXFLAGS_RELEASE += -O3 -ffast-math -mtune=ivybridge -fopt-info-loop
+}
 
 INCLUDEPATH += \
     /usr/local/include
@@ -90,7 +92,12 @@ LIBS += -lradar \
     -lexpat \
     -lm \
     -lfftw3 \
-    -ltbb
+
+CONFIG(debug, debug|release) {
+    LIBS += -ltbb_debug
+} else {
+    LIBS += -ltbb
+}
 
 LIBS += -L/usr/local/lib
 

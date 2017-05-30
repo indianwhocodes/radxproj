@@ -98,7 +98,7 @@ void PolarDataStream::populateOutputValues() {
     std::vector<float> outRangeGate(end - start + 1);
 
     for (size_t m = 0; m < outRangeGate.size(); m++) {
-      outRangeGate[m] = (m + 0.5) * g + r0;
+      outRangeGate[m] = m * g + r0;
     }
 
 #pragma GCC ivdep
