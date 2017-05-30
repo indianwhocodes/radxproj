@@ -25,6 +25,7 @@ public:
 
 private:
   Repository *_store;
+
 };
 
 #endif

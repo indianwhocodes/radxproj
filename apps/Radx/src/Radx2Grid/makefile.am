@@ -111,4 +111,5 @@ Radx2Grid_SOURCES = \
 	GridSet.cc \
 	Cartesian2Grid.cpp \
 	Polar2Cartesian.cpp \
-	PolarDataStream.cpp 
+	PolarDataStream.cpp \
+	WriteOutput.cpp 
