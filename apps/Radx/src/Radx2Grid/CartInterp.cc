@@ -44,6 +44,7 @@
 #include <Radx/RadxSweep.hh>
 #include <Mdv/DsMdvx.hh>
 #include <algorithm>
+#include "test.hh"
 using namespace std;
 
 const double CartInterp::_searchResAz = 0.1;
@@ -2600,6 +2601,11 @@ double CartInterp::_conditionAz(double az)
 
 int CartInterp::_writeOutputFile()
 {
+  Test t;
+  if(t.run(_progName, _outputFields, _params, _readVol.getPathInUse()) == 0)
+  {
+      cout << "DEBUG: WRITEOUTPUT in Radx2GridPlus No ERROR" << endl;
+  } cout << "DEBUG: AFTER WRITEOUTPUT in Radx2GridPlus" << endl;
 
   if (_params.debug) {
     cerr << "  Writing output file ... " << endl;

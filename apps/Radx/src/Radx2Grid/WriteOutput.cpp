@@ -23,6 +23,81 @@ WriteOutput::WriteOutput(std::string progN, Repository *store, RadxVol& readVol,
 }
 WriteOutput::~WriteOutput() {}
 
+/////////////////////////////////////////////////////
+// test WriteOutputFile()
+
+int WriteOutput::testWriteOutputFile(fl32 **outputFields)
+{
+    cout << "DEBUG: inside of testWriteOutputFile()" << endl;
+    if (_params.debug) {
+        cerr << "  Writing output file ... " << endl;
+    }
+    // cedric is a special case
+    if (_params.output_format == Params::CEDRIC) {
+//        return _writeCedricFile(false);  do we need this?
+    }
+
+    // initialize the output grid dimensions
+    _initGrid();
+
+    cout << "DEBUG: after initGrid" << endl;
+
+    if (_setRadarParams()) {
+        cerr << "ERROR - CartInterp::interpVol()" << endl;
+        return -1;
+    }
+
+
+
+    OutputMdv out(_progName, _params);
+    out.setMasterHeader(_readVol);
+    for (size_t ifield = 0; ifield < _interpFields.size(); ifield++) {
+        const Interp::Field &ifld = _interpFields[ifield];
+        out.addField(_readVol, _proj, _gridZLevels,
+                     ifld.outputName, ifld.longName, ifld.units,
+                     ifld.inputDataType,
+                     ifld.inputScale,
+                     ifld.inputOffset,
+                     missingFl32,
+                     outputFields[ifield]);
+    } // ifield
+
+    // debug (test) fields
+
+    for (size_t ii = 0; ii < _derived3DFields.size(); ii++) {
+        const DerivedField *dfld = _derived3DFields[ii];
+        if (dfld->writeToFile) {
+            out.addField(_readVol, _proj, dfld->vertLevels,
+                         dfld->name, dfld->longName, dfld->units,
+                         Radx::FL32, 1.0, 0.0, missingFl32, dfld->data);
+        }
+    }
+
+    for (size_t ii = 0; ii < _derived2DFields.size(); ii++) {
+        const DerivedField *dfld = _derived2DFields[ii];
+        if (dfld->writeToFile) {
+            out.addField(_readVol, _proj, dfld->vertLevels,
+                         dfld->name, dfld->longName, dfld->units,
+                         Radx::FL32, 1.0, 0.0, missingFl32, dfld->data);
+        }
+    }
+
+    // chunks
+
+    out.addChunks(_readVol, _interpFields.size());
+
+    // write out file
+
+    if (out.writeVol()) {
+        cerr << "ERROR - Interp::processFile" << endl;
+        cerr << "  Cannot write file to output_dir: "
+             << _params.output_dir << endl;
+        return -1;
+    }
+
+    return 0;
+}
+
 
 /////////////////////////////////////////////////////
 // write out data
@@ -42,6 +117,7 @@ int WriteOutput::writeOutputFile()
 
     if (_setRadarParams()) {
         cerr << "ERROR - CartInterp::interpVol()" << endl;
+        return -1;
     }
 
 

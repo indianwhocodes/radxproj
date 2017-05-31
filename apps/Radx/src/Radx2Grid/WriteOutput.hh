@@ -23,6 +23,8 @@ public:
   void _computeGridRelative();
   int _setRadarParams();
 
+  int testWriteOutputFile(fl32 **outputFields);
+
 
 protected:
     // class for debug fields
