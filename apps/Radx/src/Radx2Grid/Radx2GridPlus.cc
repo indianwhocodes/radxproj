@@ -43,6 +43,7 @@ void _popDatafromBuffer(size_t total_size) {
     std::cerr << "Expanding data: "
               << (_currentTimestamp() - start_clock) / 1.0E6 << " sec"
               << std::endl;
+
     p.reset();
   }
 }
@@ -63,19 +64,14 @@ void Radx2GridPlus::processFiles(const std::vector<string> &filepaths,
   // auto p2c = std::make_shard<std::vector<Polar2Cartesian>>();
   // auto wo = std::make_shared<std::vector<WriteOutput>>();
 
-  std::thread thread_read_nc(_pushDataintoBuffer, filepaths, params);
-  std::thread thread_process_polarstream(_popDatafromBuffer, n);
+  // std::thread thread_read_nc(_pushDataintoBuffer, filepaths, params);
+  // std::thread thread_process_polarstream(_popDatafromBuffer, n);
 
-  thread_read_nc.join();
-  thread_process_polarstream.join();
+  // thread_read_nc.join();
+  // thread_process_polarstream.join();
 
-  // for (size_t i = 0; i < filepaths.size(); i++) {
-  // pds.push_back(PolarDataStream(filepaths[i], params));
-  // p2c->at(i) = Polar2Cartesian(pds->at(i).getRepository());
-  // cg->at(i) = Cartesian2Grid(pds->at(i).getRepository());
-  // wo->at(i) = WriteOutput(_programName, pds->at(i).getRepository(),
-  // pds->at(i).getRadxVol(), params, pds->at(i).getInterpFields());
-  //}
+  _pushDataintoBuffer(filepaths, params);
+  _popDatafromBuffer(n);
 
   // step 2 : PolarDataStream to Cartesian coordinates
   // p2c->at(i).calculateCartesianCoords();

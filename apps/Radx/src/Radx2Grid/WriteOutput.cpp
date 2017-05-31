@@ -45,7 +45,7 @@ int WriteOutput::writeOutputFile() {
   out.setMasterHeader(_readVol);
   for (size_t ifield = 0; ifield < _interpFields.size(); ifield++) {
     const Interp::Field &ifld = _interpFields[ifield];
-    const fl32 *_outputFields = &(_store->_fields[ifld.outputName][0]);
+    const fl32 *_outputFields = _store->_outFields["REF"]->data();
     out.addField(_readVol, _proj, _gridZLevels, ifld.outputName, ifld.longName,
                  ifld.units, Radx::DataType_t::FL32, 1.0, 0.0, missingFl32,
                  _outputFields);
