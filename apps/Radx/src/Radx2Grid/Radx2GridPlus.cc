@@ -1,7 +1,7 @@
 
 #include "Radx2GridPlus.hh"
 #include "Params.hh"
-#include <ctime>
+#include <chrono>
 #include <memory>
 #include <thread>
 
@@ -12,17 +12,24 @@ Radx2GridPlus::~Radx2GridPlus() {}
 ThreadQueue<std::shared_ptr<PolarDataStream>>
     Radx2GridPlus::polarDataStreamQueue;
 
+long _currentTimestamp() {
+  std::chrono::microseconds start =
+      std::chrono::duration_cast<std::chrono::microseconds>(
+          std::chrono::system_clock::now().time_since_epoch());
+  return start.count();
+}
+
 void _pushDataintoBuffer(const std::vector<string> &filepaths,
                          const Params &params) {
 
   // DONE: Make this across threads
   for (size_t i = 0; i < filepaths.size(); i++) {
-    clock_t start = clock();
+    long start_clock = _currentTimestamp();
     // Step 1: Read from netCDF
     auto pds = std::make_shared<PolarDataStream>(filepaths[i], params);
     pds->LoadDataFromNetCDFFilesIntoRepository();
-    std::cerr << "Loading data: " << 1.0 * (clock() - start) / CLOCKS_PER_SEC
-              << std::endl;
+    std::cerr << "Loading data: " << (_currentTimestamp() - start_clock) / 1.0E6
+              << " sec" << std::endl;
     Radx2GridPlus::polarDataStreamQueue.push(pds);
   }
 }
@@ -31,9 +38,10 @@ void _popDatafromBuffer(size_t total_size) {
 
   for (auto i = 0; i < total_size; i++) {
     auto p = Radx2GridPlus::polarDataStreamQueue.pop();
-    clock_t start = clock();
+    long start_clock = _currentTimestamp();
     p->populateOutputValues();
-    std::cerr << "Expanding data: " << 1.0 * (clock() - start) / CLOCKS_PER_SEC
+    std::cerr << "Expanding data: "
+              << (_currentTimestamp() - start_clock) / 1.0E6 << " sec"
               << std::endl;
     p.reset();
   }
