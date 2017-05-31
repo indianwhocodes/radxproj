@@ -24,8 +24,8 @@ private:
   std::string _inputDir;
   std::string _outputDir;
 
-private:
-  static ThreadQueue<PolarDataStream> polarDataStreamQueue;
+public:
+  static ThreadQueue<std::shared_ptr<PolarDataStream>> polarDataStreamQueue;
 };
 
 #endif

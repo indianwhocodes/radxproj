@@ -7,7 +7,7 @@
 class Polar2Cartesian {
 public:
   // constructor & destructor
-  Polar2Cartesian(Repository *store);
+  Polar2Cartesian(std::shared_ptr<Repository> store);
   ~Polar2Cartesian();
 
   void calculateHeight();
@@ -24,8 +24,7 @@ public:
   // float *getGateRoI();
 
 private:
-  Repository *_store;
-
+  std::shared_ptr<Repository> _store;
 };
 
 #endif
