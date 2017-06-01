@@ -1,26 +1,26 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=* 
-// ** Copyright UCAR (c) 1990 - 2016                                         
-// ** University Corporation for Atmospheric Research (UCAR)                 
-// ** National Center for Atmospheric Research (NCAR)                        
-// ** Boulder, Colorado, USA                                                 
-// ** BSD licence applies - redistribution and use in source and binary      
-// ** forms, with or without modification, are permitted provided that       
-// ** the following conditions are met:                                      
-// ** 1) If the software is modified to produce derivative works,            
-// ** such modified software should be clearly marked, so as not             
-// ** to confuse it with the version available from UCAR.                    
-// ** 2) Redistributions of source code must retain the above copyright      
-// ** notice, this list of conditions and the following disclaimer.          
-// ** 3) Redistributions in binary form must reproduce the above copyright   
-// ** notice, this list of conditions and the following disclaimer in the    
-// ** documentation and/or other materials provided with the distribution.   
-// ** 4) Neither the name of UCAR nor the names of its contributors,         
-// ** if any, may be used to endorse or promote products derived from        
-// ** this software without specific prior written permission.               
-// ** DISCLAIMER: THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS  
-// ** OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED      
-// ** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.    
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=* 
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1990 - 2016
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Boulder, Colorado, USA
+// ** BSD licence applies - redistribution and use in source and binary
+// ** forms, with or without modification, are permitted provided that
+// ** the following conditions are met:
+// ** 1) If the software is modified to produce derivative works,
+// ** such modified software should be clearly marked, so as not
+// ** to confuse it with the version available from UCAR.
+// ** 2) Redistributions of source code must retain the above copyright
+// ** notice, this list of conditions and the following disclaimer.
+// ** 3) Redistributions in binary form must reproduce the above copyright
+// ** notice, this list of conditions and the following disclaimer in the
+// ** documentation and/or other materials provided with the distribution.
+// ** 4) Neither the name of UCAR nor the names of its contributors,
+// ** if any, may be used to endorse or promote products derived from
+// ** this software without specific prior written permission.
+// ** DISCLAIMER: THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS
+// ** OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+// ** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ///////////////////////////////////////////////////////////////
 // CartInterp class - derived from Interp.
 // Used for full 3-D Cartesian interpolation.
@@ -33,41 +33,35 @@
 
 #include "CartInterp.hh"
 #include "OutputMdv.hh"
-#include <toolsa/pjg.h>
+#include "test.hh"
+#include <Mdv/DsMdvx.hh>
+#include <Radx/RadxField.hh>
+#include <Radx/RadxPath.hh>
+#include <Radx/RadxRay.hh>
+#include <Radx/RadxSweep.hh>
+#include <Radx/RadxTime.hh>
+#include <algorithm>
 #include <toolsa/mem.h>
+#include <toolsa/pjg.h>
 #include <toolsa/sincos.h>
 #include <toolsa/toolsa_macros.h>
-#include <Radx/RadxRay.hh>
-#include <Radx/RadxField.hh>
-#include <Radx/RadxTime.hh>
-#include <Radx/RadxPath.hh>
-#include <Radx/RadxSweep.hh>
-#include <Mdv/DsMdvx.hh>
-#include <algorithm>
-#include "test.hh"
 using namespace std;
 
 const double CartInterp::_searchResAz = 0.1;
 const double CartInterp::_searchResEl = 0.1;
 const double CartInterp::_searchAzOverlapDeg = 20.0;
 const double CartInterp::_searchAzOverlapHalf =
-  CartInterp::_searchAzOverlapDeg / 2.0;
+    CartInterp::_searchAzOverlapDeg / 2.0;
 
 // Constructor
 
-CartInterp::CartInterp(const string &progName,
-                       const Params &params,
-                       RadxVol &readVol,
-                       vector<Field> &interpFields,
-                       vector<Ray *> &interpRays) :
-        Interp(progName,
-               params,
-               readVol,
-               interpFields,
-               interpRays)
-        
+CartInterp::CartInterp(const string &progName, const Params &params,
+                       RadxVol &readVol, vector<Field> &interpFields,
+                       vector<Ray *> &interpRays)
+    : Interp(progName, params, readVol, interpFields, interpRays)
+
 {
-  
+
   _searchMatrixLowerLeft = NULL;
   _searchMatrixUpperLeft = NULL;
   _searchMatrixLowerRight = NULL;
@@ -96,21 +90,20 @@ CartInterp::CartInterp(const string &progName,
   if (_params.output_test_fields) {
     _createTestFields();
   }
-  
+
   // create convective/stratiform fields if needed
 
   if (_params.identify_convective_stratiform_split) {
     _createConvStratFields();
   }
-  
+
   // initialize the output grid dimensions
-  
+
   _initGrid();
 
   // set up thread objects
 
   _createThreads();
-
 }
 
 //////////////////////////////////////
@@ -125,7 +118,6 @@ CartInterp::~CartInterp()
   _freeGridLoc();
   _freeOutputArrays();
   _freeDerivedFields();
-
 }
 
 //////////////////////////////////////////////////
@@ -152,7 +144,7 @@ int CartInterp::interpVol()
   }
 
   // initialize the output field arrays
-  
+
   _initOutputArrays();
 
   // convective / stratiform split
@@ -184,12 +176,12 @@ int CartInterp::interpVol()
 
   if (_params.debug) {
     cerr << "  _isSector: " << _isSector << endl;
-    cerr << "  _spansNorth: " << (char *) (_spansNorth? "Y":"N") << endl;
+    cerr << "  _spansNorth: " << (char *)(_spansNorth ? "Y" : "N") << endl;
   }
-  
+
   // compute search matrix angle limits - keep the matrix
   // as small as possible for efficiency
-  
+
   _computeSearchLimits();
   _printRunTime("Computing search limits");
 
@@ -200,7 +192,7 @@ int CartInterp::interpVol()
   }
   _fillSearchMatrix();
   _printRunTime("Filling search matrix");
-  
+
   // compute grid locations relative to radar
 
   if (_params.debug) {
@@ -244,54 +236,52 @@ int CartInterp::interpVol()
   // clean up
 
   _freeSearchMatrix();
-   if (_params.free_memory_between_files) {
+  if (_params.free_memory_between_files) {
     _freeGridLoc();
   }
- 
-  return 0;
 
+  return 0;
 }
 
 //////////////////////////////////////////////////
 // create the threading objects
 
-void CartInterp::_createThreads()
-{
+void CartInterp::_createThreads() {
 
   _threadComputeLowerLeft.setContext(this);
   pthread_t pthLL = 0;
   pthread_create(&pthLL, NULL, _computeSearchLowerLeft,
                  &_threadComputeLowerLeft);
   _threadComputeLowerLeft.setThreadId(pthLL);
-  
+
   _threadComputeUpperLeft.setContext(this);
   pthread_t pthUL = 0;
   pthread_create(&pthUL, NULL, _computeSearchUpperLeft,
                  &_threadComputeUpperLeft);
   _threadComputeUpperLeft.setThreadId(pthUL);
-  
+
   _threadComputeLowerRight.setContext(this);
   pthread_t pthLR = 0;
   pthread_create(&pthLR, NULL, _computeSearchLowerRight,
                  &_threadComputeLowerRight);
   _threadComputeLowerRight.setThreadId(pthLR);
-  
+
   _threadComputeUpperRight.setContext(this);
   pthread_t pthUR = 0;
   pthread_create(&pthUR, NULL, _computeSearchUpperRight,
                  &_threadComputeUpperRight);
   _threadComputeUpperRight.setThreadId(pthUR);
-  
+
   // initialize compute object
 
   pthread_mutex_init(&_debugPrintMutex, NULL);
-  
+
   if (_params.use_multiple_threads) {
-    
+
     // set up compute thread pool
-    
+
     for (int ii = 0; ii < _params.n_compute_threads; ii++) {
-      
+
       CartThread *thread = new CartThread();
       thread->setContext(this);
 
@@ -299,18 +289,14 @@ void CartInterp::_createThreads()
       pthread_create(&pth, NULL, _computeInThread, thread);
       thread->setThreadId(pth);
       _availThreads.push_back(thread);
-      
     }
-    
   }
-
 }
 
 //////////////////////////////////////////////////
 // free the threading objects
 
-void CartInterp::_freeThreads()
-{
+void CartInterp::_freeThreads() {
 
   // wait for active thread pool to complete
 
@@ -330,7 +316,7 @@ void CartInterp::_freeThreads()
   }
 
   // wait for all threads to exit
-  
+
   for (size_t ii = 0; ii < _availThreads.size(); ii++) {
     _availThreads[ii]->waitForWorkToComplete();
   }
@@ -339,7 +325,7 @@ void CartInterp::_freeThreads()
   }
 
   // delete all threads
-  
+
   for (size_t ii = 0; ii < _availThreads.size(); ii++) {
     delete _availThreads[ii];
   }
@@ -348,7 +334,6 @@ void CartInterp::_freeThreads()
   }
 
   pthread_mutex_destroy(&_debugPrintMutex);
-
 }
 
 //////////////////////////////////////////////////
@@ -357,123 +342,111 @@ void CartInterp::_freeThreads()
 void CartInterp::_createTestFields()
 
 {
-  
-  _nContribDebug = new DerivedField("nContrib", "n_points_contrib", "count", true);
+
+  _nContribDebug =
+      new DerivedField("nContrib", "n_points_contrib", "count", true);
   _derived3DFields.push_back(_nContribDebug);
-  
+
   _gridAzDebug = new DerivedField("gridAz", "grid_azimiuth", "deg", true);
   _derived3DFields.push_back(_gridAzDebug);
-  
+
   _gridElDebug = new DerivedField("gridEl", "grid_elevation", "deg", true);
   _derived3DFields.push_back(_gridElDebug);
-  
-  _gridRangeDebug = new DerivedField("gridRange", "grid_slant_range", "km", true);
+
+  _gridRangeDebug =
+      new DerivedField("gridRange", "grid_slant_range", "km", true);
   _derived3DFields.push_back(_gridRangeDebug);
-  
+
   _llElDebug = new DerivedField("llEl", "lower_left_el", "deg", true);
   _derived3DFields.push_back(_llElDebug);
   _llAzDebug = new DerivedField("llAz", "lower_left_az", "deg", true);
   _derived3DFields.push_back(_llAzDebug);
-  
+
   _lrElDebug = new DerivedField("lrEl", "lower_right_el", "deg", true);
   _derived3DFields.push_back(_lrElDebug);
   _lrAzDebug = new DerivedField("lrAz", "lower_right_az", "deg", true);
   _derived3DFields.push_back(_lrAzDebug);
-  
+
   _ulElDebug = new DerivedField("ulEl", "upper_left_el", "deg", true);
   _derived3DFields.push_back(_ulElDebug);
   _ulAzDebug = new DerivedField("ulAz", "upper_left_az", "deg", true);
   _derived3DFields.push_back(_ulAzDebug);
-  
+
   _urElDebug = new DerivedField("urEl", "upper_right_el", "deg", true);
   _derived3DFields.push_back(_urElDebug);
   _urAzDebug = new DerivedField("urAz", "upper_right_az", "deg", true);
   _derived3DFields.push_back(_urAzDebug);
-  
 }
-  
+
 //////////////////////////////////////////////////
 // create the conv-strat fields
 
 void CartInterp::_createConvStratFields()
 
 {
-  
+
   bool writeDebug = _params.conv_strat_write_debug_fields;
   bool writePartition = _params.conv_strat_write_partition;
 
-  _convStratDbzMax = new DerivedField("DbzMax",
-                                      "max_dbz_for_conv_strat", 
-                                      "dbz", writeDebug);
+  _convStratDbzMax =
+      new DerivedField("DbzMax", "max_dbz_for_conv_strat", "dbz", writeDebug);
   _derived3DFields.push_back(_convStratDbzMax);
-  
-  _convStratDbzCount = new DerivedField("DbzCount",
-                                        "n_points_dbz_for_conv_strat", 
-                                        "count", writeDebug);
+
+  _convStratDbzCount = new DerivedField(
+      "DbzCount", "n_points_dbz_for_conv_strat", "count", writeDebug);
   _derived3DFields.push_back(_convStratDbzCount);
-  
-  _convStratDbzSum = new DerivedField("DbzSum",
-                                      "sum_dbz_for_conv_strat",
-                                      "dbz", writeDebug);
+
+  _convStratDbzSum =
+      new DerivedField("DbzSum", "sum_dbz_for_conv_strat", "dbz", writeDebug);
   _derived3DFields.push_back(_convStratDbzSum);
-  
-  _convStratDbzSqSum = new DerivedField("DbzSqSum",
-                                        "sum_dbz_sq_for_conv_strat", 
+
+  _convStratDbzSqSum = new DerivedField("DbzSqSum", "sum_dbz_sq_for_conv_strat",
                                         "dbz^2", writeDebug);
   _derived3DFields.push_back(_convStratDbzSqSum);
-  
-  _convStratDbzSqSqSum = new DerivedField("DbzSqSqSum",
-                                          "sum_dbz_sq_sq_for_conv_strat",
-                                          "dbz^4", writeDebug);
+
+  _convStratDbzSqSqSum = new DerivedField(
+      "DbzSqSqSum", "sum_dbz_sq_sq_for_conv_strat", "dbz^4", writeDebug);
   _derived3DFields.push_back(_convStratDbzSqSqSum);
-  
-  _convStratDbzTexture = new DerivedField("DbzTexture",
-                                          "dbz_texture_for_conv_strat",
-                                          "dbz", writeDebug);
+
+  _convStratDbzTexture = new DerivedField(
+      "DbzTexture", "dbz_texture_for_conv_strat", "dbz", writeDebug);
   _derived3DFields.push_back(_convStratDbzTexture);
 
-  _convStratFilledTexture = new DerivedField("FilledTexture",
-                                             "filled_dbz_texture_for_conv_strat",
-                                             "dbz", writeDebug);
+  _convStratFilledTexture = new DerivedField(
+      "FilledTexture", "filled_dbz_texture_for_conv_strat", "dbz", writeDebug);
   _derived3DFields.push_back(_convStratFilledTexture);
 
-  _convStratDbzSqTexture = new DerivedField("DbzSqTexture",
-                                            "dbz_sq_texture_for_conv_strat",
-                                            "dbz", writeDebug);
+  _convStratDbzSqTexture = new DerivedField(
+      "DbzSqTexture", "dbz_sq_texture_for_conv_strat", "dbz", writeDebug);
   _derived3DFields.push_back(_convStratDbzSqTexture);
-  
-  _convStratFilledSqTexture = new DerivedField("FilledSqTexture",
-                                               "filled_dbz_sq_texture_for_conv_strat",
-                                               "dbz", writeDebug);
+
+  _convStratFilledSqTexture = new DerivedField(
+      "FilledSqTexture", "filled_dbz_sq_texture_for_conv_strat", "dbz",
+      writeDebug);
   _derived3DFields.push_back(_convStratFilledSqTexture);
 
-  _convStratDbzColMax = new DerivedField("DbzColMax",
-                                         "col_max_dbz_for_conv_strat",
-                                         "dbz", writeDebug);
+  _convStratDbzColMax = new DerivedField(
+      "DbzColMax", "col_max_dbz_for_conv_strat", "dbz", writeDebug);
   _derived2DFields.push_back(_convStratDbzColMax);
 
-  _convStratMeanTexture = new DerivedField("MeanTexture",
-                                           "mean_dbz_texture_for_conv_strat",
-                                           "dbz", writeDebug);
+  _convStratMeanTexture = new DerivedField(
+      "MeanTexture", "mean_dbz_texture_for_conv_strat", "dbz", writeDebug);
   _derived2DFields.push_back(_convStratMeanTexture);
 
-  _convStratMeanSqTexture = new DerivedField("MeanSqTexture",
-                                             "mean_dbz_sq_texture_for_conv_strat",
-                                             "dbz", writeDebug);
+  _convStratMeanSqTexture = new DerivedField(
+      "MeanSqTexture", "mean_dbz_sq_texture_for_conv_strat", "dbz", writeDebug);
   _derived2DFields.push_back(_convStratMeanSqTexture);
 
-  _convStratCategory = new DerivedField("ConvStrat",
-                                        "category_for_conv_strat",
+  _convStratCategory = new DerivedField("ConvStrat", "category_for_conv_strat",
                                         "", writePartition);
   _derived2DFields.push_back(_convStratCategory);
-  
 }
-  
+
 //////////////////////////////////////////////////
 // free the derived fields
 
 void CartInterp::_freeDerivedFields()
-  
+
 {
   for (size_t ii = 0; ii < _derived3DFields.size(); ii++) {
     delete _derived3DFields[ii];
@@ -484,7 +457,6 @@ void CartInterp::_freeDerivedFields()
   }
   _derived2DFields.clear();
 }
-
 
 ////////////////////////////////////////////////////////////
 // Initialize Z levels
@@ -502,7 +474,7 @@ void CartInterp::_initZLevels()
   }
 
   if (_params.specify_individual_z_levels) {
-  
+
     for (int ii = 0; ii < _gridNz; ii++) {
       _gridZLevels.push_back(_params._z_level_array[ii]);
     }
@@ -510,12 +482,10 @@ void CartInterp::_initZLevels()
   } else {
 
     for (int ii = 0; ii < _gridNz; ii++) {
-      _gridZLevels.push_back
-        (_params.grid_z_geom.minz + ii * _params.grid_z_geom.dz);
+      _gridZLevels.push_back(_params.grid_z_geom.minz +
+                             ii * _params.grid_z_geom.dz);
     }
-
   }
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -543,7 +513,7 @@ void CartInterp::_initGrid()
   _gridNx = _params.grid_xy_geom.nx;
   _gridMinx = _params.grid_xy_geom.minx;
   _gridDx = _params.grid_xy_geom.dx;
-  
+
   _gridNy = _params.grid_xy_geom.ny;
   _gridMiny = _params.grid_xy_geom.miny;
   _gridDy = _params.grid_xy_geom.dy;
@@ -552,10 +522,10 @@ void CartInterp::_initGrid()
   _nPointsVol = _nPointsPlane * _gridNz;
 
   _freeGridLoc();
-  
-  _gridLoc = (GridLoc ****)
-    umalloc3(_gridNz, _gridNy, _gridNx, sizeof(GridLoc *));
-  
+
+  _gridLoc =
+      (GridLoc ****)umalloc3(_gridNz, _gridNy, _gridNx, sizeof(GridLoc *));
+
   for (int iz = 0; iz < _gridNz; iz++) {
     for (int iy = 0; iy < _gridNy; iy++) {
       for (int ix = 0; ix < _gridNx; ix++) {
@@ -580,16 +550,15 @@ void CartInterp::_initGrid()
     _convStratDbzSqSum->setToZero();
     _convStratDbzSqSqSum->setToZero();
   }
-
 }
-  
+
 ////////////////////////////////////////////////////////////
 // Free grid loc array
 
 void CartInterp::_freeGridLoc()
-  
+
 {
-  
+
   if (_gridLoc) {
     for (int iz = 0; iz < _gridNz; iz++) {
       for (int iy = 0; iy < _gridNy; iy++) {
@@ -598,36 +567,34 @@ void CartInterp::_freeGridLoc()
         }
       }
     }
-    ufree3((void ***) _gridLoc);
+    ufree3((void ***)_gridLoc);
   }
 
   _gridLoc = NULL;
 
   _prevRadarLat = _prevRadarLon = _prevRadarAltKm = -9999.0;
-
 }
 
 ////////////////////////////////////////////////////////////
 // Allocate the output arrays for the gridded fields
 
 void CartInterp::_allocOutputArrays()
-  
+
 {
 
   _freeOutputArrays();
-  _outputFields = (fl32 **) umalloc2(_interpFields.size(),
-                                     _nPointsVol, sizeof(fl32));
-  
+  _outputFields =
+      (fl32 **)umalloc2(_interpFields.size(), _nPointsVol, sizeof(fl32));
 }
 
 ////////////////////////////////////////////////////////////
 // Free up the output arrays for the gridded fields
 
 void CartInterp::_freeOutputArrays()
-  
+
 {
   if (_outputFields) {
-    ufree2((void **) _outputFields);
+    ufree2((void **)_outputFields);
   }
   _outputFields = NULL;
 }
@@ -636,7 +603,7 @@ void CartInterp::_freeOutputArrays()
 // init the output arrays for the gridded fields
 
 void CartInterp::_initOutputArrays()
-  
+
 {
 
   _allocOutputArrays();
@@ -646,21 +613,19 @@ void CartInterp::_initOutputArrays()
       _outputFields[ii][jj] = missingFl32;
     }
   }
-
 }
 
 //////////////////////////////////////////////////
 // Compute the search matrix limits
 // keeping it as small as possible for efficiency
 
-void CartInterp::_computeSearchLimits()
-{
+void CartInterp::_computeSearchLimits() {
 
   // elevation
 
   double minEl = 9999.0;
   double maxEl = -9999.0;
-  
+
   vector<RadxRay *> &rays = _readVol.getRays();
   for (size_t ii = 0; ii < rays.size(); ii++) {
     double el = rays[ii]->getElevationDeg();
@@ -673,25 +638,26 @@ void CartInterp::_computeSearchLimits()
   }
 
   double elevExtension = _beamWidthDegV *
-    _params.beam_width_fraction_for_data_limit_extension * 2.0;
+                         _params.beam_width_fraction_for_data_limit_extension *
+                         2.0;
 
   minEl -= elevExtension;
   maxEl += elevExtension;
 
   // set elevation resolution and search radius
-  
+
   _searchRadiusEl = _scanDeltaEl + _beamWidthDegV + 1.0;
-  
+
   _searchMinEl =
-    (int) floor((minEl - _searchRadiusEl) / _searchResEl) * _searchResEl;
+      (int)floor((minEl - _searchRadiusEl) / _searchResEl) * _searchResEl;
   _searchMaxEl =
-    (int) floor((maxEl + _searchRadiusEl) / _searchResEl + 1.0) * _searchResEl;
-  _searchNEl = (int) ((_searchMaxEl - _searchMinEl) / _searchResEl + 1);
-  _searchMaxDistEl = (int) (_searchRadiusEl / _searchResEl + 0.5);
+      (int)floor((maxEl + _searchRadiusEl) / _searchResEl + 1.0) * _searchResEl;
+  _searchNEl = (int)((_searchMaxEl - _searchMinEl) / _searchResEl + 1);
+  _searchMaxDistEl = (int)(_searchRadiusEl / _searchResEl + 0.5);
   _searchMaxCount = _searchMaxDistEl;
-  
+
   // set azimuth resolution and search radius
-  
+
   _searchRadiusAz = _scanDeltaAz + _beamWidthDegH + 1.0;
 
   if (_params.debug) {
@@ -700,7 +666,7 @@ void CartInterp::_computeSearchLimits()
   }
 
   if (_isSector) {
-    
+
     if (_params.debug) {
       cerr << "  _dataSectorStartAzDeg: " << _dataSectorStartAzDeg << endl;
       cerr << "  _dataSectorEndAzDeg: " << _dataSectorEndAzDeg << endl;
@@ -708,23 +674,22 @@ void CartInterp::_computeSearchLimits()
 
     double searchAzRangeDeg = _dataSectorEndAzDeg - _dataSectorStartAzDeg;
     _searchMinAz = _dataSectorStartAzDeg;
-    _searchNAz = (int) (searchAzRangeDeg / _searchResAz + 1);
-    _searchMaxDistAz = (int) (_searchRadiusAz / _searchResAz + 0.5);
+    _searchNAz = (int)(searchAzRangeDeg / _searchResAz + 1);
+    _searchMaxDistAz = (int)(_searchRadiusAz / _searchResAz + 0.5);
 
   } else {
-    
+
     // full 360
 
     double minAzDeg = 0;
     double maxAzDeg = 360.0 + _searchAzOverlapDeg;
-    
+
     double searchAzRangeDeg = maxAzDeg - minAzDeg;
     _searchMinAz = minAzDeg;
-    _searchNAz = (int) (searchAzRangeDeg / _searchResAz + 1);
-    _searchMaxDistAz = (int) (_searchRadiusAz / _searchResAz + 0.5);
-
+    _searchNAz = (int)(searchAzRangeDeg / _searchResAz + 1);
+    _searchMaxDistAz = (int)(_searchRadiusAz / _searchResAz + 0.5);
   }
-  
+
   if (_searchMaxDistAz > _searchMaxCount) {
     _searchMaxCount = _searchMaxDistAz;
   }
@@ -734,30 +699,29 @@ void CartInterp::_computeSearchLimits()
     cerr << "  _searchNAz: " << _searchNAz << endl;
     cerr << "  _searchMaxDistAz: " << _searchMaxDistAz << endl;
   }
-
 }
 
 ///////////////////////////////////////////////////////////
 // Thread function to perform computations
 
 void *CartInterp::_computeInThread(void *thread_data)
-  
+
 {
-  
+
   // get thread data from args
 
-  CartThread *cartThread = (CartThread *) thread_data;
+  CartThread *cartThread = (CartThread *)thread_data;
   CartInterp *context = cartThread->getContext();
   assert(context);
-  
+
   while (true) {
 
     // wait for main to unlock start mutex on this thread
-    
+
     cartThread->waitForStartSignal();
-    
+
     // if exit flag is set, context is done, exit now
-    
+
     if (cartThread->getExitFlag()) {
       if (context->getParams().debug >= Params::DEBUG_VERBOSE) {
         pthread_mutex_t *debugPrintMutex = context->getDebugPrintMutex();
@@ -768,24 +732,23 @@ void *CartInterp::_computeInThread(void *thread_data)
       cartThread->signalParentWorkIsComplete();
       return NULL;
     }
-    
+
     // perform computations
 
     if (cartThread->getTask() == CartThread::INTERP) {
       context->_interpRow(cartThread->getZIndex(), cartThread->getYIndex());
     } else if (cartThread->getTask() == CartThread::GRID_LOC) {
-      context->_computeGridRow(cartThread->getZIndex(), 
+      context->_computeGridRow(cartThread->getZIndex(),
                                cartThread->getYIndex());
     }
-    
+
     // unlock done mutex
-    
+
     cartThread->signalParentWorkIsComplete();
-    
+
   } // while
 
   return NULL;
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -806,7 +769,7 @@ void CartInterp::_computeGridRelative()
   _prevRadarLat = _radarLat;
   _prevRadarLon = _radarLon;
   _prevRadarAltKm = _radarAltKm;
-  
+
   if (_params.center_grid_on_radar) {
     _gridOriginLat = _radarLat;
     _gridOriginLon = _radarLon;
@@ -834,33 +797,30 @@ void CartInterp::_computeGridRelative()
   } else {
 
     // loop through the grid
-    
+
     for (int iz = 0; iz < _gridNz; iz++) {
       for (int iy = 0; iy < _gridNy; iy++) {
         _computeGridRow(iz, iy);
       } // iy
-    } // iz
-
+    }   // iz
   }
-
 }
 
 //////////////////////////////////////////////////////
 // compute grid rows in multi-threaded mode
 
-void CartInterp::_computeGridRelMultiThreaded()
-{
+void CartInterp::_computeGridRelMultiThreaded() {
 
   // loop through the Z layers
-  
+
   for (int iz = 0; iz < _gridNz; iz++) {
 
     // loop through the Y columns
-  
+
     for (int iy = 0; iy < _gridNy; iy++) {
-      
+
       // is a thread available? if not wait for one
-    
+
       CartThread *thread = NULL;
       if (_availThreads.size() > 0) {
         // get thread from available pool
@@ -874,31 +834,30 @@ void CartInterp::_computeGridRelMultiThreaded()
         // wait for current work to complete
         thread->waitForWorkToComplete();
       }
-    
+
       // set thread going to compute moments
-      
+
       thread->setTask(CartThread::GRID_LOC);
       thread->setZIndex(iz);
       thread->setYIndex(iy);
       thread->signalWorkToStart();
-      
+
       // push onto active pool
-      
+
       _activeThreads.push_back(thread);
 
     } // iy
 
   } // iz
-    
+
   // wait for all active threads to complete
-  
+
   while (_activeThreads.size() > 0) {
     CartThread *thread = _activeThreads.front();
     _activeThreads.pop_front();
     _availThreads.push_back(thread);
     thread->waitForWorkToComplete();
   }
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -923,26 +882,25 @@ void CartInterp::_computeGridRow(int iz, int iy)
   double xx = _gridMinx;
 
   for (int ix = 0; ix < _gridNx; ix++, xx += _gridDx) {
-    
+
     // get the latlon of the (x,y) point in the output grid
-    
+
     double gridLat, gridLon;
     _proj.xy2latlon(xx, yy, gridLat, gridLon);
-    
+
     // get the azimuth and distance from the radar
-    
+
     double gndRange, azimuth;
-    PJGLatLon2RTheta(_radarLat, _radarLon,
-                     gridLat, gridLon,
-                     &gndRange, &azimuth);
+    PJGLatLon2RTheta(_radarLat, _radarLon, gridLat, gridLon, &gndRange,
+                     &azimuth);
     if (azimuth < 0) {
       azimuth += 360.0;
     }
-    
+
     // compute elevation
-    
+
     double elevDeg = beamHt.computeElevationDeg(zz, gndRange);
-    
+
     // compute coords relative to radar
 
     double sinAz, cosAz;
@@ -960,9 +918,8 @@ void CartInterp::_computeGridRow(int iz, int iy)
     loc->xxInstr = xxInstr;
     loc->yyInstr = yyInstr;
     loc->zzInstr = zzInstr;
-    
-  } // ix
 
+  } // ix
 }
 
 ////////////////////////////////////////////////////////////
@@ -972,18 +929,17 @@ void CartInterp::_allocSearchMatrix()
 
 {
 
-  _searchMatrixLowerLeft = 
-    (SearchPoint **) umalloc2(_searchNEl, _searchNAz, sizeof(SearchPoint));
+  _searchMatrixLowerLeft =
+      (SearchPoint **)umalloc2(_searchNEl, _searchNAz, sizeof(SearchPoint));
 
-  _searchMatrixUpperLeft = 
-    (SearchPoint **) umalloc2(_searchNEl, _searchNAz, sizeof(SearchPoint));
+  _searchMatrixUpperLeft =
+      (SearchPoint **)umalloc2(_searchNEl, _searchNAz, sizeof(SearchPoint));
 
-  _searchMatrixLowerRight = 
-    (SearchPoint **) umalloc2(_searchNEl, _searchNAz, sizeof(SearchPoint));
+  _searchMatrixLowerRight =
+      (SearchPoint **)umalloc2(_searchNEl, _searchNAz, sizeof(SearchPoint));
 
-  _searchMatrixUpperRight = 
-    (SearchPoint **) umalloc2(_searchNEl, _searchNAz, sizeof(SearchPoint));
-
+  _searchMatrixUpperRight =
+      (SearchPoint **)umalloc2(_searchNEl, _searchNAz, sizeof(SearchPoint));
 }
 
 ////////////////////////////////////////////////////////////
@@ -993,19 +949,19 @@ void CartInterp::_freeSearchMatrix()
 
 {
   if (_searchMatrixLowerLeft) {
-    ufree2((void **) _searchMatrixLowerLeft);
+    ufree2((void **)_searchMatrixLowerLeft);
     _searchMatrixLowerLeft = NULL;
   }
   if (_searchMatrixUpperLeft) {
-    ufree2((void **) _searchMatrixUpperLeft);
+    ufree2((void **)_searchMatrixUpperLeft);
     _searchMatrixUpperLeft = NULL;
   }
   if (_searchMatrixLowerRight) {
-    ufree2((void **) _searchMatrixLowerRight);
+    ufree2((void **)_searchMatrixLowerRight);
     _searchMatrixLowerRight = NULL;
   }
   if (_searchMatrixUpperRight) {
-    ufree2((void **) _searchMatrixUpperRight);
+    ufree2((void **)_searchMatrixUpperRight);
     _searchMatrixUpperRight = NULL;
   }
 }
@@ -1027,19 +983,19 @@ void CartInterp::_initSearchMatrix()
   }
 
   for (size_t iray = 0; iray < _interpRays.size(); iray++) {
-    
+
     const Ray *ray = _interpRays[iray];
 
     // compute elevation index
-    
+
     double el = ray->el;
     if (el < _searchMinEl || el > _searchMaxEl) {
       continue;
     }
     int iel = _getSearchElIndex(el);
-    
+
     // compute azimuth index
-    
+
     double az = ray->az;
     if (_isSector) {
       az = _conditionAz(az);
@@ -1070,43 +1026,43 @@ void CartInterp::_initSearchMatrix()
   } // iray
 
   if (_isSector) {
-    
+
     // condition the ray azimuth to the correct 360
-    
+
     if (_spansNorth) {
       for (int iaz = 0; iaz < _searchNAz; iaz++) {
         for (int iel = 0; iel < _searchNEl; iel++) {
           if (_searchMatrixLowerLeft[iel][iaz].ray) {
             _searchMatrixLowerLeft[iel][iaz].rayAz =
-              _conditionAz(_searchMatrixLowerLeft[iel][iaz].rayAz);
+                _conditionAz(_searchMatrixLowerLeft[iel][iaz].rayAz);
           }
           if (_searchMatrixLowerRight[iel][iaz].ray) {
             _searchMatrixLowerRight[iel][iaz].rayAz =
-              _conditionAz(_searchMatrixLowerRight[iel][iaz].rayAz);
+                _conditionAz(_searchMatrixLowerRight[iel][iaz].rayAz);
           }
           if (_searchMatrixUpperLeft[iel][iaz].ray) {
             _searchMatrixUpperLeft[iel][iaz].rayAz =
-              _conditionAz(_searchMatrixUpperLeft[iel][iaz].rayAz);
+                _conditionAz(_searchMatrixUpperLeft[iel][iaz].rayAz);
           }
           if (_searchMatrixUpperRight[iel][iaz].ray) {
             _searchMatrixUpperRight[iel][iaz].rayAz =
-              _conditionAz(_searchMatrixUpperRight[iel][iaz].rayAz);
+                _conditionAz(_searchMatrixUpperRight[iel][iaz].rayAz);
           }
         } // iel
-      } // iaz
-    } // if (_spansNorth)
+      }   // iaz
+    }     // if (_spansNorth)
 
   } else {
-    
+
     // for full 360, copy the low azimuths into extra region at the
     // high end, so that we can interpolate across the N line
     // so search can cross N line
-    
+
     int sourceIndexStart = _getSearchAzIndex(0.0);
     int sourceIndexEnd = _getSearchAzIndex(_searchAzOverlapDeg);
     int targetIndexStart = _getSearchAzIndex(360.0);
     int targetOffset = targetIndexStart - sourceIndexStart;
-    
+
     // cerr << "1111111111 targetOffset, _searchNEl: " << targetOffset
     //      << ", " << _searchNEl << endl;
     for (int iaz = sourceIndexStart; iaz <= sourceIndexEnd; iaz++) {
@@ -1125,11 +1081,9 @@ void CartInterp::_initSearchMatrix()
         }
       }
     }
-    
-  } // if (_isSector) 
 
+  } // if (_isSector)
 }
-
 
 ////////////////////////////////////////////////////////////
 // Fill the search matrix, using the el/az for each ray
@@ -1151,7 +1105,7 @@ void CartInterp::_fillSearchMatrix()
     _threadComputeUpperLeft.signalWorkToStart();
     _threadComputeLowerRight.signalWorkToStart();
     _threadComputeUpperRight.signalWorkToStart();
-    
+
     _threadComputeLowerLeft.waitForWorkToComplete();
     _threadComputeUpperLeft.waitForWorkToComplete();
     _threadComputeLowerRight.waitForWorkToComplete();
@@ -1170,20 +1124,17 @@ void CartInterp::_fillSearchMatrix()
 
     _threadComputeUpperRight.signalWorkToStart();
     _threadComputeUpperRight.waitForWorkToComplete();
-
   }
-     
+
   if (_params.debug >= Params::DEBUG_EXTRA) {
     _printSearchMatrix(stderr, 1);
   }
-
 }
 
 ///////////////////////////////////////////////////////////
 // print search matrix
 
-void CartInterp::_printSearchMatrix(FILE *out, int res)
-{
+void CartInterp::_printSearchMatrix(FILE *out, int res) {
 
   for (int iel = 0; iel < _searchNEl; iel += res) {
     for (int iaz = 0; iaz < _searchNAz; iaz += res) {
@@ -1197,62 +1148,60 @@ void CartInterp::_printSearchMatrix(FILE *out, int res)
         continue;
       }
 
-      fprintf(out,
-              "iel, iaz, el, az: "
-              "%4d %4d "
-              "%7.3f %7.3f ",
-              iel, iaz,
-              iel * _searchResEl + _searchMinEl,
+      fprintf(out, "iel, iaz, el, az: "
+                   "%4d %4d "
+                   "%7.3f %7.3f ",
+              iel, iaz, iel * _searchResEl + _searchMinEl,
               iaz * _searchResAz + _searchMinAz);
 
       if (ll.ray) {
-        fprintf(out, "LL %7.3f %7.3f %3d ", ll.rayEl, ll.rayAz, ll.ray->sweepIndex);
+        fprintf(out, "LL %7.3f %7.3f %3d ", ll.rayEl, ll.rayAz,
+                ll.ray->sweepIndex);
       } else {
         fprintf(out, "LL %7.3f %7.3f %3d ", -99.999, -99.999, -99);
       }
       if (ul.ray) {
-        fprintf(out, "UL %7.3f %7.3f %3d ", ul.rayEl, ul.rayAz, ul.ray->sweepIndex);
+        fprintf(out, "UL %7.3f %7.3f %3d ", ul.rayEl, ul.rayAz,
+                ul.ray->sweepIndex);
       } else {
         fprintf(out, "UL %7.3f %7.3f %3d ", -99.999, -99.999, -99);
       }
       if (lr.ray) {
-        fprintf(out, "LR %7.3f %7.3f %3d ", lr.rayEl, lr.rayAz, lr.ray->sweepIndex);
+        fprintf(out, "LR %7.3f %7.3f %3d ", lr.rayEl, lr.rayAz,
+                lr.ray->sweepIndex);
       } else {
         fprintf(out, "LR %7.3f %7.3f %3d ", -99.999, -99.999, -99);
       }
       if (ur.ray) {
-        fprintf(out, "UR %7.3f %7.3f %3d ", ur.rayEl, ur.rayAz, ur.ray->sweepIndex);
+        fprintf(out, "UR %7.3f %7.3f %3d ", ur.rayEl, ur.rayAz,
+                ur.ray->sweepIndex);
       } else {
         fprintf(out, "UR %7.3f %7.3f %3d ", -99.999, -99.999, -99);
       }
       fprintf(out, "\n");
 
     } // iaz
-  } // iel
-
+  }   // iel
 }
 
 ///////////////////////////////////////////////////////////
 // print point in search matrix
 
-void CartInterp::_printSearchMatrixPoint(FILE *out, int iel, int iaz)
-{
+void CartInterp::_printSearchMatrixPoint(FILE *out, int iel, int iaz) {
 
   const SearchPoint &ll = _searchMatrixLowerLeft[iel][iaz];
   const SearchPoint &ul = _searchMatrixUpperLeft[iel][iaz];
   const SearchPoint &lr = _searchMatrixLowerRight[iel][iaz];
   const SearchPoint &ur = _searchMatrixUpperRight[iel][iaz];
-  
+
   cout << "----------------------------------------------" << endl;
-  
-  fprintf(out,
-          "Search matrix point: iel, iaz, el, az: "
-          "%4d %4d "
-          "%7.3f %7.3f ",
-          iel, iaz,
-          iel * _searchResEl + _searchMinEl,
+
+  fprintf(out, "Search matrix point: iel, iaz, el, az: "
+               "%4d %4d "
+               "%7.3f %7.3f ",
+          iel, iaz, iel * _searchResEl + _searchMinEl,
           iaz * _searchResAz + _searchMinAz);
-  
+
   if (ll.ray) {
     fprintf(out, "LL %7.3f %7.3f ", ll.rayEl, ll.rayAz);
   } else {
@@ -1274,18 +1223,16 @@ void CartInterp::_printSearchMatrixPoint(FILE *out, int iel, int iaz)
     fprintf(out, "UR %7.3f %7.3f ", -99.999, -99.999);
   }
   fprintf(out, "\n");
-  
-  cout << "----------------------------------------------" << endl;
 
+  cout << "----------------------------------------------" << endl;
 }
 
 ///////////////////////////////////////////////////////////
 // Thread function to compute search matrix lower left
 
-void *CartInterp::_computeSearchLowerLeft(void *thread_data)
-{
+void *CartInterp::_computeSearchLowerLeft(void *thread_data) {
 
-  CartThread *interpThread = (CartThread *) thread_data;
+  CartThread *interpThread = (CartThread *)thread_data;
   CartInterp *interp = interpThread->getContext();
   assert(interp);
 
@@ -1294,7 +1241,7 @@ void *CartInterp::_computeSearchLowerLeft(void *thread_data)
   while (true) {
 
     interpThread->waitForStartSignal();
-    
+
     vector<SearchIndex> thisSearch, nextSearch;
     for (int level = 0; level < interp->_searchMaxCount; level++) {
       if (interp->_fillSearchLowerLeft(level, thisSearch, nextSearch) == 0) {
@@ -1304,20 +1251,17 @@ void *CartInterp::_computeSearchLowerLeft(void *thread_data)
     }
 
     interpThread->signalParentWorkIsComplete();
-
   }
 
   return NULL;
-
 }
 
 ///////////////////////////////////////////////////////////
 // Thread function to compute search matrix upper left
 
-void *CartInterp::_computeSearchUpperLeft(void *thread_data)
-{
+void *CartInterp::_computeSearchUpperLeft(void *thread_data) {
 
-  CartThread *interpThread = (CartThread *) thread_data;
+  CartThread *interpThread = (CartThread *)thread_data;
   CartInterp *interp = interpThread->getContext();
   assert(interp);
 
@@ -1333,20 +1277,17 @@ void *CartInterp::_computeSearchUpperLeft(void *thread_data)
     }
 
     interpThread->signalParentWorkIsComplete();
-
   }
 
   return NULL;
-
 }
 
 ///////////////////////////////////////////////////////////
 // Thread function to compute search matrix lower right
 
-void *CartInterp::_computeSearchLowerRight(void *thread_data)
-{
+void *CartInterp::_computeSearchLowerRight(void *thread_data) {
 
-  CartThread *interpThread = (CartThread *) thread_data;
+  CartThread *interpThread = (CartThread *)thread_data;
   CartInterp *interp = interpThread->getContext();
   assert(interp);
 
@@ -1362,20 +1303,17 @@ void *CartInterp::_computeSearchLowerRight(void *thread_data)
     }
 
     interpThread->signalParentWorkIsComplete();
-
   }
 
   return NULL;
-
 }
 
 ///////////////////////////////////////////////////////////
 // Thread function to compute search matrix upper right
 
-void *CartInterp::_computeSearchUpperRight(void *thread_data)
-{
+void *CartInterp::_computeSearchUpperRight(void *thread_data) {
 
-  CartThread *interpThread = (CartThread *) thread_data;
+  CartThread *interpThread = (CartThread *)thread_data;
   CartInterp *interp = interpThread->getContext();
   assert(interp);
 
@@ -1391,28 +1329,24 @@ void *CartInterp::_computeSearchUpperRight(void *thread_data)
     }
 
     interpThread->signalParentWorkIsComplete();
-
   }
 
   return NULL;
-
 }
 
-  
 ////////////////////////////////////////////////////////////
 // Fill the matrix for ray down and left of the search point
 //
 // We do this by propagating the ray information up and
 // to the right.
 
-int CartInterp::_fillSearchLowerLeft(int level,
-                                     vector<SearchIndex> &thisSearch,
+int CartInterp::_fillSearchLowerLeft(int level, vector<SearchIndex> &thisSearch,
                                      vector<SearchIndex> &nextSearch)
-  
+
 {
 
   // for initial level, prepare initial search vector
-  
+
   if (level == 0) {
     thisSearch.clear();
     for (int iel = 0; iel < _searchNEl - 1; iel++) {
@@ -1427,16 +1361,16 @@ int CartInterp::_fillSearchLowerLeft(int level,
   } else {
     thisSearch = nextSearch;
   }
-  
+
   // clear next search
 
   nextSearch.clear();
-  
+
   // loop through the search points
 
   int count = 0;
   for (size_t ii = 0; ii < thisSearch.size(); ii++) {
-    
+
     int iel = thisSearch[ii].elIndex;
     int iaz = thisSearch[ii].azIndex;
 
@@ -1456,8 +1390,8 @@ int CartInterp::_fillSearchLowerLeft(int level,
     }
 
     // propagate to the right
-    
-    SearchPoint &right = _searchMatrixLowerLeft[iel][iaz+1];
+
+    SearchPoint &right = _searchMatrixLowerLeft[iel][iaz + 1];
     if (right.ray == NULL) {
       right.level = level + 1;
       right.azDist = sp.azDist + 1;
@@ -1466,13 +1400,13 @@ int CartInterp::_fillSearchLowerLeft(int level,
       right.rayEl = sp.rayEl;
       right.rayAz = sp.rayAz;
       count++;
-      SearchIndex si(iel, iaz+1);
+      SearchIndex si(iel, iaz + 1);
       nextSearch.push_back(si);
     }
-    
+
     // propagate up
-    
-    SearchPoint &up = _searchMatrixLowerLeft[iel+1][iaz];
+
+    SearchPoint &up = _searchMatrixLowerLeft[iel + 1][iaz];
     if (up.ray == NULL) {
       up.level = level + 1;
       up.elDist = sp.elDist + 1;
@@ -1481,14 +1415,13 @@ int CartInterp::_fillSearchLowerLeft(int level,
       up.rayEl = sp.rayEl;
       up.rayAz = sp.rayAz;
       count++;
-      SearchIndex si(iel+1, iaz);
+      SearchIndex si(iel + 1, iaz);
       nextSearch.push_back(si);
     }
-    
+
   } // ii
 
   return count;
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -1497,14 +1430,13 @@ int CartInterp::_fillSearchLowerLeft(int level,
 // We do this by propagating the ray information down and
 // to the right.
 
-int CartInterp::_fillSearchUpperLeft(int level,
-                                     vector<SearchIndex> &thisSearch,
+int CartInterp::_fillSearchUpperLeft(int level, vector<SearchIndex> &thisSearch,
                                      vector<SearchIndex> &nextSearch)
 
 {
 
   // for initial level, prepare initial search vector
-  
+
   if (level == 0) {
     thisSearch.clear();
     for (int iel = _searchNEl - 1; iel > 0; iel--) {
@@ -1523,12 +1455,12 @@ int CartInterp::_fillSearchUpperLeft(int level,
   // clear next search
 
   nextSearch.clear();
-  
+
   // loop through the search points
 
   int count = 0;
   for (size_t ii = 0; ii < thisSearch.size(); ii++) {
-    
+
     int iel = thisSearch[ii].elIndex;
     int iaz = thisSearch[ii].azIndex;
 
@@ -1539,7 +1471,6 @@ int CartInterp::_fillSearchUpperLeft(int level,
       continue;
     }
 
-
     SearchPoint &sp = _searchMatrixUpperLeft[iel][iaz];
     if (sp.elDist >= _searchMaxDistEl) {
       continue;
@@ -1549,8 +1480,8 @@ int CartInterp::_fillSearchUpperLeft(int level,
     }
 
     // propagate to the right
-    
-    SearchPoint &right = _searchMatrixUpperLeft[iel][iaz+1];
+
+    SearchPoint &right = _searchMatrixUpperLeft[iel][iaz + 1];
     if (right.ray == NULL) {
       right.level = level + 1;
       right.azDist = sp.azDist + 1;
@@ -1559,13 +1490,13 @@ int CartInterp::_fillSearchUpperLeft(int level,
       right.rayEl = sp.rayEl;
       right.rayAz = sp.rayAz;
       count++;
-      SearchIndex si(iel, iaz+1);
+      SearchIndex si(iel, iaz + 1);
       nextSearch.push_back(si);
     }
 
     // propagate down
-    
-    SearchPoint &down = _searchMatrixUpperLeft[iel-1][iaz];
+
+    SearchPoint &down = _searchMatrixUpperLeft[iel - 1][iaz];
     if (down.ray == NULL) {
       down.level = level + 1;
       down.elDist = sp.elDist + 1;
@@ -1574,14 +1505,13 @@ int CartInterp::_fillSearchUpperLeft(int level,
       down.rayEl = sp.rayEl;
       down.rayAz = sp.rayAz;
       count++;
-      SearchIndex si(iel-1, iaz);
+      SearchIndex si(iel - 1, iaz);
       nextSearch.push_back(si);
     }
-    
+
   } // ii
 
   return count;
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -1597,7 +1527,7 @@ int CartInterp::_fillSearchLowerRight(int level,
 {
 
   // for initial level, prepare initial search vector
-  
+
   if (level == 0) {
     thisSearch.clear();
     for (int iel = 0; iel < _searchNEl - 1; iel++) {
@@ -1616,12 +1546,12 @@ int CartInterp::_fillSearchLowerRight(int level,
   // clear next search
 
   nextSearch.clear();
-  
+
   // loop through the search points
 
   int count = 0;
   for (size_t ii = 0; ii < thisSearch.size(); ii++) {
-    
+
     int iel = thisSearch[ii].elIndex;
     int iaz = thisSearch[ii].azIndex;
 
@@ -1639,10 +1569,10 @@ int CartInterp::_fillSearchLowerRight(int level,
     if (sp.azDist >= _searchMaxDistAz) {
       continue;
     }
-    
+
     // propagate to the left
-    
-    SearchPoint &left = _searchMatrixLowerRight[iel][iaz-1];
+
+    SearchPoint &left = _searchMatrixLowerRight[iel][iaz - 1];
     if (left.ray == NULL) {
       left.level = level + 1;
       left.azDist = sp.azDist + 1;
@@ -1651,13 +1581,13 @@ int CartInterp::_fillSearchLowerRight(int level,
       left.rayEl = sp.rayEl;
       left.rayAz = sp.rayAz;
       count++;
-      SearchIndex si(iel, iaz-1);
+      SearchIndex si(iel, iaz - 1);
       nextSearch.push_back(si);
     }
-    
+
     // propagate up
-    
-    SearchPoint &up = _searchMatrixLowerRight[iel+1][iaz];
+
+    SearchPoint &up = _searchMatrixLowerRight[iel + 1][iaz];
     if (up.ray == NULL) {
       up.level = level + 1;
       up.elDist = sp.elDist + 1;
@@ -1666,14 +1596,13 @@ int CartInterp::_fillSearchLowerRight(int level,
       up.rayEl = sp.rayEl;
       up.rayAz = sp.rayAz;
       count++;
-      SearchIndex si(iel+1, iaz);
+      SearchIndex si(iel + 1, iaz);
       nextSearch.push_back(si);
     }
-    
+
   } // ii
 
   return count;
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -1689,7 +1618,7 @@ int CartInterp::_fillSearchUpperRight(int level,
 {
 
   // for initial level, prepare initial search vector
-  
+
   if (level == 0) {
     thisSearch.clear();
     for (int iel = _searchNEl - 1; iel > 0; iel--) {
@@ -1708,12 +1637,12 @@ int CartInterp::_fillSearchUpperRight(int level,
   // clear next search
 
   nextSearch.clear();
-  
+
   // loop through the search points
 
   int count = 0;
   for (size_t ii = 0; ii < thisSearch.size(); ii++) {
-    
+
     int iel = thisSearch[ii].elIndex;
     int iaz = thisSearch[ii].azIndex;
 
@@ -1731,10 +1660,10 @@ int CartInterp::_fillSearchUpperRight(int level,
     if (sp.azDist >= _searchMaxDistAz) {
       continue;
     }
-    
+
     // propagate to the left
-    
-    SearchPoint &left = _searchMatrixUpperRight[iel][iaz-1];
+
+    SearchPoint &left = _searchMatrixUpperRight[iel][iaz - 1];
     if (left.ray == NULL) {
       left.level = level + 1;
       left.azDist = sp.azDist + 1;
@@ -1743,13 +1672,13 @@ int CartInterp::_fillSearchUpperRight(int level,
       left.rayEl = sp.rayEl;
       left.rayAz = sp.rayAz;
       count++;
-      SearchIndex si(iel, iaz-1);
+      SearchIndex si(iel, iaz - 1);
       nextSearch.push_back(si);
     }
-    
+
     // propagate down
-    
-    SearchPoint &down = _searchMatrixUpperRight[iel-1][iaz];
+
+    SearchPoint &down = _searchMatrixUpperRight[iel - 1][iaz];
     if (down.ray == NULL) {
       down.level = level + 1;
       down.elDist = sp.elDist + 1;
@@ -1758,14 +1687,13 @@ int CartInterp::_fillSearchUpperRight(int level,
       down.rayEl = sp.rayEl;
       down.rayAz = sp.rayAz;
       count++;
-      SearchIndex si(iel-1, iaz);
+      SearchIndex si(iel - 1, iaz);
       nextSearch.push_back(si);
     }
-    
+
   } // ii
 
   return count;
-
 }
 
 /////////////////////////////////////////////////////////
@@ -1774,9 +1702,8 @@ int CartInterp::_fillSearchUpperRight(int level,
 //
 // Returns -1 if out of bounds
 
-int CartInterp::_getSearchElIndex(double el) 
-{ 
-  int iel = (int) floor((el - _searchMinEl) / _searchResEl + 0.5);
+int CartInterp::_getSearchElIndex(double el) {
+  int iel = (int)floor((el - _searchMinEl) / _searchResEl + 0.5);
   if (iel < 0) {
     iel = -1;
   } else if (iel > _searchNEl - 1) {
@@ -1791,9 +1718,8 @@ int CartInterp::_getSearchElIndex(double el)
 //
 // Returns -1 if out of bounds
 
-int CartInterp::_getSearchAzIndex(double az) 
-{
-  int iaz = (int) ((az - _searchMinAz) / _searchResAz + 0.5);
+int CartInterp::_getSearchAzIndex(double az) {
+  int iaz = (int)((az - _searchMinAz) / _searchResAz + 0.5);
   if (iaz < 0) {
     iaz = -1;
   } else if (iaz > _searchNAz - 1) {
@@ -1801,28 +1727,25 @@ int CartInterp::_getSearchAzIndex(double az)
   }
   return iaz;
 }
-  
+
 /////////////////////////////////////////////////////////
 // get the elevation given the search index
 
-double CartInterp::_getSearchEl(int index) 
-{
+double CartInterp::_getSearchEl(int index) {
   return _searchMinEl + index * _searchResEl;
 }
-  
+
 /////////////////////////////////////////////////////////
 // get the azimuth given the search index
 
-double CartInterp::_getSearchAz(int index) 
-{
+double CartInterp::_getSearchAz(int index) {
   return _searchMinAz + index * _searchResAz;
 }
-  
+
 //////////////////////////////////////////////////
 // interpolate onto the grid
 
-void CartInterp::_doInterp()
-{
+void CartInterp::_doInterp() {
 
   // perform the interpolation
 
@@ -1831,41 +1754,37 @@ void CartInterp::_doInterp()
   } else {
     _interpSingleThreaded();
   }
-
 }
 
 //////////////////////////////////////////////////
 // interpolate entire volume in single thread
 
-void CartInterp::_interpSingleThreaded()
-{
-  
+void CartInterp::_interpSingleThreaded() {
+
   // interpolate one column at a time
 
   for (int iz = 0; iz < _gridNz; iz++) {
     for (int iy = 0; iy < _gridNy; iy++) {
       _interpRow(iz, iy);
     } // iy
-  } // iz
-
+  }   // iz
 }
 
 //////////////////////////////////////////////////////
 // interpolate volume in threads, one X row at a time
 
-void CartInterp::_interpMultiThreaded()
-{
+void CartInterp::_interpMultiThreaded() {
 
   // loop through the Z layers
-  
+
   for (int iz = 0; iz < _gridNz; iz++) {
 
     // loop through the Y columns
-  
+
     for (int iy = 0; iy < _gridNy; iy++) {
-      
+
       // is a thread available? if not wait for one
-    
+
       CartThread *thread = NULL;
       if (_availThreads.size() > 0) {
         // get thread from available pool
@@ -1879,31 +1798,30 @@ void CartInterp::_interpMultiThreaded()
         // wait for current work to complete
         thread->waitForWorkToComplete();
       }
-    
+
       // set thread going to compute moments
-      
+
       thread->setTask(CartThread::INTERP);
       thread->setZIndex(iz);
       thread->setYIndex(iy);
       thread->signalWorkToStart();
-      
+
       // push onto active pool
-      
+
       _activeThreads.push_back(thread);
 
     } // iy
 
   } // iz
-    
+
   // wait for all active threads to complete
-  
+
   while (_activeThreads.size() > 0) {
     CartThread *thread = _activeThreads.front();
     _activeThreads.pop_front();
     _availThreads.push_back(thread);
     thread->waitForWorkToComplete();
   }
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -1920,15 +1838,17 @@ void CartInterp::_interpRow(int iz, int iy)
     // get the grid location
 
     const GridLoc *loc = _gridLoc[iz][iy][ix];
-    
+
     if (_gridAzDebug) {
       _gridAzDebug->data[ptIndex] = fmod(loc->az, _params.modulus_for_azimuth);
     }
     if (_gridElDebug) {
-      _gridElDebug->data[ptIndex] = fmod(loc->el, _params.modulus_for_elevation);
+      _gridElDebug->data[ptIndex] =
+          fmod(loc->el, _params.modulus_for_elevation);
     }
     if (_gridRangeDebug) {
-      _gridRangeDebug->data[ptIndex] = fmod(loc->slantRange, _params.modulus_for_range);
+      _gridRangeDebug->data[ptIndex] =
+          fmod(loc->slantRange, _params.modulus_for_range);
     }
 
     // find starting location in search matrix
@@ -1960,7 +1880,7 @@ void CartInterp::_interpRow(int iz, int iy)
 
     // check to make sure ll ray is actually below and
     // to the left of the grid point
-    
+
     if (ll.ray) {
       int jel = iel;
       int jaz = iaz;
@@ -1968,19 +1888,21 @@ void CartInterp::_interpRow(int iz, int iy)
         if ((ll.rayEl > loc->el) && (jel > 0)) {
           jel--;
           ll = _searchMatrixLowerLeft[jel][jaz];
-          if (!ll.ray) break;
+          if (!ll.ray)
+            break;
         }
         if ((ll.rayAz > az) && (jaz > 0)) {
           jaz--;
           ll = _searchMatrixLowerLeft[jel][jaz];
-          if (!ll.ray) break;
+          if (!ll.ray)
+            break;
         }
       } // ii
     }
-    
+
     // check to make sure ul ray is actually above and
     // to the left of the grid point
-    
+
     if (ul.ray) {
       int jel = iel;
       int jaz = iaz;
@@ -1988,19 +1910,21 @@ void CartInterp::_interpRow(int iz, int iy)
         if ((ul.rayEl < loc->el) && (jel < _searchNEl - 1)) {
           jel++;
           ul = _searchMatrixUpperLeft[jel][jaz];
-          if (!ul.ray) break;
+          if (!ul.ray)
+            break;
         }
         if ((ul.rayAz > az) && (jaz > 0)) {
           jaz--;
           ul = _searchMatrixUpperLeft[jel][jaz];
-          if (!ul.ray) break;
+          if (!ul.ray)
+            break;
         }
       } // ii
     }
-    
+
     // check to make sure lr ray is actually below and
     // to the right of the grid point
-    
+
     if (lr.ray) {
       int jel = iel;
       int jaz = iaz;
@@ -2008,19 +1932,21 @@ void CartInterp::_interpRow(int iz, int iy)
         if ((lr.rayEl > loc->el) && (jel > 0)) {
           jel--;
           lr = _searchMatrixLowerRight[jel][jaz];
-          if (!lr.ray) break;
+          if (!lr.ray)
+            break;
         }
         if ((lr.rayAz < az) && (jaz < _searchNAz - 1)) {
           jaz++;
           lr = _searchMatrixLowerRight[jel][jaz];
-          if (!lr.ray) break;
+          if (!lr.ray)
+            break;
         }
       } // ii
     }
-    
+
     // check to make sure ur ray is actually above and
     // to the right of the grid point
-    
+
     if (ur.ray) {
       int jel = iel;
       int jaz = iaz;
@@ -2028,16 +1954,18 @@ void CartInterp::_interpRow(int iz, int iy)
         if ((ur.rayEl < loc->el) && (jel < _searchNEl - 1)) {
           jel++;
           ur = _searchMatrixUpperRight[jel][jaz];
-          if (!ur.ray) break;
+          if (!ur.ray)
+            break;
         }
         if ((ur.rayAz < az) && (jaz < _searchNAz - 1)) {
           jaz++;
           ur = _searchMatrixUpperRight[jel][jaz];
-          if (!ur.ray) break;
+          if (!ur.ray)
+            break;
         }
       } // ii
     }
-    
+
     // count number of available rays around this point
     // initialize az and el to be used for interp
 
@@ -2080,10 +2008,11 @@ void CartInterp::_interpRow(int iz, int iy)
     }
 
     // set debugging data as required
-    
+
     if (ll.ray) {
       if (_llElDebug) {
-        _llElDebug->data[ptIndex] = fmod(ll.rayEl, _params.modulus_for_elevation);
+        _llElDebug->data[ptIndex] =
+            fmod(ll.rayEl, _params.modulus_for_elevation);
       }
       if (_llAzDebug) {
         _llAzDebug->data[ptIndex] = fmod(ll.rayAz, _params.modulus_for_azimuth);
@@ -2092,7 +2021,8 @@ void CartInterp::_interpRow(int iz, int iy)
 
     if (ul.ray) {
       if (_ulElDebug) {
-        _ulElDebug->data[ptIndex] = fmod(ul.rayEl, _params.modulus_for_elevation);
+        _ulElDebug->data[ptIndex] =
+            fmod(ul.rayEl, _params.modulus_for_elevation);
       }
       if (_ulAzDebug) {
         _ulAzDebug->data[ptIndex] = fmod(ul.rayAz, _params.modulus_for_azimuth);
@@ -2101,7 +2031,8 @@ void CartInterp::_interpRow(int iz, int iy)
 
     if (lr.ray) {
       if (_lrElDebug) {
-        _lrElDebug->data[ptIndex] = fmod(lr.rayEl, _params.modulus_for_elevation);
+        _lrElDebug->data[ptIndex] =
+            fmod(lr.rayEl, _params.modulus_for_elevation);
       }
       if (_lrAzDebug) {
         _lrAzDebug->data[ptIndex] = fmod(lr.rayAz, _params.modulus_for_azimuth);
@@ -2110,7 +2041,8 @@ void CartInterp::_interpRow(int iz, int iy)
 
     if (ur.ray) {
       if (_urElDebug) {
-        _urElDebug->data[ptIndex] = fmod(ur.rayEl, _params.modulus_for_elevation);
+        _urElDebug->data[ptIndex] =
+            fmod(ur.rayEl, _params.modulus_for_elevation);
       }
       if (_urAzDebug) {
         _urAzDebug->data[ptIndex] = fmod(ur.rayAz, _params.modulus_for_azimuth);
@@ -2125,7 +2057,7 @@ void CartInterp::_interpRow(int iz, int iy)
 
     // if we have exactly 2 available rays, make sure we are within the
     // beam width of the edge of the measured data
-    
+
     if (nAvail == 2) {
       // determine whether we have the point on the side or
       // above/below
@@ -2155,7 +2087,7 @@ void CartInterp::_interpRow(int iz, int iy)
       // if angle error exceeds the beam width, cannot process
       // this point
       double angleExtension =
-        beamWidth * _params.beam_width_fraction_for_data_limit_extension;
+          beamWidth * _params.beam_width_fraction_for_data_limit_extension;
       if (angleError > angleExtension) {
         continue;
       }
@@ -2165,18 +2097,18 @@ void CartInterp::_interpRow(int iz, int iy)
 
     double rangeKm = loc->slantRange;
     double dgate = (rangeKm - _startRangeKm) / _gateSpacingKm;
-    int igateInner = (int) floor(dgate);
+    int igateInner = (int)floor(dgate);
     int igateOuter = igateInner + 1;
     double wtOuter = dgate - igateInner;
     double wtInner = 1.0 - wtOuter;
     Neighbors wts;
 
     if (nAvail == 2) {
-      
+
       // if we only have 2 valid rays, use an inverse distance interp
 
       _loadWtsFor2ValidRays(loc, ll, ul, lr, ur, wtInner, wtOuter, wts);
-      
+
     } else {
 
       if (nAvail == 3) {
@@ -2197,8 +2129,8 @@ void CartInterp::_interpRow(int iz, int iy)
       } // if (nAvail == 3)
 
       _loadWtsFor3Or4ValidRays(loc, ll, ul, lr, ur, wtInner, wtOuter, wts);
-      
-    } // if (nAvail == 2) 
+
+    } // if (nAvail == 2)
 
     // normalize weights
 
@@ -2251,31 +2183,28 @@ void CartInterp::_interpRow(int iz, int iy)
     }
 
   } // ix
-
 }
 
 ////////////////////////////////////////////
 // load up weights for case where we only
 // have 2 valid rays
-  
+
 void CartInterp::_loadWtsFor2ValidRays(const GridLoc *loc,
                                        const SearchPoint &ll,
                                        const SearchPoint &ul,
                                        const SearchPoint &lr,
-                                       const SearchPoint &ur,
-                                       double wtInner,
-                                       double wtOuter, 
-                                       Neighbors &wts)
+                                       const SearchPoint &ur, double wtInner,
+                                       double wtOuter, Neighbors &wts)
 
 {
-  
+
   double az = _conditionAz(loc->az);
 
   // compute 'distance' in el/az space from ray to grid location
   // compute weights based on inverse of
   // distances from grid pt to surrounding rays multiplied
   // by weight for range
-  
+
   if (ll.ray) {
     double dist_ll = _angDist(loc->el - ll.rayEl, az - ll.rayAz);
     double wtDist = 1.0 / dist_ll;
@@ -2285,7 +2214,7 @@ void CartInterp::_loadWtsFor2ValidRays(const GridLoc *loc,
     wts.ll_inner = 0.0;
     wts.ll_outer = 0.0;
   }
-  
+
   if (ul.ray) {
     double dist_ul = _angDist(loc->el - ul.rayEl, az - ul.rayAz);
     double wtDist = 1.0 / dist_ul;
@@ -2295,7 +2224,7 @@ void CartInterp::_loadWtsFor2ValidRays(const GridLoc *loc,
     wts.ul_inner = 0.0;
     wts.ul_outer = 0.0;
   }
-  
+
   if (lr.ray) {
     double dist_lr = _angDist(loc->el - lr.rayEl, az - lr.rayAz);
     double wtDist = 1.0 / dist_lr;
@@ -2305,7 +2234,7 @@ void CartInterp::_loadWtsFor2ValidRays(const GridLoc *loc,
     wts.lr_inner = 0.0;
     wts.lr_outer = 0.0;
   }
-  
+
   if (ur.ray) {
     double dist_ur = _angDist(loc->el - ur.rayEl, az - ur.rayAz);
     double wtDist = 1.0 / dist_ur;
@@ -2315,20 +2244,17 @@ void CartInterp::_loadWtsFor2ValidRays(const GridLoc *loc,
     wts.ur_inner = 0.0;
     wts.ur_outer = 0.0;
   }
-
 }
 
 ////////////////////////////////////////////
 // load up weights for 3 or 4 valid rays
-  
+
 void CartInterp::_loadWtsFor3Or4ValidRays(const GridLoc *loc,
                                           const SearchPoint &ll,
                                           const SearchPoint &ul,
                                           const SearchPoint &lr,
-                                          const SearchPoint &ur,
-                                          double wtInner,
-                                          double wtOuter, 
-                                          Neighbors &wts)
+                                          const SearchPoint &ur, double wtInner,
+                                          double wtOuter, Neighbors &wts)
 
 {
 
@@ -2343,7 +2269,7 @@ void CartInterp::_loadWtsFor3Or4ValidRays(const GridLoc *loc,
   }
   double wtAzLl = 1.0 - wtAzLr;
   double elLowerInterp = ll.interpEl * wtAzLl + lr.interpEl * wtAzLr;
-  
+
   // compute wts for interpolating based on azimuth upper
 
   double dazUpper = ur.interpAz - ul.interpAz;
@@ -2373,7 +2299,7 @@ void CartInterp::_loadWtsFor3Or4ValidRays(const GridLoc *loc,
     wts.ll_inner = 0.0;
     wts.ll_outer = 0.0;
   }
-  
+
   if (ul.ray) {
     double wtAng = wtAzUl * wtElUpper;
     wts.ul_inner = wtAng * wtInner;
@@ -2382,7 +2308,7 @@ void CartInterp::_loadWtsFor3Or4ValidRays(const GridLoc *loc,
     wts.ul_inner = 0.0;
     wts.ul_outer = 0.0;
   }
-  
+
   if (lr.ray) {
     double wtAng = wtAzLr * wtElLower;
     wts.lr_inner = wtAng * wtInner;
@@ -2391,7 +2317,7 @@ void CartInterp::_loadWtsFor3Or4ValidRays(const GridLoc *loc,
     wts.lr_inner = 0.0;
     wts.lr_outer = 0.0;
   }
-  
+
   if (ur.ray) {
     double wtAng = wtAzUr * wtElUpper;
     wts.ur_inner = wtAng * wtInner;
@@ -2400,53 +2326,47 @@ void CartInterp::_loadWtsFor3Or4ValidRays(const GridLoc *loc,
     wts.ur_inner = 0.0;
     wts.ur_outer = 0.0;
   }
-
 }
-    
+
 ////////////////////////////////////////////
 // load up grid point using nearest neighbor
 // returns the number of points contributing
-  
-int CartInterp::_loadNearestGridPt(int ifield,
-                                   int ptIndex,
-                                   int igateInner,
-                                   int igateOuter,
-                                   const SearchPoint &ll,
-                                   const SearchPoint &ul,
-                                   const SearchPoint &lr,
-                                   const SearchPoint &ur,
-                                   const Neighbors &wts)
-  
+
+int CartInterp::_loadNearestGridPt(int ifield, int ptIndex, int igateInner,
+                                   int igateOuter, const SearchPoint &ll,
+                                   const SearchPoint &ul, const SearchPoint &lr,
+                                   const SearchPoint &ur, const Neighbors &wts)
+
 {
 
   // find value with highest weight - that will be closest
-        
+
   double maxWt = 0.0;
   double closestVal = 0.0;
   int nContrib = 0;
-  
+
   if (ll.ray) {
-    _accumNearest(ll.ray, ifield, igateInner, igateOuter,
-                  wts.ll_inner, wts.ll_outer, closestVal, maxWt, nContrib);
+    _accumNearest(ll.ray, ifield, igateInner, igateOuter, wts.ll_inner,
+                  wts.ll_outer, closestVal, maxWt, nContrib);
   }
-  
+
   if (ul.ray) {
-    _accumNearest(ul.ray, ifield, igateInner, igateOuter,
-                  wts.ul_inner, wts.ul_outer, closestVal, maxWt, nContrib);
+    _accumNearest(ul.ray, ifield, igateInner, igateOuter, wts.ul_inner,
+                  wts.ul_outer, closestVal, maxWt, nContrib);
   }
-  
+
   if (lr.ray) {
-    _accumNearest(lr.ray, ifield, igateInner, igateOuter,
-                  wts.lr_inner, wts.lr_outer, closestVal, maxWt, nContrib);
+    _accumNearest(lr.ray, ifield, igateInner, igateOuter, wts.lr_inner,
+                  wts.lr_outer, closestVal, maxWt, nContrib);
   }
-  
+
   if (ur.ray) {
-    _accumNearest(ur.ray, ifield, igateInner, igateOuter,
-                  wts.ur_inner, wts.ur_outer, closestVal, maxWt, nContrib);
+    _accumNearest(ur.ray, ifield, igateInner, igateOuter, wts.ur_inner,
+                  wts.ur_outer, closestVal, maxWt, nContrib);
   }
-  
+
   // compute weighted mean
-  
+
   if (nContrib >= _params.min_nvalid_for_interp) {
     _outputFields[ifield][ptIndex] = closestVal;
   } else {
@@ -2454,53 +2374,47 @@ int CartInterp::_loadNearestGridPt(int ifield,
   }
 
   return nContrib;
-  
 }
 
 /////////////////////////////////////////////////////
 // load up data for a grid point using interpolation
 // returns the number of points contributing
-  
-int CartInterp::_loadInterpGridPt(int ifield,
-                                  int ptIndex,
-                                  int igateInner,
-                                  int igateOuter,
-                                  const SearchPoint &ll,
-                                  const SearchPoint &ul,
-                                  const SearchPoint &lr,
-                                  const SearchPoint &ur,
-                                  const Neighbors &wts)
+
+int CartInterp::_loadInterpGridPt(int ifield, int ptIndex, int igateInner,
+                                  int igateOuter, const SearchPoint &ll,
+                                  const SearchPoint &ul, const SearchPoint &lr,
+                                  const SearchPoint &ur, const Neighbors &wts)
 
 {
 
   // sum up weighted vals
-  
+
   double sumVals = 0.0;
   double sumWts = 0.0;
   int nContrib = 0;
-  
+
   if (ll.ray) {
-    _accumInterp(ll.ray, ifield, igateInner, igateOuter,
-                 wts.ll_inner, wts.ll_outer, sumVals, sumWts, nContrib);
+    _accumInterp(ll.ray, ifield, igateInner, igateOuter, wts.ll_inner,
+                 wts.ll_outer, sumVals, sumWts, nContrib);
   }
 
   if (ul.ray) {
-    _accumInterp(ul.ray, ifield, igateInner, igateOuter,
-                 wts.ul_inner, wts.ul_outer, sumVals, sumWts, nContrib);
+    _accumInterp(ul.ray, ifield, igateInner, igateOuter, wts.ul_inner,
+                 wts.ul_outer, sumVals, sumWts, nContrib);
   }
-  
+
   if (lr.ray) {
-    _accumInterp(lr.ray, ifield, igateInner, igateOuter,
-                 wts.lr_inner, wts.lr_outer, sumVals, sumWts, nContrib);
+    _accumInterp(lr.ray, ifield, igateInner, igateOuter, wts.lr_inner,
+                 wts.lr_outer, sumVals, sumWts, nContrib);
   }
-  
+
   if (ur.ray) {
-    _accumInterp(ur.ray, ifield, igateInner, igateOuter,
-                 wts.ur_inner, wts.ur_outer, sumVals, sumWts, nContrib);
+    _accumInterp(ur.ray, ifield, igateInner, igateOuter, wts.ur_inner,
+                 wts.ur_outer, sumVals, sumWts, nContrib);
   }
-  
+
   // compute weighted mean
-  
+
   if (nContrib >= _params.min_nvalid_for_interp) {
     double interpVal = missingDouble;
     if (sumWts > 0) {
@@ -2512,76 +2426,67 @@ int CartInterp::_loadInterpGridPt(int ifield,
   }
 
   return nContrib;
-
 }
 
 /////////////////////////////////////////////////////
 // load up data for a grid point using interpolation
 // for a folded field
 // returns the number of points contributing
-  
-int CartInterp::_loadFoldedGridPt(int ifield,
-                                  int ptIndex,
-                                  int igateInner,
-                                  int igateOuter,
-                                  const SearchPoint &ll,
-                                  const SearchPoint &ul,
-                                  const SearchPoint &lr,
-                                  const SearchPoint &ur,
-                                  const Neighbors &wts)
-  
+
+int CartInterp::_loadFoldedGridPt(int ifield, int ptIndex, int igateInner,
+                                  int igateOuter, const SearchPoint &ll,
+                                  const SearchPoint &ul, const SearchPoint &lr,
+                                  const SearchPoint &ur, const Neighbors &wts)
+
 {
 
   // sum up weighted vals
-  
+
   double sumX = 0.0;
   double sumY = 0.0;
   double sumWts = 0.0;
   int nContrib = 0;
-  
+
   if (ll.ray) {
-    _accumFolded(ll.ray, ifield, igateInner, igateOuter,
-                 wts.ll_inner, wts.ll_outer, sumX, sumY, sumWts, nContrib);
+    _accumFolded(ll.ray, ifield, igateInner, igateOuter, wts.ll_inner,
+                 wts.ll_outer, sumX, sumY, sumWts, nContrib);
   }
-  
-  
+
   if (ul.ray) {
-    _accumFolded(ul.ray, ifield, igateInner, igateOuter,
-                 wts.ul_inner, wts.ul_outer, sumX, sumY, sumWts, nContrib);
+    _accumFolded(ul.ray, ifield, igateInner, igateOuter, wts.ul_inner,
+                 wts.ul_outer, sumX, sumY, sumWts, nContrib);
   }
-  
+
   if (lr.ray) {
-    _accumFolded(lr.ray, ifield, igateInner, igateOuter,
-                 wts.lr_inner, wts.lr_outer, sumX, sumY, sumWts, nContrib);
+    _accumFolded(lr.ray, ifield, igateInner, igateOuter, wts.lr_inner,
+                 wts.lr_outer, sumX, sumY, sumWts, nContrib);
   }
-  
+
   if (ur.ray) {
-    _accumFolded(ur.ray, ifield, igateInner, igateOuter,
-                 wts.ur_inner, wts.ur_outer, sumX, sumY, sumWts, nContrib);
+    _accumFolded(ur.ray, ifield, igateInner, igateOuter, wts.ur_inner,
+                 wts.ur_outer, sumX, sumY, sumWts, nContrib);
   }
-  
+
   // compute weighted mean
-  
+
   if (nContrib >= _params.min_nvalid_for_interp) {
     const Field &intFld = _interpFields[ifield];
     double angleInterp = atan2(sumY, sumX);
-    double valInterp = _getFoldValue(angleInterp,
-                                     intFld.foldLimitLower, intFld.foldRange);
+    double valInterp =
+        _getFoldValue(angleInterp, intFld.foldLimitLower, intFld.foldRange);
     _outputFields[ifield][ptIndex] = valInterp;
   } else {
     _outputFields[ifield][ptIndex] = missingFl32;
   }
 
   return nContrib;
-
 }
 
 /////////////////////////////////////////////////////
 // condition the azimuth, if we are in sector that
 // spans the north line
 
-double CartInterp::_conditionAz(double az)
-{
+double CartInterp::_conditionAz(double az) {
   if (_isSector) {
     // sector mode
     if (_spansNorth && az < _dataSectorStartAzDeg) {
@@ -2599,37 +2504,23 @@ double CartInterp::_conditionAz(double az)
 /////////////////////////////////////////////////////
 // write out data
 
-int CartInterp::_writeOutputFile()
-{
-  Test t;
-  if(t.run(_progName, _outputFields, _params, _readVol.getPathInUse()) == 0)
-  {
-      cout << "DEBUG: WRITEOUTPUT in Radx2GridPlus No ERROR" << endl;
-  } cout << "DEBUG: AFTER WRITEOUTPUT in Radx2GridPlus" << endl;
-
-  if (_params.debug) {
-    cerr << "  Writing output file ... " << endl;
-  }
+int CartInterp::_writeOutputFile() {
 
   // cedric is a special case
-  
+
   if (_params.output_format == Params::CEDRIC) {
     return _writeCedricFile(false);
   }
 
   // all other formats go via the MDV class
-  
+
   OutputMdv out(_progName, _params);
   out.setMasterHeader(_readVol);
   for (size_t ifield = 0; ifield < _interpFields.size(); ifield++) {
     const Field &ifld = _interpFields[ifield];
-    out.addField(_readVol, _proj, _gridZLevels,
-                 ifld.outputName, ifld.longName, ifld.units,
-                 ifld.inputDataType,
-                 ifld.inputScale,
-                 ifld.inputOffset,
-                 missingFl32,
-                 _outputFields[ifield]);
+    out.addField(_readVol, _proj, _gridZLevels, ifld.outputName, ifld.longName,
+                 ifld.units, ifld.inputDataType, ifld.inputScale,
+                 ifld.inputOffset, missingFl32, _outputFields[ifield]);
   } // ifield
 
   // debug (test) fields
@@ -2637,43 +2528,40 @@ int CartInterp::_writeOutputFile()
   for (size_t ii = 0; ii < _derived3DFields.size(); ii++) {
     const DerivedField *dfld = _derived3DFields[ii];
     if (dfld->writeToFile) {
-      out.addField(_readVol, _proj, dfld->vertLevels,
-                   dfld->name, dfld->longName, dfld->units,
-                   Radx::FL32, 1.0, 0.0, missingFl32, dfld->data);
+      out.addField(_readVol, _proj, dfld->vertLevels, dfld->name,
+                   dfld->longName, dfld->units, Radx::FL32, 1.0, 0.0,
+                   missingFl32, dfld->data);
     }
   }
 
   for (size_t ii = 0; ii < _derived2DFields.size(); ii++) {
     const DerivedField *dfld = _derived2DFields[ii];
     if (dfld->writeToFile) {
-      out.addField(_readVol, _proj, dfld->vertLevels,
-                   dfld->name, dfld->longName, dfld->units,
-                   Radx::FL32, 1.0, 0.0, missingFl32, dfld->data);
+      out.addField(_readVol, _proj, dfld->vertLevels, dfld->name,
+                   dfld->longName, dfld->units, Radx::FL32, 1.0, 0.0,
+                   missingFl32, dfld->data);
     }
   }
 
   // chunks
 
   out.addChunks(_readVol, _interpFields.size());
-  
+
   // write out file
-  
+
   if (out.writeVol()) {
     cerr << "ERROR - Interp::processFile" << endl;
-    cerr << "  Cannot write file to output_dir: "
-         << _params.output_dir << endl;
+    cerr << "  Cannot write file to output_dir: " << _params.output_dir << endl;
     return -1;
   }
 
   return 0;
-
 }
 
 /////////////////////////////////////////////////////
 // write out search matrix data
 
-int CartInterp::_writeSearchMatrices()
-{
+int CartInterp::_writeSearchMatrices() {
 
   if (_params.debug) {
     cerr << "  Writing search matrix debug files ... " << endl;
@@ -2682,26 +2570,26 @@ int CartInterp::_writeSearchMatrices()
   // create MDVX object
 
   DsMdvx mdvx;
-  
+
   // set master header
-  
+
   Mdvx::master_header_t mhdr;
   MEM_zero(mhdr);
-  
+
   mhdr.index_number = _readVol.getVolumeNumber();
   mhdr.time_gen = time(NULL);
   mhdr.time_begin = _readVol.getStartTimeSecs();
   mhdr.time_end = _readVol.getEndTimeSecs();
   mhdr.time_centroid = _readVol.getEndTimeSecs();
   mhdr.time_expire = mhdr.time_centroid;
-  
+
   mhdr.num_data_times = 1;
   mhdr.data_dimension = 2;
-  
+
   mhdr.data_collection_type = Mdvx::DATA_MEASURED;
   mhdr.native_vlevel_type = Mdvx::VERT_TYPE_ELEV;
   mhdr.vlevel_type = Mdvx::VERT_TYPE_SURFACE;
-  
+
   mhdr.vlevel_included = TRUE;
   mhdr.grid_orientation = Mdvx::ORIENT_SN_WE;
   mhdr.data_ordering = Mdvx::ORDER_XYZ;
@@ -2709,9 +2597,9 @@ int CartInterp::_writeSearchMatrices()
   mhdr.sensor_lon = _readVol.getLongitudeDeg();
   mhdr.sensor_lat = _readVol.getLatitudeDeg();
   mhdr.sensor_alt = _readVol.getAltitudeKm();
-  
+
   mdvx.setMasterHeader(mhdr);
-  
+
   mdvx.setDataSetInfo(_readVol.getHistory().c_str());
   mdvx.setDataSetName("Radx2Grid search matrices");
   mdvx.setDataSetSource(_readVol.getSource().c_str());
@@ -2732,7 +2620,7 @@ int CartInterp::_writeSearchMatrices()
   fl32 *urAz = new fl32[npts];
   fl32 *urSwpNum = new fl32[npts];
   fl32 missing = -9999.0;
-  
+
   int count = 0;
   for (int iel = 0; iel < _searchNEl; iel++) {
     for (int iaz = 0; iaz < _searchNAz; iaz++, count++) {
@@ -2779,20 +2667,24 @@ int CartInterp::_writeSearchMatrices()
 
   _addMatrixField(mdvx, llEl, missing, "LL_El", "LowerLeftElevation", "deg");
   _addMatrixField(mdvx, llAz, missing, "LL_Az", "LowerLeftAzimuth", "deg");
-  _addMatrixField(mdvx, llSwpNum, missing, "LL_SwpNum", "LowerLeftSweepNum", "");
-  
+  _addMatrixField(mdvx, llSwpNum, missing, "LL_SwpNum", "LowerLeftSweepNum",
+                  "");
+
   _addMatrixField(mdvx, lrEl, missing, "LR_El", "LowerRightElevation", "deg");
   _addMatrixField(mdvx, lrAz, missing, "LR_Az", "LowerRightAzimuth", "deg");
-  _addMatrixField(mdvx, lrSwpNum, missing, "LR_SwpNum", "LowerRightSweepNum", "");
-  
+  _addMatrixField(mdvx, lrSwpNum, missing, "LR_SwpNum", "LowerRightSweepNum",
+                  "");
+
   _addMatrixField(mdvx, ulEl, missing, "UL_El", "UpperLeftElevation", "deg");
   _addMatrixField(mdvx, ulAz, missing, "UL_Az", "UpperLeftAzimuth", "deg");
-  _addMatrixField(mdvx, ulSwpNum, missing, "UL_SwpNum", "UpperLeftSweepNum", "");
-  
+  _addMatrixField(mdvx, ulSwpNum, missing, "UL_SwpNum", "UpperLeftSweepNum",
+                  "");
+
   _addMatrixField(mdvx, urEl, missing, "UR_El", "UpperRightElevation", "deg");
   _addMatrixField(mdvx, urAz, missing, "UR_Az", "UpperRightAzimuth", "deg");
-  _addMatrixField(mdvx, urSwpNum, missing, "UR_SwpNum", "UpperRightSweepNum", "");
-  
+  _addMatrixField(mdvx, urSwpNum, missing, "UR_SwpNum", "UpperRightSweepNum",
+                  "");
+
   // free up arrays
 
   delete[] llEl;
@@ -2807,32 +2699,28 @@ int CartInterp::_writeSearchMatrices()
   delete[] urEl;
   delete[] urAz;
   delete[] urSwpNum;
-  
+
   // write the file
 
   if (mdvx.writeToDir(_params.search_matrix_dir)) {
     cerr << "ERROR - CartInterp::_writeSearchMatrices" << endl;
-    cerr << "  Cannot write matrix file to dir: "
-         << _params.search_matrix_dir << endl;
+    cerr << "  Cannot write matrix file to dir: " << _params.search_matrix_dir
+         << endl;
     return -1;
   }
 
   if (_params.debug) {
     cerr << "  Wrote search matrix debug file: " << mdvx.getPathInUse() << endl;
   }
-  
-  return 0;
 
+  return 0;
 }
 
 ////////////////////////////////////////////////
 // add a field to the search matrix mdv object
 
-void CartInterp::_addMatrixField(DsMdvx &mdvx,
-                                 const fl32 *data,
-                                 fl32 missing,
-                                 const string &name,
-                                 const string &longName,
+void CartInterp::_addMatrixField(DsMdvx &mdvx, const fl32 *data, fl32 missing,
+                                 const string &name, const string &longName,
                                  const string &units)
 
 {
@@ -2844,14 +2732,14 @@ void CartInterp::_addMatrixField(DsMdvx &mdvx,
 
   Mdvx::field_header_t fhdr;
   MEM_zero(fhdr);
-  
+
   fhdr.nx = _searchNAz;
   fhdr.ny = _searchNEl;
   fhdr.nz = nz;
 
   fhdr.native_vlevel_type = Mdvx::VERT_TYPE_ELEV;
   fhdr.vlevel_type = Mdvx::VERT_TYPE_SURFACE;
-  
+
   fhdr.proj_type = Mdvx::PROJ_LATLON;
   fhdr.dz_constant = true;
 
@@ -2861,15 +2749,15 @@ void CartInterp::_addMatrixField(DsMdvx &mdvx,
   fhdr.compression_type = Mdvx::COMPRESSION_NONE;
   fhdr.transform_type = Mdvx::DATA_TRANSFORM_NONE;
   fhdr.scaling_type = Mdvx::SCALING_NONE;
-  
+
   fhdr.proj_origin_lat = 0.0;
   fhdr.proj_origin_lon = 0.0;
   fhdr.user_data_fl32[0] = 0.0;
-  
+
   fhdr.grid_dx = _searchResAz / 10.0;
   fhdr.grid_dy = _searchResEl;
   fhdr.grid_dz = 1.0;
-  
+
   fhdr.grid_minx = _searchMinAz / 10.0;
   fhdr.grid_miny = _searchMinEl;
   fhdr.grid_minz = 0.0;
@@ -2878,9 +2766,9 @@ void CartInterp::_addMatrixField(DsMdvx &mdvx,
   fhdr.bias = 0.0;
   fhdr.bad_data_value = missing;
   fhdr.missing_data_value = missing;
-  
+
   // vlevel header
-  
+
   Mdvx::vlevel_header_t vhdr;
   MEM_zero(vhdr);
   int nLevels = nz;
@@ -2888,36 +2776,32 @@ void CartInterp::_addMatrixField(DsMdvx &mdvx,
     vhdr.level[i] = fhdr.grid_minz;
     vhdr.type[i] = Mdvx::VERT_TYPE_SURFACE;
   }
-  
+
   // create field
 
   MdvxField *fld = new MdvxField(fhdr, vhdr, data);
-  fld->convertType(Mdvx::ENCODING_INT16,
-                   Mdvx::COMPRESSION_GZIP,
+  fld->convertType(Mdvx::ENCODING_INT16, Mdvx::COMPRESSION_GZIP,
                    Mdvx::SCALING_DYNAMIC);
 
   // set strings
-  
+
   fld->setFieldName(name.c_str());
   fld->setFieldNameLong(longName.c_str());
   fld->setUnits(units.c_str());
   fld->setTransform("");
-  
+
   // add to object
-  
+
   mdvx.addField(fld);
-
 }
-
 
 //////////////////////////////////////////////////
 // Prepare for convective/stratiform analysis
 
-void CartInterp::_convStratPrepare()
-{
+void CartInterp::_convStratPrepare() {
 
   // initialize beamHeight computations
-  
+
   BeamHeight beamHt;
   if (_params.override_standard_pseudo_earth_radius) {
     beamHt.setPseudoRadiusRatio(_params.pseudo_earth_radius_ratio);
@@ -2925,13 +2809,13 @@ void CartInterp::_convStratPrepare()
   beamHt.setInstrumentHtKm(_radarAltKm);
 
   // loop through rays
-  
+
   for (size_t iray = 0; iray < _interpRays.size(); iray++) {
-    
+
     const Ray *ray = _interpRays[iray];
 
     // get dbz field
-    
+
     RadxRay *radxRay = ray->inputRay;
     RadxField *dbzField = radxRay->getField(_params.conv_strat_dbz_field_name);
     if (dbzField == NULL) {
@@ -2941,13 +2825,13 @@ void CartInterp::_convStratPrepare()
     Radx::fl32 missing = dbzField->getMissingFl32();
 
     // initialize meta data
-    
+
     double el = ray->el;
     double az = ray->az;
-    
+
     double sinAz, cosAz;
     ta_sincos(az * DEG_TO_RAD, &sinAz, &cosAz);
-    
+
     int nGates = ray->nGates;
     double range = _startRangeKm;
 
@@ -2956,40 +2840,39 @@ void CartInterp::_convStratPrepare()
     for (int igate = 0; igate < nGates; igate++, range += _gateSpacingKm) {
 
       // check for good dbz data
-      
+
       Radx::fl32 dbz = dbzArray[igate];
-      if (dbz == missing ||
-          dbz < _params.conv_strat_min_valid_dbz) {
+      if (dbz == missing || dbz < _params.conv_strat_min_valid_dbz) {
         continue;
       }
       double dbzSq = dbz * dbz;
       double dbzSqSq = dbzSq * dbzSq;
 
       // compute (zz, yy, xx) location for each gate
-    
+
       double xx = _radarX + range * sinAz;
       double yy = _radarY + range * cosAz;
       double zz = beamHt.computeHtKm(el, range);
 
       // compute grid indices
 
-      int ix = (int) floor((xx - _gridMinx) / _gridDx + 0.5);
+      int ix = (int)floor((xx - _gridMinx) / _gridDx + 0.5);
       if (ix < 0 || ix > _gridNx - 1) {
         continue;
       }
 
-      int iy = (int) floor((yy - _gridMiny) / _gridDy + 0.5);
+      int iy = (int)floor((yy - _gridMiny) / _gridDy + 0.5);
       if (iy < 0 || iy > _gridNy - 1) {
         continue;
       }
 
-      int iLookup = (int) (zz * 100.0 + 0.5);
+      int iLookup = (int)(zz * 100.0 + 0.5);
       if (iLookup >= 0 && iLookup < NLOOKUP) {
-        for (int iz = _textureIzLower[iLookup];
-             iz <= _textureIzUpper[iLookup]; iz++) {
-          
+        for (int iz = _textureIzLower[iLookup]; iz <= _textureIzUpper[iLookup];
+             iz++) {
+
           int index = iz * _nPointsPlane + iy * _gridNx + ix;
-          
+
           fl32 dbzMax = _convStratDbzMax->data[index];
           if (dbzMax == missingFl32 || dbzMax < dbz) {
             _convStratDbzMax->data[index] = dbz;
@@ -3002,16 +2885,14 @@ void CartInterp::_convStratPrepare()
       }
 
     } // igate
-    
+
   } // iray
-  
 }
 
 //////////////////////////////////////////////////
 // Compute convective/stratiform split
 
-void CartInterp::_convStratCompute()
-{
+void CartInterp::_convStratCompute() {
 
   // prepare the data
 
@@ -3021,7 +2902,7 @@ void CartInterp::_convStratCompute()
   // compute kernels
 
   _convStratComputeKernels();
-  
+
   // set array pointers
 
   fl32 *dbzCount = _convStratDbzCount->data;
@@ -3032,23 +2913,23 @@ void CartInterp::_convStratCompute()
   fl32 *sqTexture = _convStratDbzSqTexture->data;
   fl32 *filledTexture = _convStratFilledTexture->data;
   fl32 *filledSqTexture = _convStratFilledSqTexture->data;
-  
+
   // initialize
-  
+
   memset(dbzCount, 0, _nPointsPlane * sizeof(fl32));
   memset(dbzSum, 0, _nPointsPlane * sizeof(fl32));
   memset(dbzSqSum, 0, _nPointsPlane * sizeof(fl32));
   memset(dbzSqSqSum, 0, _nPointsPlane * sizeof(fl32));
-  
+
   for (int ii = 0; ii < _nPointsVol; ii++) {
     texture[ii] = missingFl32;
     sqTexture[ii] = missingFl32;
     filledTexture[ii] = missingFl32;
     filledSqTexture[ii] = missingFl32;
   }
-  
+
   // set up threads for computing texture at each level
-  
+
   vector<ComputeTexture *> threads;
   for (int iz = 0; iz <= _gridNz; iz++) {
     size_t zoffset = iz * _nPointsPlane;
@@ -3056,14 +2937,11 @@ void CartInterp::_convStratCompute()
     thread->setGridSize(_gridNx, _gridNy);
     thread->setKernelSize(_nxTexture, _nyTexture);
     thread->setKernel(_textureKernel);
-    thread->setMinValidFraction(_params.conv_strat_min_valid_fraction_for_texture);
-    thread->setFields(dbzCount + zoffset,
-                      dbzSum + zoffset,
-                      dbzSqSum + zoffset,
-                      dbzSqSqSum + zoffset,
-                      texture + zoffset,
-                      sqTexture + zoffset,
-                      filledTexture + zoffset,
+    thread->setMinValidFraction(
+        _params.conv_strat_min_valid_fraction_for_texture);
+    thread->setFields(dbzCount + zoffset, dbzSum + zoffset, dbzSqSum + zoffset,
+                      dbzSqSqSum + zoffset, texture + zoffset,
+                      sqTexture + zoffset, filledTexture + zoffset,
                       filledSqTexture + zoffset);
     threads.push_back(thread);
   } // iz
@@ -3086,7 +2964,7 @@ void CartInterp::_convStratCompute()
     delete threads[ii];
   }
   threads.clear();
-  
+
   // compute min and max vert indices
 
   int minIz = 0;
@@ -3102,12 +2980,12 @@ void CartInterp::_convStratCompute()
   } // iz
 
   // compute mean texture at each point, and the col max
-  
+
   fl32 *dbzMax = _convStratDbzMax->data;
   fl32 *dbzColMax = _convStratDbzColMax->data;
   fl32 *meanTexture = _convStratMeanTexture->data;
   fl32 *meanSqTexture = _convStratMeanSqTexture->data;
-  
+
   int jj = 0;
   for (int iy = 0; iy < _gridNy; iy++) {
     for (int ix = 0; ix < _gridNx; ix++, jj++) {
@@ -3134,7 +3012,7 @@ void CartInterp::_convStratCompute()
       }
       dbzColMax[jj] = colMax;
     } // ix
-  } // iy
+  }   // iy
 
 #ifdef NOTNOW
   // fill in col max gaps using nearest neighbor
@@ -3155,18 +3033,18 @@ void CartInterp::_convStratCompute()
         }
       }
     } // ix
-  } // iy
+  }   // iy
   memcpy(dbzColMax, tmpColMax, _nPointsPlane * sizeof(fl32));
   delete[] tmpColMax;
 #endif
-  
+
   // compute the category
-  
+
   fl32 *category = _convStratCategory->data;
 
   for (int iy = _nyConv; iy < _gridNy - _nyConv; iy++) {
     for (int ix = _nxConv; ix < _gridNx - _nxConv; ix++) {
-      
+
       int ii = ix + iy * _gridNx;
 
       // set convective flag from texture
@@ -3177,21 +3055,22 @@ void CartInterp::_convStratCompute()
           category[jj] = CATEGORY_CONVECTIVE;
         }
       }
-      
+
       // set convective flag from col max dbz
 
-      if (dbzColMax[ii] >= _params.conv_strat_dbz_threshold_for_definite_convection) {
+      if (dbzColMax[ii] >=
+          _params.conv_strat_dbz_threshold_for_definite_convection) {
         for (size_t kk = 0; kk < _convKernel.size(); kk++) {
           int jj = ii + _convKernel[kk].offset;
           category[jj] = CATEGORY_CONVECTIVE;
         }
       }
-      
+
     } // ix
-  } // iy
+  }   // iy
 
   // set stratiform flag for what is left
-  
+
   for (int iy = _nyConv; iy < _gridNy - _nyConv; iy++) {
     for (int ix = _nxConv; ix < _gridNx - _nxConv; ix++) {
       int ii = ix + iy * _gridNx;
@@ -3205,15 +3084,13 @@ void CartInterp::_convStratCompute()
   }
 
   _printRunTime("CartInterp::_convStratCompute");
-  
 }
 
 //////////////////////////////////////
 // compute the kernels for this grid
 
-bool CartInterp::_compareKernels(kernel_t x, kernel_t y) 
-{
-  return x.distance < y.distance; 
+bool CartInterp::_compareKernels(kernel_t x, kernel_t y) {
+  return x.distance < y.distance;
 }
 
 void CartInterp::_convStratComputeKernels()
@@ -3227,15 +3104,15 @@ void CartInterp::_convStratComputeKernels()
 
   _textureKernel.clear();
 
-  _nyTexture = (int) floor(_textureRadiusKm / _gridDy + 0.5);
-  _nxTexture = (int) floor(_textureRadiusKm / _gridDx + 0.5);
-  
+  _nyTexture = (int)floor(_textureRadiusKm / _gridDy + 0.5);
+  _nxTexture = (int)floor(_textureRadiusKm / _gridDx + 0.5);
+
   if (_params.debug >= Params::DEBUG_VERBOSE) {
     cerr << "Texture kernel size:" << endl;
     cerr << "  idy: " << _nyTexture << endl;
     cerr << "  nx: " << _nxTexture << endl;
   }
-  
+
   kernel_t entry;
   for (int jdy = -_nyTexture; jdy <= _nyTexture; jdy++) {
     double yy = jdy * _gridDy;
@@ -3257,15 +3134,15 @@ void CartInterp::_convStratComputeKernels()
 
   _convKernel.clear();
 
-  _nyConv = (int) floor(_convectiveRadiusKm / _gridDy + 0.5);
-  _nxConv = (int) floor(_convectiveRadiusKm / _gridDx + 0.5);
+  _nyConv = (int)floor(_convectiveRadiusKm / _gridDy + 0.5);
+  _nxConv = (int)floor(_convectiveRadiusKm / _gridDx + 0.5);
 
   if (_params.debug >= Params::DEBUG_VERBOSE) {
     cerr << "Convective kernel size:" << endl;
     cerr << "  idy: " << _nyConv << endl;
     cerr << "  nx: " << _nxConv << endl;
   }
-  
+
   for (int jdy = -_nyConv; jdy <= _nyConv; jdy++) {
     double yy = jdy * _gridDy;
     for (int jdx = -_nxConv; jdx <= _nxConv; jdx++) {
@@ -3281,7 +3158,6 @@ void CartInterp::_convStratComputeKernels()
   // sort
 
   sort(_convKernel.begin(), _convKernel.end(), _compareKernels);
-
 }
 
 /////////////////////////////////////////////
@@ -3297,12 +3173,12 @@ void CartInterp::_convStratComputeVertLookups()
   }
 
   for (int ii = 0; ii < NLOOKUP; ii++) {
-    
+
     double zz = ii * 0.01; // ht in km
     double zLowerLimit = zz - _params.conv_strat_texture_depth_km / 2.0;
     double zUpperLimit = zz + _params.conv_strat_texture_depth_km / 2.0;
-    
-    for (int jj = 0; jj < (int) _gridZLevels.size(); jj++) {
+
+    for (int jj = 0; jj < (int)_gridZLevels.size(); jj++) {
       double zLevel = _gridZLevels[jj];
       if (zLevel >= zLowerLimit) {
         _textureIzLower[ii] = jj;
@@ -3310,16 +3186,14 @@ void CartInterp::_convStratComputeVertLookups()
       }
     }
 
-    for (int jj = (int) _gridZLevels.size() - 1; jj >= 0; jj--) {
+    for (int jj = (int)_gridZLevels.size() - 1; jj >= 0; jj--) {
       double zLevel = _gridZLevels[jj];
       if (zLevel <= zUpperLimit) {
         _textureIzUpper[ii] = jj;
         break;
       }
     }
-
   }
-
 }
 
 ///////////////////////////////////////////////////////////////
@@ -3331,10 +3205,7 @@ void CartInterp::_convStratComputeVertLookups()
 
 // Constructor
 
-CartInterp::ComputeTexture::ComputeTexture(int iz) :
-        TaThread(),
-        _iz(iz)
-{
+CartInterp::ComputeTexture::ComputeTexture(int iz) : TaThread(), _iz(iz) {
   char name[128];
   sprintf(name, "ComputeTexture-level-%d", _iz);
   setThreadName(name);
@@ -3346,47 +3217,42 @@ CartInterp::ComputeTexture::ComputeTexture(int iz) :
   _dbzSqTexture = NULL;
   _nx = _ny = 0;
   _nxTexture = _nyTexture = 0;
-}  
-
-
-CartInterp::ComputeTexture::~ComputeTexture() 
-{
 }
+
+CartInterp::ComputeTexture::~ComputeTexture() {}
 
 // override run method
 // compute texture at each point in plane
 
-void CartInterp::ComputeTexture::run()
-{
-  
+void CartInterp::ComputeTexture::run() {
+
   // check for validity
-  
+
   if (_dbzCount == NULL) {
     cerr << "ERROR - ComputeTexture::run" << endl;
     cerr << "  Initialization not complete" << endl;
     return;
   }
-  
+
   // compute texture at each point in the plane
 
-  int minPtsForTexture = 
-    (int) (_minValidFraction * _kernel.size() + 0.5);
-  
+  int minPtsForTexture = (int)(_minValidFraction * _kernel.size() + 0.5);
+
   for (int iy = _nyTexture; iy < _ny - _nyTexture; iy++) {
-    
+
     int icenter = _nxTexture + iy * _nx;
-    
+
     for (int ix = _nxTexture; ix < _nx - _nxTexture; ix++, icenter++) {
-      
+
       // compute texture in circular kernel around point
       // first we compute the standard deviation of the square of dbz
       // then we take the square root of the sdev
-      
+
       double nn = 0.0;
       double sum = 0.0;
       double sumSq = 0.0;
       double sumSqSq = 0.0;
-      
+
       for (size_t ii = 0; ii < _kernel.size(); ii++) {
         int kk = icenter + _kernel[ii].offset;
         if (_dbzCount[kk] > 0) {
@@ -3413,13 +3279,12 @@ void CartInterp::ComputeTexture::run()
         }
         double sdevSq = sqrt(varSq);
         _dbzSqTexture[icenter] = sqrt(sdevSq);
-
       }
-      
+
     } // ix
-    
+
   } // iy
-  
+
   // fill in gaps in texture using closest non-missing point
 
   for (int iy = _nyTexture; iy < _ny - _nyTexture; iy++) {
@@ -3434,8 +3299,5 @@ void CartInterp::ComputeTexture::run()
         }
       }
     } // ix
-  } // iy
-  
+  }   // iy
 }
-
-

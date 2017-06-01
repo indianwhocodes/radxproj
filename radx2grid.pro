@@ -20,7 +20,6 @@ INCLUDEPATH += \
 HEADERS += \
            apps/Radx/src/Radx2Grid/Args.hh \
            apps/Radx/src/Radx2Grid/CartInterp.hh \
-           apps/Radx/src/Radx2Grid/GridSet.hh \
            apps/Radx/src/Radx2Grid/Interp.hh \
            apps/Radx/src/Radx2Grid/OutputMdv.hh \
            apps/Radx/src/Radx2Grid/Params.hh \
@@ -33,18 +32,15 @@ HEADERS += \
            apps/Radx/src/Radx2Grid/SatInterp.hh \
            apps/Radx/src/Radx2Grid/SvdData.hh \
            apps/Radx/src/Radx2Grid/Thread.hh \
-           apps/Radx/src/Radx2Grid/VolumePointsSet.hh \
-           apps/Radx/src/Radx2Grid/VolumeStream.hh \
            apps/Radx/src/Radx2Grid/PolarDataStream.hh \
            apps/Radx/src/Radx2Grid/Polar2Cartesian.hh \
-           apps/Radx/src/Radx2Grid/Cartesian2Grid.hh \
     apps/Radx/src/Radx2Grid/ThreadQueue.hh \
-    apps/Radx/src/Radx2Grid/WriteOutput.hh
+    apps/Radx/src/Radx2Grid/WriteOutput.hh \
+    apps/Radx/src/Radx2Grid/test.hh \
+    apps/Radx/src/Radx2Grid/Cart2Grid.hh
 
 SOURCES += apps/Radx/src/Radx2Grid/Args.cc \
-           apps/Radx/src/Radx2Grid/Cartesian2Grid.cpp \
            apps/Radx/src/Radx2Grid/CartInterp.cc \
-           apps/Radx/src/Radx2Grid/GridSet.cc \
            apps/Radx/src/Radx2Grid/Interp.cc \
            apps/Radx/src/Radx2Grid/Main.cc \
            apps/Radx/src/Radx2Grid/OutputMdv.cc \
@@ -60,9 +56,8 @@ SOURCES += apps/Radx/src/Radx2Grid/Args.cc \
            apps/Radx/src/Radx2Grid/SatInterp.cc \
            apps/Radx/src/Radx2Grid/SvdData.cc \
            apps/Radx/src/Radx2Grid/Thread.cc \
-           apps/Radx/src/Radx2Grid/VolumePointsSet.cc \
-           apps/Radx/src/Radx2Grid/VolumeStream.cc \
-    apps/Radx/src/Radx2Grid/WriteOutput.cpp
+    apps/Radx/src/Radx2Grid/WriteOutput.cpp \
+    apps/Radx/src/Radx2Grid/Cart2Grid.cpp
 
 OTHER_FILES += apps/Radx/src/Radx2Grid/makefile.am
 

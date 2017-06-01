@@ -2,7 +2,6 @@
 #ifndef Radx2GridPlus_h
 #define Radx2GridPlus_h
 
-#include "Cartesian2Grid.hh"
 #include "Polar2Cartesian.hh"
 #include "PolarDataStream.hh"
 #include "ThreadQueue.hh"

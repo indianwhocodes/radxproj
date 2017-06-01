@@ -66,7 +66,7 @@ struct Repository {
   std::map<std::string, shared_ptr<std::vector<float>>> _outFields;
 
   // Cartesian Coords
-  std::vector<float> _gateDistance;
+  std::vector<float> _gateGroundDistance;
   std::vector<float> _gateZr;
   std::vector<float> _gateX;
   std::vector<float> _gateY;

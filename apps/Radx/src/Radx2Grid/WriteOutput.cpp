@@ -25,78 +25,69 @@ WriteOutput::~WriteOutput() {}
 /////////////////////////////////////////////////////
 // test WriteOutputFile()
 
-int WriteOutput::testWriteOutputFile(fl32 **outputFields)
-{
-    cout << "DEBUG: inside of testWriteOutputFile()" << endl;
-    if (_params.debug) {
-        cerr << "  Writing output file ... " << endl;
+int WriteOutput::testWriteOutputFile(fl32 **outputFields) {
+  cout << "DEBUG: inside of testWriteOutputFile()" << endl;
+  if (_params.debug) {
+    cerr << "  Writing output file ... " << endl;
+  }
+  // cedric is a special case
+  if (_params.output_format == Params::CEDRIC) {
+    //        return _writeCedricFile(false);  do we need this?
+  }
+
+  // initialize the output grid dimensions
+  _initGrid();
+
+  cout << "DEBUG: after initGrid" << endl;
+
+  if (_setRadarParams()) {
+    cerr << "ERROR - CartInterp::interpVol()" << endl;
+    return -1;
+  }
+
+  OutputMdv out(_progName, _params);
+  out.setMasterHeader(_readVol);
+  for (size_t ifield = 0; ifield < _interpFields.size(); ifield++) {
+    const Interp::Field &ifld = _interpFields[ifield];
+    out.addField(_readVol, _proj, _gridZLevels, ifld.outputName, ifld.longName,
+                 ifld.units, ifld.inputDataType, ifld.inputScale,
+                 ifld.inputOffset, missingFl32, outputFields[ifield]);
+  } // ifield
+
+  // debug (test) fields
+
+  for (size_t ii = 0; ii < _derived3DFields.size(); ii++) {
+    const DerivedField *dfld = _derived3DFields[ii];
+    if (dfld->writeToFile) {
+      out.addField(_readVol, _proj, dfld->vertLevels, dfld->name,
+                   dfld->longName, dfld->units, Radx::FL32, 1.0, 0.0,
+                   missingFl32, dfld->data);
     }
-    // cedric is a special case
-    if (_params.output_format == Params::CEDRIC) {
-//        return _writeCedricFile(false);  do we need this?
+  }
+
+  for (size_t ii = 0; ii < _derived2DFields.size(); ii++) {
+    const DerivedField *dfld = _derived2DFields[ii];
+    if (dfld->writeToFile) {
+      out.addField(_readVol, _proj, dfld->vertLevels, dfld->name,
+                   dfld->longName, dfld->units, Radx::FL32, 1.0, 0.0,
+                   missingFl32, dfld->data);
     }
+  }
 
-    // initialize the output grid dimensions
-    _initGrid();
+  // chunks
 
-    cout << "DEBUG: after initGrid" << endl;
+  out.addChunks(_readVol, _interpFields.size());
 
-    if (_setRadarParams()) {
-        cerr << "ERROR - CartInterp::interpVol()" << endl;
-        return -1;
-    }
+  // write out file
 
+  if (out.writeVol()) {
+    cerr << "ERROR - Interp::processFile" << endl;
+    cerr << "  Cannot write file to output_dir: " << _params.output_dir << endl;
+    return -1;
+  }
 
-
-    OutputMdv out(_progName, _params);
-    out.setMasterHeader(_readVol);
-    for (size_t ifield = 0; ifield < _interpFields.size(); ifield++) {
-        const Interp::Field &ifld = _interpFields[ifield];
-        out.addField(_readVol, _proj, _gridZLevels,
-                     ifld.outputName, ifld.longName, ifld.units,
-                     ifld.inputDataType,
-                     ifld.inputScale,
-                     ifld.inputOffset,
-                     missingFl32,
-                     outputFields[ifield]);
-    } // ifield
-
-    // debug (test) fields
-
-    for (size_t ii = 0; ii < _derived3DFields.size(); ii++) {
-        const DerivedField *dfld = _derived3DFields[ii];
-        if (dfld->writeToFile) {
-            out.addField(_readVol, _proj, dfld->vertLevels,
-                         dfld->name, dfld->longName, dfld->units,
-                         Radx::FL32, 1.0, 0.0, missingFl32, dfld->data);
-        }
-    }
-
-    for (size_t ii = 0; ii < _derived2DFields.size(); ii++) {
-        const DerivedField *dfld = _derived2DFields[ii];
-        if (dfld->writeToFile) {
-            out.addField(_readVol, _proj, dfld->vertLevels,
-                         dfld->name, dfld->longName, dfld->units,
-                         Radx::FL32, 1.0, 0.0, missingFl32, dfld->data);
-        }
-    }
-
-    // chunks
-
-    out.addChunks(_readVol, _interpFields.size());
-
-    // write out file
-
-    if (out.writeVol()) {
-        cerr << "ERROR - Interp::processFile" << endl;
-        cerr << "  Cannot write file to output_dir: "
-             << _params.output_dir << endl;
-        return -1;
-    }
-
-    return 0;
+  return 0;
 }
-
 
 /////////////////////////////////////////////////////
 // write out data
@@ -341,61 +332,8 @@ void WriteOutput::_initZLevels() {
 void WriteOutput::_initProjection()
 
 {
-
-  _proj.setGrid(_gridNx, _gridNy, _gridDx, _gridDy, _gridMinx, _gridMiny);
-
-  if (_params.grid_projection == Params::PROJ_LATLON) {
-    _proj.initLatlon();
-  } else if (_params.grid_projection == Params::PROJ_FLAT) {
-    _proj.initFlat(_gridOriginLat, _gridOriginLon, _params.grid_rotation);
-  } else if (_params.grid_projection == Params::PROJ_LAMBERT_CONF) {
-    _proj.initLambertConf(_gridOriginLat, _gridOriginLon, _params.grid_lat1,
-                          _params.grid_lat2);
-  } else if (_params.grid_projection == Params::PROJ_POLAR_STEREO) {
-    Mdvx::pole_type_t poleType = Mdvx::POLE_NORTH;
-    if (!_params.grid_pole_is_north) {
-      poleType = Mdvx::POLE_SOUTH;
-    }
-    _proj.initPolarStereo(_gridOriginLat, _gridOriginLon,
-                          _params.grid_tangent_lon, poleType,
-                          _params.grid_central_scale);
-  } else if (_params.grid_projection == Params::PROJ_OBLIQUE_STEREO) {
-    _proj.initObliqueStereo(_gridOriginLat, _gridOriginLon,
-                            _params.grid_tangent_lat, _params.grid_tangent_lon,
-                            _params.grid_central_scale);
-  } else if (_params.grid_projection == Params::PROJ_MERCATOR) {
-    _proj.initMercator(_gridOriginLat, _gridOriginLon);
-  } else if (_params.grid_projection == Params::PROJ_TRANS_MERCATOR) {
-    _proj.initTransMercator(_gridOriginLat, _gridOriginLon,
-                            _params.grid_central_scale);
-  } else if (_params.grid_projection == Params::PROJ_ALBERS) {
-    _proj.initAlbers(_gridOriginLat, _gridOriginLon, _params.grid_lat1,
-                     _params.grid_lat2);
-  } else if (_params.grid_projection == Params::PROJ_LAMBERT_AZIM) {
-    _proj.initLambertAzim(_gridOriginLat, _gridOriginLon);
-  } else if (_params.grid_projection == Params::PROJ_VERT_PERSP) {
-    _proj.initVertPersp(_gridOriginLat, _gridOriginLon,
-                        _params.grid_persp_radius);
-  }
-
-  if (_params.grid_set_offset_origin) {
-    _proj.setOffsetOrigin(_params.grid_offset_origin_latitude,
-                          _params.grid_offset_origin_longitude);
-  } else {
-    _proj.setOffsetCoords(_params.grid_false_northing,
-                          _params.grid_false_easting);
-  }
-
-  _proj.latlon2xy(_readVol.getLatitudeDeg(), _readVol.getLongitudeDeg(),
-                  _radarX, _radarY);
-
-  if (_params.debug >= Params::DEBUG_VERBOSE) {
-    cerr << "============ Interp::_initProjection() ===============" << endl;
-    _proj.print(cerr, false);
-    cerr << "  radarX: " << _radarX << endl;
-    cerr << "  radarY: " << _radarY << endl;
-    cerr << "======================================================" << endl;
-  }
+  _radarX = 0.0;
+  _radarY = 0.0;
 }
 
 ////////////////////////////////////////////////////////////

@@ -2,41 +2,49 @@
 #ifndef Test_h
 #define Test_h
 
+#include "Params.hh"
 #include "PolarDataStream.hh"
 #include "WriteOutput.hh"
-#include "Params.hh"
-#include <Radx/RadxVol.hh>
 #include <Radx/Radx.hh>
+#include <Radx/RadxVol.hh>
 #include <string>
 
-
-class Test 
-{
+class Test {
 public:
-    Test(){}
-    ~Test(){}
+  Test() {}
+  ~Test() {}
 
+  int example_call() {
+    //    Test t;
+    //    if (t.run(_progName, _outputFields, _params, _readVol.getPathInUse())
+    //    ==
+    //        0) {
+    //      cout << "DEBUG: WRITEOUTPUT in Radx2GridPlus No ERROR" << endl;
+    //    }
+    //    cout << "DEBUG: AFTER WRITEOUTPUT in Radx2GridPlus" << endl;
 
-    int run(string progName, fl32 **outputFields, Params params, const string& filePath)
-    {
-        cout << "DEBUG: inside of Test::run()" << endl;
-//        params.output_dir = "./test";
-        cout << "DEBUG: set params_output_dir" << endl;
-	    PolarDataStream pds(filePath, params);
-        cout << "DEBUG: create PolarDataStream instance" << endl;
-	    pds.LoadDataFromNetCDFFilesIntoRepository();
-        cout << "DEBUG: call LoadDataFromNetCDFFilesIntoRepository()" << endl;
-	    WriteOutput wo(progName, pds.getRepository(), pds.getRadxVol(), params, pds.getInterpFields());
-        cout << "DEBUG: create WriteOutput instance" << endl;
-	    wo.testWriteOutputFile(outputFields);
-        cout << "DEBUG: call testWriteOutputFile()" << endl;
+    //    if (_params.debug) {
+    //      cerr << "  Writing output file ... " << endl;
+    //    }
+  }
 
-        return 0;
-    }
+  int run(string progName, fl32 **outputFields, Params params,
+          const string &filePath) {
+    cout << "DEBUG: inside of Test::run()" << endl;
+    //        params.output_dir = "./test";
+    cout << "DEBUG: set params_output_dir" << endl;
+    PolarDataStream pds(filePath, params);
+    cout << "DEBUG: create PolarDataStream instance" << endl;
+    pds.LoadDataFromNetCDFFilesIntoRepository();
+    cout << "DEBUG: call LoadDataFromNetCDFFilesIntoRepository()" << endl;
+    WriteOutput wo(progName, pds.getRepository(), pds.getRadxVol(), params,
+                   pds.getInterpFields());
+    cout << "DEBUG: create WriteOutput instance" << endl;
+    wo.testWriteOutputFile(outputFields);
+    cout << "DEBUG: call testWriteOutputFile()" << endl;
 
-
+    return 0;
+  }
 };
-
-
 
 #endif
