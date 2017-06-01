@@ -66,6 +66,8 @@ inline void atomicAdd(tbb::atomic<float> &x, float addend) {
 
 void Cart2Grid::interpGrid() {
   // Convert everything to 0;
+  _clock = _currentTimestamp();
+
   float DMinX = _xy_geom.minx * 1000.0f;
   float DMinY = _xy_geom.miny * 1000.0f;
   float DMinZ = _z_geom.minz * 1000.0f;
@@ -163,7 +165,14 @@ void Cart2Grid::interpGrid() {
       }   // Loop j
     }     // Loop i
   });     // Parfor m
+  if (_params.debug) {
+    _timeit("Computation");
+  }
+  _clock = _currentTimestamp();
   computeGrid();
+  if (_params.debug) {
+    _timeit("Masking");
+  }
 }
 
 void Cart2Grid::computeGrid() {
@@ -175,7 +184,6 @@ void Cart2Grid::computeGrid() {
                   vector<vector<float>>(_DSizeJ, vector<float>(_DSizeK, 0)));
     tbb::parallel_for(0, _DSizeI, [=](int i) {
       for (int j = 0; j < _DSizeJ; j++) {
-#pragma ivdep
         for (int k = 0; k < _DSizeK; k++) {
           if (_outputGridCount[name]->at(i).at(j).at(k) < 3 ||
               _outputGridWeight[name]->at(i).at(j).at(k) == 0) {
