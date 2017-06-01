@@ -79,7 +79,6 @@ void Cart2Grid::interpGrid() {
   float Z0 = _store->_altitudeAgl;
 
   tbb::parallel_for(0, _store->_nPoints, [=](int m) {
-    std::cout << "=================" << m << "===============" << std::endl;
     // Grab gates
     float X = _store->_gateX[m];
     float Y = _store->_gateY[m];
