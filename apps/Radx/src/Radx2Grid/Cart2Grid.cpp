@@ -2,7 +2,8 @@
 #include "tbb/compat/thread"
 #include "tbb/parallel_for.h"
 #include <assert.h>
-#include <iostream>
+#include <fstream>
+#include <sstream>
 
 Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params &params)
     : _store(store), _params(params) {
@@ -79,7 +80,14 @@ void Cart2Grid::interpGrid() {
   float Z0 = _store->_altitudeAgl;
 
   tbb::parallel_for(0, _store->_nPoints, [=](int m) {
-    std::cout << "=================" << m << "===============" << std::endl;
+    auto id = std::this_thread::get_id();
+    ostringstream logname;
+    logname << "f" << id << ".txt";
+    ofstream logstream;
+    logstream.open(logname.str(), std::fstream::out | std::fstream::app);
+    logstream << m << std::endl;
+    logstream.close();
+
     // Grab gates
     float X = _store->_gateX[m];
     float Y = _store->_gateY[m];
