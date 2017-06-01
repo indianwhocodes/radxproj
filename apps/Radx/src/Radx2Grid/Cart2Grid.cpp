@@ -1,6 +1,8 @@
 #include "Cart2Grid.hh"
+#include "tbb/compat/thread"
+#include "tbb/parallel_for.h"
 #include <assert.h>
-#include <tbb/parallel_for.h>
+#include <iostream>
 
 Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params &params)
     : _store(store), _params(params) {
@@ -77,6 +79,7 @@ void Cart2Grid::interpGrid() {
   float Z0 = _store->_altitudeAgl;
 
   tbb::parallel_for(0, _store->_nPoints, [=](int m) {
+    std::cout << "=================" << m << "===============" << std::endl;
     // Grab gates
     float X = _store->_gateX[m];
     float Y = _store->_gateY[m];
@@ -157,9 +160,10 @@ void Cart2Grid::interpGrid() {
 
             float vw = v * w + 2e-5f;
 
-            atomicAdd(_outputGridSum[name]->at(i).at(j).at(k), vw);
-            atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k), w);
-            (_outputGridCount[name]->at(i).at(j).at(k))++;
+            //           atomicAdd(_outputGridSum[name]->at(i).at(j).at(k), vw);
+            //           atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k),
+            //           w);
+            //           (_outputGridCount[name]->at(i).at(j).at(k))++;
           }
         } // Loop k
       }   // Loop j
