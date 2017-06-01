@@ -1,4 +1,5 @@
 #include "Cart2Grid.hh"
+#include "ctpl.h"
 #include "tbb/compat/thread"
 #include "tbb/parallel_for.h"
 #include <assert.h>
@@ -79,104 +80,110 @@ void Cart2Grid::interpGrid() {
   float CellZ = _z_geom.dz * 1000.0f;
   float Z0 = _store->_altitudeAgl;
 
-  tbb::parallel_for(0, _store->_nPoints, [=](int m) {
-    auto id = std::this_thread::get_id();
-    ostringstream logname;
-    logname << "f" << id << ".txt";
-    ofstream logstream;
-    logstream.open(logname.str(), std::fstream::out | std::fstream::app);
-    logstream << m << std::endl;
-    logstream.close();
+  ctpl::thread_pool pool(8);
 
-    // Grab gates
-    float X = _store->_gateX[m];
-    float Y = _store->_gateY[m];
-    float Z = _store->_gateZ[m];
-    float RoI = _store->_gateRoI[m];
-    float E = _store->_outElevation[m];
-    float G = _store->_outGate[m];
-    float S = _store->_gateGroundDistance[m];
-    float GateSize = _store->_gateSize[0];
+  for (int m = 0; m < _store->_nPoints; m++) {
+    pool.push([=](int) {
+      //      auto id = std::this_thread::get_id();
+      //      ostringstream logname;
+      //      logname << "f" << id << ".txt";
+      //      ofstream logstream;
+      //      logstream.open(logname.str(), std::fstream::out |
+      //      std::fstream::app);
+      //      logstream << m << std::endl;
+      //      logstream.close();
 
-    // Put it at grid
-    int ci = int((X - DMinX) / CellX);
-    int cj = int((Y - DMinY) / CellY);
-    int ck = int((Z - DMinZ) / CellZ);
+      // Grab gates
+      float X = _store->_gateX[m];
+      float Y = _store->_gateY[m];
+      float Z = _store->_gateZ[m];
+      float RoI = _store->_gateRoI[m];
+      float E = _store->_outElevation[m];
+      float G = _store->_outGate[m];
+      float S = _store->_gateGroundDistance[m];
+      float GateSize = _store->_gateSize[0];
 
-    // Search range
-    int si = int(RoI / CellX) + 1;
-    int sj = int(RoI / CellY) + 1;
-    int sk = int(RoI / CellZ) + 1;
+      // Put it at grid
+      int ci = int((X - DMinX) / CellX);
+      int cj = int((Y - DMinY) / CellY);
+      int ck = int((Z - DMinZ) / CellZ);
 
-    int starti = std::max(0, ci - si);
-    int endi = std::min(_DSizeI - 1, ci + si);
-    if (endi < starti)
-      return;
-    int startj = std::max(0, cj - sj);
-    int endj = std::min(_DSizeJ - 1, cj + sj);
-    if (endj < startj)
-      return;
-    int startk = std::max(0, ck - sk);
-    int endk = std::min(_DSizeK - 1, ck + sk);
-    if (endk < startk)
-      return;
+      // Search range
+      int si = int(RoI / CellX) + 1;
+      int sj = int(RoI / CellY) + 1;
+      int sk = int(RoI / CellZ) + 1;
 
-    for (int i = starti; i <= endi; ++i) {
-      for (int j = startj; j <= endj; ++j) {
-        for (int k = startk; k <= endk; ++k) {
-          float posx = DMinX + i * CellX;
-          float posy = DMinY + j * CellY;
-          float posz = DMinZ + k * CellZ;
+      int starti = std::max(0, ci - si);
+      int endi = std::min(_DSizeI - 1, ci + si);
+      if (endi < starti)
+        return;
+      int startj = std::max(0, cj - sj);
+      int endj = std::min(_DSizeJ - 1, cj + sj);
+      if (endj < startj)
+        return;
+      int startk = std::max(0, ck - sk);
+      int endk = std::min(_DSizeK - 1, ck + sk);
+      if (endk < startk)
+        return;
 
-          float s = std::sqrt(posx * posx + posy * posy);
-          float el = calculate_elevation(s, posz, Z0);
-          float rg = calculate_range_gate(s, posz, el, Z0);
+      for (int i = starti; i <= endi; ++i) {
+        for (int j = startj; j <= endj; ++j) {
+          for (int k = startk; k <= endk; ++k) {
+            float posx = DMinX + i * CellX;
+            float posy = DMinY + j * CellY;
+            float posz = DMinZ + k * CellZ;
 
-          if ((el < 0.0) || (el > 20)) {
-            continue;
-          }
+            float s = std::sqrt(posx * posx + posy * posy);
+            float el = calculate_elevation(s, posz, Z0);
+            float rg = calculate_range_gate(s, posz, el, Z0);
 
-          if (std::abs(rg - G) > 2.0 * GateSize) {
-            continue;
-          }
-
-          float max_e_diff = (E < 6.0) ? 1.0 : 3.0;
-          if (std::abs(el / M_PI * 180.0 - E) > max_e_diff) {
-            continue;
-          }
-
-          float dot = std::min(1.0f, (posx * X + posy * Y) / (S * s));
-          float term1 = std::cos(std::abs(el - E));
-          float term2 = dot;
-          float e_u = std::acos(term1 * term2) * 180.0 / M_PI;
-
-          float alpha = e_u / max_e_diff;
-
-          float gate_diff = fabs(rg - G) / (2 * GateSize) + 1e-5;
-
-          float w = std::pow(0.005f, alpha * alpha * alpha) /
-                        (gate_diff * gate_diff) +
-                    2e-5;
-
-          for (auto it = _outputGridCount.cbegin();
-               it != _outputGridCount.cend(); ++it) {
-            string name = (*it).first;
-            float v = _store->_outFields[name]->at(m);
-            if (v < -100.0f) {
+            if ((el < 0.0) || (el > 20)) {
               continue;
             }
 
-            float vw = v * w + 2e-5f;
+            if (std::abs(rg - G) > 2.0 * GateSize) {
+              continue;
+            }
 
-            //           atomicAdd(_outputGridSum[name]->at(i).at(j).at(k), vw);
-            //           atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k),
-            //           w);
-            //           (_outputGridCount[name]->at(i).at(j).at(k))++;
-          }
-        } // Loop k
-      }   // Loop j
-    }     // Loop i
-  });     // Parfor m
+            float max_e_diff = (E < 6.0) ? 1.0 : 3.0;
+            if (std::abs(el / M_PI * 180.0 - E) > max_e_diff) {
+              continue;
+            }
+
+            float dot = std::min(1.0f, (posx * X + posy * Y) / (S * s));
+            float term1 = std::cos(std::abs(el - E));
+            float term2 = dot;
+            float e_u = std::acos(term1 * term2) * 180.0 / M_PI;
+
+            float alpha = e_u / max_e_diff;
+
+            float gate_diff = fabs(rg - G) / (2 * GateSize) + 1e-5;
+
+            float w = std::pow(0.005f, alpha * alpha * alpha) /
+                          (gate_diff * gate_diff) +
+                      2e-5;
+
+            for (auto it = _outputGridCount.cbegin();
+                 it != _outputGridCount.cend(); ++it) {
+              string name = (*it).first;
+              float v = _store->_outFields[name]->at(m);
+              if (v < -100.0f) {
+                continue;
+              }
+
+              float vw = v * w + 2e-5f;
+
+              //           atomicAdd(_outputGridSum[name]->at(i).at(j).at(k),
+              //           vw);
+              //           atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k),
+              //           w);
+              //           (_outputGridCount[name]->at(i).at(j).at(k))++;
+            }
+          } // Loop k
+        }   // Loop j
+      }     // Loop i
+    });     // Lambda in pool
+  }         // Parfor m
   if (_params.debug) {
     _timeit("Computation");
   }

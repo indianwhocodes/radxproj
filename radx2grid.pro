@@ -37,7 +37,9 @@ HEADERS += \
     apps/Radx/src/Radx2Grid/ThreadQueue.hh \
     apps/Radx/src/Radx2Grid/WriteOutput.hh \
     apps/Radx/src/Radx2Grid/test.hh \
-    apps/Radx/src/Radx2Grid/Cart2Grid.hh
+    apps/Radx/src/Radx2Grid/Cart2Grid.hh \
+    apps/Radx/src/Radx2Grid/ctpl.h \
+    apps/Radx/src/Radx2Grid/ctpl_stl.h
 
 SOURCES += apps/Radx/src/Radx2Grid/Args.cc \
            apps/Radx/src/Radx2Grid/CartInterp.cc \
