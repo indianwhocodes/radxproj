@@ -5,6 +5,7 @@
 #include <chrono>
 #include <memory>
 #include <thread>
+#include "tbb/task_scheduler_init.h"
 
 Radx2GridPlus::Radx2GridPlus(std::string pName) : _programName(pName) {}
 
@@ -87,6 +88,8 @@ void Radx2GridPlus::processFiles(const std::vector<string> &filepaths,
 
   // Get total number of files to be allocated
   auto n = filepaths.size();
+
+  tbb::task_scheduler_init TBBinit(64);
 
   std::thread thread_read_nc(_pushDataintoBuffer, filepaths, params);
   std::thread thread_process_polarstream(_popDatafromBuffer, n,
