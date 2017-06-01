@@ -106,10 +106,7 @@ Radx2Grid_SOURCES = \
 	SvdData.cc \
 	Thread.cc \
 	Radx2GridPlus.cc \
-	VolumePointsSet.cc \
-	VolumeStream.cc \
-	GridSet.cc \
-	Cartesian2Grid.cpp \
 	Polar2Cartesian.cpp \
 	PolarDataStream.cpp \
-	WriteOutput.cpp 
+	WriteOutput.cpp \
+	Cart2Grid.cpp
