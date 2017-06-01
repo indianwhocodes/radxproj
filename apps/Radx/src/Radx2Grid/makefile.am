@@ -51,6 +51,7 @@ AM_CXXFLAGS = $(AM_CFLAGS)
 #AM_LDFLAGS += -L../../../../libs/tdrp/src
 #AM_LDFLAGS += -L../../../../libs/toolsa/src
 #AM_LDFLAGS += -L../../../../libs/kd/src
+AM_LDFLAGS = -L${MKLROOT}/lib/mic
 
 # load libs
 
@@ -83,8 +84,15 @@ LDADD += -lbz2
 LDADD += -lpthread
 LDADD += -lexpat
 LDADD += -lm
-LDADD += -lfftw3
+#LDADD += -lfftw3
 LDADD += -ltbb
+LDADD += -lmkl_intel_ilp64 
+LDADD += -lmkl_tbb_thread 
+LDADD += -lmkl_core 
+LDADD += -lstdc++ 
+LDADD += -lpthread 
+LDADD += -lm 
+LDADD += -ldl
 # set app name
 
 bin_PROGRAMS = Radx2Grid
@@ -106,7 +114,7 @@ Radx2Grid_SOURCES = \
 	SvdData.cc \
 	Thread.cc \
 	Radx2GridPlus.cc \
-	Polar2Cartesian.cpp \
+	Cart2Grid.cpp 
 	PolarDataStream.cpp \
-	WriteOutput.cpp \
-	Cart2Grid.cpp
+        Polar2Cartesian.cpp \	
+	WriteOutput.cpp 
