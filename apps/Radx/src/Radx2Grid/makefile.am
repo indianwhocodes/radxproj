@@ -51,8 +51,7 @@ AM_CXXFLAGS = $(AM_CFLAGS)
 #AM_LDFLAGS += -L../../../../libs/tdrp/src
 #AM_LDFLAGS += -L../../../../libs/toolsa/src
 #AM_LDFLAGS += -L../../../../libs/kd/src
-AM_LDFLAGS = -L${MKLROOT}/lib/mic
-
+AM_LDFLAGS = -L${MKLROOT}/lib
 # load libs
 
 LDADD = -ldsdata
@@ -114,7 +113,7 @@ Radx2Grid_SOURCES = \
 	SvdData.cc \
 	Thread.cc \
 	Radx2GridPlus.cc \
-	Cart2Grid.cpp \ 
+  Cart2Grid.cpp \
 	PolarDataStream.cpp \
-        Polar2Cartesian.cpp \	
+  Polar2Cartesian.cpp \
 	WriteOutput.cpp 
