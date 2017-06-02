@@ -143,15 +143,15 @@ Cart2Grid::interpGrid()
 
           double s, el, rg;
 
-          if (_grid_valid->at(i).at(j).at(k) != 0) {
-            s = _grid_gate->at(i).at(j).at(k);
+          if (_grid_el->at(i).at(j).at(k) != 0.0) {
+            s = _grid_ground->at(i).at(j).at(k);
             el = _grid_el->at(i).at(j).at(k);
             rg = _grid_gate->at(i).at(j).at(k);
           } else {
             s = std::sqrt(posx * posx + posy * posy);
             el = calculate_elevation(s, posz, Z0);
             rg = calculate_range_gate(s, posz, el, Z0);
-            _grid_gate->at(i).at(j).at(k) = s;
+            _grid_ground->at(i).at(j).at(k) = s;
             _grid_el->at(i).at(j).at(k) = el;
             _grid_gate->at(i).at(j).at(k) = rg;
           }
