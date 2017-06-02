@@ -10,7 +10,7 @@ CONFIG -= app_bundle
 QMAKE_CXXFLAGS += -std=c++14
 
 *-icc* {
-    QMAKE_CXXFLAGS_RELEASE -= -O2 -falign-stack=maintain-16-byte
+    QMAKE_CXXFLAGS_RELEASE -= -O2
     QMAKE_CXXFLAGS_RELEASE += -O3 -xHost -ipo -fp-model fast=2
 }
 
@@ -94,7 +94,7 @@ LIBS += -lradar \
     -lpthread \
     -lexpat \
     -lm \
-    -lfftw3 \
+    -lfftw3
 
 CONFIG(debug, debug|release) {
     LIBS += -ltbb_debug
@@ -102,12 +102,8 @@ CONFIG(debug, debug|release) {
     LIBS += -ltbb
 }
 
-LIBS += -L/usr/local/lib
-
-macx:{
-    #LIBS += -L/opt/intel/compilers_and_libraries/mac/tbb/lib
-    #INCLUDEPATH += /opt/intel/compilers_and_libraries/mac/tbb/include
-}
+LIBS += -L/usr/local/lib \
+        -L/apps/lib/expat/2.1.1/lib
 
 unix:{
     T1 = $$(RADX_RUNTIME)

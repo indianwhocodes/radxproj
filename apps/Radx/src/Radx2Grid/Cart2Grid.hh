@@ -15,17 +15,26 @@
 #define calculate_range_gate(s, h, e, Z0)                                      \
   (std::sin(s / IR) * (IR + h - Z0) / std::cos(e))
 
-class Cart2Grid {
+template<typename T>
+using vector3d = vector<vector<vector<T>>>;
+
+template<typename T>
+using ptr_vector3d = std::shared_ptr<vector3d<T>>;
+
+class Cart2Grid
+{
 
 private:
   shared_ptr<Repository> _store;
-  map<string, std::shared_ptr<vector<vector<vector<tbb::atomic<float>>>>>>
-      _outputGridSum;
-  map<string, std::shared_ptr<vector<vector<vector<tbb::atomic<float>>>>>>
-      _outputGridWeight;
-  map<string, std::shared_ptr<vector<vector<vector<tbb::atomic<int>>>>>>
-      _outputGridCount;
-  map<string, std::shared_ptr<vector<vector<vector<float>>>>> _outputFinalGrid;
+  map<string, ptr_vector3d<tbb::atomic<float>>> _outputGridSum;
+  map<string, ptr_vector3d<tbb::atomic<float>>> _outputGridWeight;
+  map<string, ptr_vector3d<tbb::atomic<int>>> _outputGridCount;
+  map<string, ptr_vector3d<float>> _outputFinalGrid;
+
+  ptr_vector3d<float> _grid_el;
+  ptr_vector3d<float> _grid_gate;
+  ptr_vector3d<float> _grid_ground;
+  ptr_vector3d<bool> _grid_valid;
 
   const Params _params;
   Params::grid_xy_geom_t _xy_geom;
@@ -33,14 +42,16 @@ private:
 
   long _clock = 0;
 
-  inline long _currentTimestamp() {
+  inline long _currentTimestamp()
+  {
     std::chrono::microseconds start =
-        std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch());
+      std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::system_clock::now().time_since_epoch());
     return start.count();
   }
 
-  inline void _timeit(string promotion = "") {
+  inline void _timeit(string promotion = "")
+  {
     std::cerr << promotion << ": " << (_currentTimestamp() - _clock) / 1.0E6
               << " sec" << std::endl;
   }
@@ -48,7 +59,7 @@ private:
   int _DSizeI, _DSizeJ, _DSizeK; // Size of the grid
 
 public:
-  Cart2Grid(std::shared_ptr<Repository> store, const Params &params);
+  Cart2Grid(std::shared_ptr<Repository> store, const Params& params);
   void interpGrid();
   void computeGrid();
 };
