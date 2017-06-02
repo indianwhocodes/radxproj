@@ -11,18 +11,22 @@
 #include <vector>
 
 // constructor
-PolarDataStream::PolarDataStream(const std::string &inputFile,
-                                 const Params &params)
-    : _params(params) {
+PolarDataStream::PolarDataStream(const std::string& inputFile,
+                                 const Params& params)
+  : _params(params)
+{
   _store = std::make_shared<Repository>();
   _store->_inputFile = inputFile;
 }
 
 PolarDataStream::~PolarDataStream() /*delete _store;*/
-{}
+{
+}
 
 // read dimenssions, variables from NetCDF file and fill the repository
-void PolarDataStream::LoadDataFromNetCDFFilesIntoRepository() {
+void
+PolarDataStream::LoadDataFromNetCDFFilesIntoRepository()
+{
   if (_params.debug) {
     std::cerr << "Function called: LoadDataFromNetCDFFilesIntoRepository"
               << std::endl;
@@ -49,42 +53,42 @@ void PolarDataStream::LoadDataFromNetCDFFilesIntoRepository() {
   netCDF::NcVar alt_agl = dataFile.getVar("altitude_agl");
   alt_agl.getVar(&_store->_altitudeAgl);
   _store->_timeVar.resize(_store->_timeDim);
-  float *timeVarPtr = _store->_timeVar.data();
+  float* timeVarPtr = _store->_timeVar.data();
   netCDF::NcVar timeVar = dataFile.getVar("time");
   timeVar.getVar(timeVarPtr);
   _store->_rangeVar.resize(_store->_timeDim);
-  float *rangeVarPtr = _store->_rangeVar.data();
+  float* rangeVarPtr = _store->_rangeVar.data();
   netCDF::NcVar range = dataFile.getVar("range");
   range.getVar(rangeVarPtr);
   _store->_rayNGates.resize(_store->_timeDim);
-  int *rayNGatesPtr = _store->_rayNGates.data();
+  int* rayNGatesPtr = _store->_rayNGates.data();
   netCDF::NcVar ray_n_gates = dataFile.getVar("ray_n_gates");
   ray_n_gates.getVar(rayNGatesPtr);
   _store->_gateSize.resize(_store->_timeDim);
-  float *gateSizePtr = _store->_gateSize.data();
+  float* gateSizePtr = _store->_gateSize.data();
   netCDF::NcVar gateSize = dataFile.getVar("ray_gate_spacing");
   gateSize.getVar(gateSizePtr);
   _store->_rayStartIndex.resize(_store->_timeDim);
-  int *rayStartIndexPtr = _store->_rayStartIndex.data();
+  int* rayStartIndexPtr = _store->_rayStartIndex.data();
   netCDF::NcVar ray_start_index = dataFile.getVar("ray_start_index");
   ray_start_index.getVar(rayStartIndexPtr);
   _store->_rayStartRange.resize(_store->_timeDim);
-  float *rayStartRangePtr = _store->_rayStartRange.data();
+  float* rayStartRangePtr = _store->_rayStartRange.data();
   netCDF::NcVar ray_start_range = dataFile.getVar("ray_start_range");
   ray_start_range.getVar(rayStartRangePtr);
   _store->_azimuth.resize(_store->_timeDim);
-  float *azimuthPtr = _store->_azimuth.data();
+  float* azimuthPtr = _store->_azimuth.data();
   netCDF::NcVar azimuth = dataFile.getVar("azimuth");
   azimuth.getVar(azimuthPtr);
   _store->_elevation.resize(_store->_timeDim);
-  float *elevationPtr = _store->_elevation.data();
+  float* elevationPtr = _store->_elevation.data();
   netCDF::NcVar elevation = dataFile.getVar("elevation");
   elevation.getVar(elevationPtr);
 
   // TODO: Must read fields from parameter files
   auto f1 = make_shared<RepositoryField>();
   f1->fieldValues.resize(_store->_nPoints);
-  float *reflectivityPtr = f1->fieldValues.data();
+  float* reflectivityPtr = f1->fieldValues.data();
   netCDF::NcVar ref = dataFile.getVar("REF");
   ref.getVar(reflectivityPtr);
   netCDF::NcVarAtt scaleFactor = ref.getAtt("scale_factor");
@@ -100,11 +104,13 @@ void PolarDataStream::LoadDataFromNetCDFFilesIntoRepository() {
     offset.getValues(&(f1->add_offset));
   }
   _store->_inFields.insert(
-      std::pair<std::string, shared_ptr<RepositoryField>>("REF", f1));
+    std::pair<std::string, shared_ptr<RepositoryField>>("REF", f1));
 }
 
 // create 1D array for Elevation, Azimuth, Gate and field values such as Ref
-void PolarDataStream::populateOutputValues() {
+void
+PolarDataStream::populateOutputValues()
+{
   // Size of outGate, outRef, outAzi etc = sum(ray_n_gates) = n_points
 
   // Pre-allocate for speed.
@@ -115,18 +121,18 @@ void PolarDataStream::populateOutputValues() {
        ++it) {
     string name = (*it).first;
     auto fin = (*it).second;
-    auto fout = make_shared<std::vector<float>>();
+    auto fout = make_shared<std::vector<double>>();
     fout->resize(_store->_nPoints);
 
-    tbb::parallel_for(0, _store->_timeDim, 1, [=](int i) {
+    tbb::parallel_for(size_t(0), _store->_timeDim, [=](size_t i) {
       // Start of Expansion function
-      float r0 = _store->_rayStartRange[i];
-      float g = _store->_gateSize[i];
-      int start = _store->_rayStartIndex[i];
-      int end = start + _store->_rayNGates[i];
-      float replicateElevation = _store->_elevation[i];
-      float replicateAz = _store->_azimuth[i];
-      std::vector<float> outRangeGate(end - start + 1);
+      const float& r0 = _store->_rayStartRange[i];
+      const float& g = _store->_gateSize[i];
+      const size_t& start = size_t(_store->_rayStartIndex[i]);
+      const size_t& end = start + size_t(_store->_rayNGates[i]);
+      const float& replicateElevation = _store->_elevation[i];
+      const float& replicateAz = _store->_azimuth[i];
+      std::vector<double> outRangeGate(end - start + 1);
 
 #pragma ivdep
       for (size_t m = 0; m < outRangeGate.size(); m++) {
@@ -134,7 +140,7 @@ void PolarDataStream::populateOutputValues() {
       }
 
 #pragma ivdep
-      for (int j = start; j < end; j++) {
+      for (auto j = start; j < end; j++) {
         _store->_outGate[j] = outRangeGate[j - start];
         _store->_outElevation[j] = replicateElevation;
         _store->_outAzimuth[j] = replicateAz;
@@ -143,38 +149,30 @@ void PolarDataStream::populateOutputValues() {
           fout->at(j) = INVALID_DATA;
         } else {
           fout->at(j) =
-              fin->fieldValues[j] * fin->scale_factor + fin->add_offset;
+            fin->fieldValues[j] * fin->scale_factor + fin->add_offset;
         }
       }
       // End of Expansion function
     });
-    _store->_outFields.insert(
-        std::pair<string, shared_ptr<std::vector<float>>>(name, fout));
+    _store->_outFields.insert(std::make_pair(name, fout));
   }
 }
 
-// getter for output values
-std::vector<float> PolarDataStream::getOutElevation() {
-  return _store->_outElevation;
+std::shared_ptr<Repository>
+PolarDataStream::getRepository()
+{
+  return _store;
 }
 
-std::vector<float> PolarDataStream::getOutAzimuth() {
-  return _store->_azimuth;
-  // return _store->_outAzimuth;
-  // which one is rignt?
+RadxVol&
+PolarDataStream::getRadxVol()
+{
+  return _readVol;
 }
 
-std::vector<float> PolarDataStream::getOutGate() { return _store->_outGate; }
-
-std::vector<float> PolarDataStream::getOutRef() {
-  return *(_store->_outFields["REF"]);
-}
-
-std::shared_ptr<Repository> PolarDataStream::getRepository() { return _store; }
-
-RadxVol &PolarDataStream::getRadxVol() { return _readVol; }
-
-vector<Interp::Field> &PolarDataStream::getInterpFields() {
+vector<Interp::Field>&
+PolarDataStream::getInterpFields()
+{
   return _interpFields;
 }
 
@@ -186,7 +184,9 @@ vector<Interp::Field> &PolarDataStream::getInterpFields() {
 // Read in a RADX file
 // Returns 0 on success, -1 on failure
 
-int PolarDataStream::_readFile(const string &filePath) {
+int
+PolarDataStream::_readFile(const string& filePath)
+{
 
   GenericRadxFile inFile;
   _setupRead(inFile);
@@ -301,7 +301,9 @@ int PolarDataStream::_readFile(const string &filePath) {
 // set up read
 // RadxFile provides the methods for writing and reading RadxVol.
 
-void PolarDataStream::_setupRead(RadxFile &file) {
+void
+PolarDataStream::_setupRead(RadxFile& file)
+{
 
   if (_params.debug >= Params::DEBUG_VERBOSE) {
     file.setDebug(true);
@@ -371,7 +373,9 @@ void PolarDataStream::_setupRead(RadxFile &file) {
 //////////////////////////////////////////////////
 // set up the transform fields, as needed
 
-void PolarDataStream::_setupTransformFields() {
+void
+PolarDataStream::_setupTransformFields()
+{
 
   if (!_params.transform_fields_for_interpolation) {
     return;
@@ -379,32 +383,32 @@ void PolarDataStream::_setupTransformFields() {
 
   // loop through rays
 
-  vector<RadxRay *> &rays = _readVol.getRays();
+  vector<RadxRay*>& rays = _readVol.getRays();
   for (size_t iray = 0; iray < rays.size(); iray++) {
 
-    RadxRay *ray = rays[iray];
+    RadxRay* ray = rays[iray];
 
     // loop through fields to be transformed
 
     for (int jfield = 0; jfield < _params.transform_fields_n; jfield++) {
 
       bool makeCopy = true;
-      const Params::transform_field_t &transform =
-          _params._transform_fields[jfield];
+      const Params::transform_field_t& transform =
+        _params._transform_fields[jfield];
       if (strcmp(transform.input_name, transform.output_name) == 0) {
         makeCopy = false;
       }
 
       // find field on ray
 
-      RadxField *rfield = ray->getField(transform.input_name);
+      RadxField* rfield = ray->getField(transform.input_name);
       if (rfield == NULL) {
         continue;
       }
 
       // get working field
 
-      RadxField *xfield = rfield;
+      RadxField* xfield = rfield;
       if (makeCopy) {
         // copy field
         xfield = new RadxField(*rfield);
@@ -423,7 +427,7 @@ void PolarDataStream::_setupTransformFields() {
         xfield->transformDbToLinear();
       } else if (transform.transform == Params::TRANSFORM_LINEAR_TO_DB ||
                  transform.transform ==
-                     Params::TRANSFORM_LINEAR_TO_DB_AND_BACK) {
+                   Params::TRANSFORM_LINEAR_TO_DB_AND_BACK) {
         xfield->transformLinearToDb();
       }
 
@@ -442,7 +446,9 @@ void PolarDataStream::_setupTransformFields() {
 // to the input data, so that they are available
 // for interpolation as needed.
 
-void PolarDataStream::_addTestAndCoverageInputFields() {
+void
+PolarDataStream::_addTestAndCoverageInputFields()
+{
 
   if (!_params.output_test_fields && !_params.output_coverage_field &&
       !_params.output_range_field && !_params.output_time_field) {
@@ -469,19 +475,19 @@ void PolarDataStream::_addTestAndCoverageInputFields() {
 
   // loop through rays
 
-  vector<RadxRay *> &rays = _readVol.getRays();
+  vector<RadxRay*>& rays = _readVol.getRays();
   for (size_t iray = 0; iray < rays.size(); iray++) {
 
-    RadxRay *ray = rays[iray];
+    RadxRay* ray = rays[iray];
     int nGates = ray->getNGates();
     TaArray<Radx::fl32> data_;
-    Radx::fl32 *data = data_.alloc(nGates);
+    Radx::fl32* data = data_.alloc(nGates);
 
     if (_params.output_test_fields) {
 
       // add elevation field
 
-      RadxField *elevFld = new RadxField("el" + mode, "deg");
+      RadxField* elevFld = new RadxField("el" + mode, "deg");
       elevFld->setLongName("diagnostic_field_elevation_angle" + mode);
       elevFld->setStandardName("elevation_angle" + mode);
       elevFld->setTypeFl32(-9999.0);
@@ -497,7 +503,7 @@ void PolarDataStream::_addTestAndCoverageInputFields() {
 
       // add azimuth field
 
-      RadxField *azFld = new RadxField("az" + mode, "deg");
+      RadxField* azFld = new RadxField("az" + mode, "deg");
       azFld->setLongName("diagnostic_field_azimuth_angle" + mode);
       azFld->setStandardName("azimuth_angle" + mode);
       azFld->setTypeFl32(-9999.0);
@@ -513,7 +519,7 @@ void PolarDataStream::_addTestAndCoverageInputFields() {
 
       // add ht field
 
-      RadxField *htFld = new RadxField("hgt" + mode, "km");
+      RadxField* htFld = new RadxField("hgt" + mode, "km");
       htFld->setLongName("diagnostic_field_height_MSL" + mode);
       htFld->setStandardName("height_MSL" + mode);
       htFld->setTypeFl32(-9999.0);
@@ -534,7 +540,7 @@ void PolarDataStream::_addTestAndCoverageInputFields() {
 
     // range field
 
-    RadxField *rangeFld = new RadxField("range", "km");
+    RadxField* rangeFld = new RadxField("range", "km");
     rangeFld->setLongName("diagnostic_field_range_from_radar" + mode);
     rangeFld->setStandardName("slant_range" + mode);
     rangeFld->setTypeFl32(-9999.0);
@@ -552,7 +558,7 @@ void PolarDataStream::_addTestAndCoverageInputFields() {
     // time field
 
     if (_params.output_time_field) {
-      RadxField *timeFld = new RadxField("time_elapsed", "secs");
+      RadxField* timeFld = new RadxField("time_elapsed", "secs");
       timeFld->setLongName("diagnostic_field_time_since_volume_start");
       timeFld->setStandardName("time_since_volume_start");
       timeFld->setTypeFl32(-9999.0);
@@ -573,7 +579,7 @@ void PolarDataStream::_addTestAndCoverageInputFields() {
     // coverage field
 
     if (_params.output_coverage_field) {
-      RadxField *covFld = new RadxField(_params.coverage_field_name, "");
+      RadxField* covFld = new RadxField(_params.coverage_field_name, "");
       covFld->setLongName("diagnostic_field_radar_coverage_flag");
       covFld->setStandardName("radar_coverage_flag");
       covFld->setTypeFl32(-9999.0);
@@ -590,7 +596,8 @@ void PolarDataStream::_addTestAndCoverageInputFields() {
 ////////////////////////////////////////////////////////////
 // Add in sweeps to provide boundedness
 
-void PolarDataStream::_addBoundingSweeps()
+void
+PolarDataStream::_addBoundingSweeps()
 
 {
 
@@ -609,9 +616,9 @@ void PolarDataStream::_addBoundingSweeps()
   int lowSweepNum = 0, highSweepNum = 0;
   double minFixedAngle = 360;
   double maxFixedAngle = -360;
-  const vector<RadxSweep *> &sweeps = _readVol.getSweeps();
+  const vector<RadxSweep*>& sweeps = _readVol.getSweeps();
   for (size_t ii = 0; ii < sweeps.size(); ii++) {
-    const RadxSweep *sweep = sweeps[ii];
+    const RadxSweep* sweep = sweeps[ii];
     double fixedAngle = sweep->getFixedAngleDeg();
     int sweepNum = sweep->getSweepNumber();
     if (fixedAngle < minFixedAngle) {
@@ -630,12 +637,12 @@ void PolarDataStream::_addBoundingSweeps()
   // loop through rays, adding rays below the lowest sweep
 
   double beamWidthDegV = _readVol.getRadarBeamWidthDegV();
-  const vector<RadxRay *> &rays = _readVol.getRays();
+  const vector<RadxRay*>& rays = _readVol.getRays();
   for (size_t ii = 0; ii < rays.size(); ii++) {
-    const RadxRay *ray = rays[ii];
+    const RadxRay* ray = rays[ii];
     if (ray->getSweepNumber() == lowSweepNum) {
       // copy the ray
-      RadxRay *copy = new RadxRay(*ray);
+      RadxRay* copy = new RadxRay(*ray);
       // set the fixed angle half a beam width below
       copy->setFixedAngleDeg(ray->getFixedAngleDeg() - beamWidthDegV / 2.0);
       // set the elevation angle half a beam width below
@@ -650,10 +657,10 @@ void PolarDataStream::_addBoundingSweeps()
   // loop through rays, adding rays above the highest sweep
 
   for (size_t ii = 0; ii < rays.size(); ii++) {
-    const RadxRay *ray = rays[ii];
+    const RadxRay* ray = rays[ii];
     if (ray->getSweepNumber() == highSweepNum) {
       // copy the ray
-      RadxRay *copy = new RadxRay(*ray);
+      RadxRay* copy = new RadxRay(*ray);
       // set the fixed angle half a beam width above
       copy->setFixedAngleDeg(ray->getFixedAngleDeg() + beamWidthDegV / 2.0);
       // set the elevation angle half a beam width above
@@ -671,7 +678,9 @@ void PolarDataStream::_addBoundingSweeps()
 //////////////////////////////////////////////////
 // initialize the fields for interpolation
 
-void PolarDataStream::_initInterpFields() {
+void
+PolarDataStream::_initInterpFields()
+{
 
   _interpFields.clear();
 
@@ -686,10 +695,10 @@ void PolarDataStream::_initInterpFields() {
 
     string radxName = fieldNames[ifield];
 
-    vector<RadxRay *> &rays = _readVol.getRays();
+    vector<RadxRay*>& rays = _readVol.getRays();
     for (size_t iray = 0; iray < rays.size(); iray++) {
-      const RadxRay *ray = rays[iray];
-      const RadxField *field = ray->getField(radxName);
+      const RadxRay* ray = rays[iray];
+      const RadxField* field = ray->getField(radxName);
       if (field != NULL) {
         Interp::Field interpField;
         interpField.radxName = field->getName();
@@ -705,7 +714,7 @@ void PolarDataStream::_initInterpFields() {
           interpField.foldLimitLower = field->getFoldLimitLower();
           interpField.foldLimitUpper = field->getFoldLimitUpper();
           interpField.foldRange =
-              interpField.foldLimitUpper - interpField.foldLimitLower;
+            interpField.foldLimitUpper - interpField.foldLimitLower;
         }
         if (field->getIsDiscrete()) {
           interpField.isDiscrete = true;
@@ -720,9 +729,9 @@ void PolarDataStream::_initInterpFields() {
   // override fold limits from the parameters
 
   double nyquist = 0.0;
-  vector<RadxRay *> &rays = _readVol.getRays();
+  vector<RadxRay*>& rays = _readVol.getRays();
   for (size_t iray = 0; iray < rays.size(); iray++) {
-    const RadxRay *ray = rays[iray];
+    const RadxRay* ray = rays[iray];
     if (fabs(ray->getNyquistMps() - Radx::missingFl64) > 1.0e-6) {
       nyquist = ray->getNyquistMps();
       break;
@@ -807,21 +816,24 @@ void PolarDataStream::_initInterpFields() {
 //////////////////////////////////////////////////
 // load up the input ray data vector
 
-void PolarDataStream::_loadInterpRays() {
+void
+PolarDataStream::_loadInterpRays()
+{
 
   // loop through the rays in the read volume,
   // making some checks and then adding the rays
   // to the interp rays array as appropriate
 
-  vector<RadxRay *> &rays = _readVol.getRays();
+  vector<RadxRay*>& rays = _readVol.getRays();
   for (size_t isweep = 0; isweep < _readVol.getNSweeps(); isweep++) {
 
-    const RadxSweep *sweep = _readVol.getSweeps()[isweep];
+    const RadxSweep* sweep = _readVol.getSweeps()[isweep];
 
     for (size_t iray = sweep->getStartRayIndex();
-         iray <= sweep->getEndRayIndex(); iray++) {
+         iray <= sweep->getEndRayIndex();
+         iray++) {
 
-      const RadxRay *ray = rays[iray];
+      const RadxRay* ray = rays[iray];
 
       // check elevation limits if required
 
@@ -880,10 +892,12 @@ void PolarDataStream::_loadInterpRays() {
 
       // accept ray
 
-      Interp::Ray *interpRay =
-          new Interp::Ray(rays[iray], isweep, _interpFields,
-                          _params.use_fixed_angle_for_interpolation,
-                          _params.use_fixed_angle_for_data_limits);
+      Interp::Ray* interpRay =
+        new Interp::Ray(rays[iray],
+                        isweep,
+                        _interpFields,
+                        _params.use_fixed_angle_for_interpolation,
+                        _params.use_fixed_angle_for_data_limits);
       if (_params.apply_censoring) {
         _censorInterpRay(interpRay);
       }
@@ -898,16 +912,18 @@ void PolarDataStream::_loadInterpRays() {
 // check all fields are present
 // set standard names etc
 
-void PolarDataStream::_checkFields(const string &filePath) {
+void
+PolarDataStream::_checkFields(const string& filePath)
+{
 
-  vector<RadxRay *> &rays = _readVol.getRays();
+  vector<RadxRay*>& rays = _readVol.getRays();
 
   for (size_t ifield = 0; ifield < _interpFields.size(); ifield++) {
     bool found = false;
     string fieldName = _interpFields[ifield].radxName;
     for (size_t ii = 0; ii < rays.size(); ii++) {
-      const RadxRay *ray = rays[ii];
-      const RadxField *fld = ray->getField(fieldName);
+      const RadxRay* ray = rays[ii];
+      const RadxField* fld = ray->getField(fieldName);
       if (fld != NULL) {
         found = true;
         _interpFields[ifield].longName = fld->getLongName();
@@ -926,12 +942,14 @@ void PolarDataStream::_checkFields(const string &filePath) {
 /////////////////////////////////////////////////////
 // check whether volume is predominantly in RHI mode
 
-bool PolarDataStream::_isRhi() {
+bool
+PolarDataStream::_isRhi()
+{
 
   // check to see if we are in RHI mode, set flag accordingly
 
   int nRaysRhi = 0;
-  const vector<RadxRay *> &rays = _readVol.getRays();
+  const vector<RadxRay*>& rays = _readVol.getRays();
   for (size_t ii = 0; ii < rays.size(); ii++) {
     if (rays[ii]->getSweepMode() == Radx::SWEEP_MODE_RHI ||
         rays[ii]->getSweepMode() == Radx::SWEEP_MODE_ELEVATION_SURVEILLANCE) {
@@ -949,11 +967,12 @@ bool PolarDataStream::_isRhi() {
 ////////////////////////////////////////////////////////////////////
 // censor an interp ray
 
-void PolarDataStream::_censorInterpRay(Interp::Ray *interpRay)
+void
+PolarDataStream::_censorInterpRay(Interp::Ray* interpRay)
 
 {
 
-  RadxRay *ray = interpRay->inputRay;
+  RadxRay* ray = interpRay->inputRay;
 
   if (!_params.apply_censoring) {
     return;
@@ -975,12 +994,12 @@ void PolarDataStream::_censorInterpRay(Interp::Ray *interpRay)
 
   for (int ifield = 0; ifield < _params.censoring_fields_n; ifield++) {
 
-    const Params::censoring_field_t &cfld = _params._censoring_fields[ifield];
+    const Params::censoring_field_t& cfld = _params._censoring_fields[ifield];
     if (cfld.combination_method != Params::LOGICAL_OR) {
       continue;
     }
 
-    RadxField *field = ray->getField(cfld.name);
+    RadxField* field = ray->getField(cfld.name);
     if (field == NULL) {
       // field missing, do not censor
       if (_nWarnCensorPrint % 360 == 0) {
@@ -999,7 +1018,7 @@ void PolarDataStream::_censorInterpRay(Interp::Ray *interpRay)
     double minValidVal = cfld.min_valid_value;
     double maxValidVal = cfld.max_valid_value;
 
-    const Radx::fl32 *fdata = (const Radx::fl32 *)field->getData();
+    const Radx::fl32* fdata = (const Radx::fl32*)field->getData();
     for (size_t igate = 0; igate < nGates; igate++) {
       double val = fdata[igate];
       if (val >= minValidVal && val <= maxValidVal) {
@@ -1022,12 +1041,12 @@ void PolarDataStream::_censorInterpRay(Interp::Ray *interpRay)
 
   for (int ifield = 0; ifield < _params.censoring_fields_n; ifield++) {
 
-    const Params::censoring_field_t &cfld = _params._censoring_fields[ifield];
+    const Params::censoring_field_t& cfld = _params._censoring_fields[ifield];
     if (cfld.combination_method != Params::LOGICAL_AND) {
       continue;
     }
 
-    RadxField *field = ray->getField(cfld.name);
+    RadxField* field = ray->getField(cfld.name);
     if (field == NULL) {
       continue;
     }
@@ -1035,7 +1054,7 @@ void PolarDataStream::_censorInterpRay(Interp::Ray *interpRay)
     double minValidVal = cfld.min_valid_value;
     double maxValidVal = cfld.max_valid_value;
 
-    const Radx::fl32 *fdata = (const Radx::fl32 *)field->getData();
+    const Radx::fl32* fdata = (const Radx::fl32*)field->getData();
     for (size_t igate = 0; igate < nGates; igate++) {
       double val = fdata[igate];
       if (val < minValidVal || val > maxValidVal) {
@@ -1077,14 +1096,14 @@ void PolarDataStream::_censorInterpRay(Interp::Ray *interpRay)
 
   // apply censoring by setting censored gates to missing for all fields
 
-  vector<RadxField *> fields = ray->getFields();
+  vector<RadxField*> fields = ray->getFields();
   for (size_t ifield = 0; ifield < fields.size(); ifield++) {
-    RadxField *field = fields[ifield];
+    RadxField* field = fields[ifield];
     if (field->getLongName().find("diagnostic_field_") != string::npos) {
       // do not censor diagnostic fields
       continue;
     }
-    Radx::fl32 *fdata = (Radx::fl32 *)field->getData();
+    Radx::fl32* fdata = (Radx::fl32*)field->getData();
     for (size_t igate = 0; igate < nGates; igate++) {
       if (censorFlag[igate] == 1) {
         fdata[igate] = Radx::missingFl32;

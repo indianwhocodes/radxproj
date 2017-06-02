@@ -2,7 +2,8 @@
 #ifndef PolarDataStream_h
 #define PolarDataStream_h
 
-#define INVALID_DATA -9999.0F
+#define INVALID_DATA_F -9999.0F
+#define INVALID_DATA -9999.0
 
 #include "Interp.hh"
 #include "Params.hh"
@@ -18,18 +19,20 @@ class RadxFile;
 class RadxRay;
 class RadxField;
 
-struct RepositoryField {
+struct RepositoryField
+{
   std::vector<float> fieldValues;
   float scale_factor = 1.0;
   float add_offset = 0.0;
   float fill_value = INVALID_DATA;
 };
 
-struct Repository {
+struct Repository
+{
   // dimenssions
-  int _nPoints;
-  int _timeDim;
-  int _rangeDim;
+  size_t _nPoints;
+  size_t _timeDim;
+  size_t _rangeDim;
 
   // variables
   float _latitude;
@@ -60,24 +63,25 @@ struct Repository {
   std::string _inputFile;
 
   // output values
-  std::vector<float> _outElevation;
-  std::vector<float> _outAzimuth;
-  std::vector<float> _outGate;
-  std::map<std::string, shared_ptr<std::vector<float>>> _outFields;
+  std::vector<double> _outElevation;
+  std::vector<double> _outAzimuth;
+  std::vector<double> _outGate;
+  std::map<std::string, shared_ptr<std::vector<double>>> _outFields;
 
   // Cartesian Coords
-  std::vector<float> _gateGroundDistance;
-  std::vector<float> _gateZr;
-  std::vector<float> _gateX;
-  std::vector<float> _gateY;
-  std::vector<float> _gateZ;
-  std::vector<float> _gateRoI;
+  std::vector<double> _gateGroundDistance;
+  std::vector<double> _gateZr;
+  std::vector<double> _gateX;
+  std::vector<double> _gateY;
+  std::vector<double> _gateZ;
+  std::vector<double> _gateRoI;
 };
 
-class PolarDataStream {
+class PolarDataStream
+{
 public:
   // constructor & destructor
-  PolarDataStream(const std::string &inputFile, const Params &params);
+  PolarDataStream(const std::string& inputFile, const Params& params);
   ~PolarDataStream();
 
   // read variables from NetCDF files
@@ -93,30 +97,30 @@ public:
   std::vector<float> getOutRef();
 
   std::shared_ptr<Repository> getRepository();
-  RadxVol &getRadxVol();
-  vector<Interp::Field> &getInterpFields();
+  RadxVol& getRadxVol();
+  vector<Interp::Field>& getInterpFields();
 
-  int _readFile(const string &filePath);
-  void _setupRead(RadxFile &file);
+  int _readFile(const string& filePath);
+  void _setupRead(RadxFile& file);
 
   void _setupTransformFields();
   void _addTestAndCoverageInputFields();
   void _addBoundingSweeps();
   void _initInterpFields();
   void _loadInterpRays();
-  void _checkFields(const string &filePath);
+  void _checkFields(const string& filePath);
   bool _isRhi();
-  void _censorInterpRay(Interp::Ray *interpRay);
+  void _censorInterpRay(Interp::Ray* interpRay);
 
 private:
   std::shared_ptr<Repository> _store;
-  const Params &_params;
+  const Params& _params;
 
   RadxVol _readVol;
   vector<string> _readPaths;
   bool _rhiMode;
   vector<Interp::Field> _interpFields;
-  vector<Interp::Ray *> _interpRays;
+  vector<Interp::Ray*> _interpRays;
 
   int _volNum;
 

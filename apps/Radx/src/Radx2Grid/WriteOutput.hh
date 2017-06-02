@@ -9,12 +9,15 @@
 
 const fl32 missingFl32 = -9999.0;
 
-class WriteOutput {
+class WriteOutput
+{
 public:
   // constructor & destructor
-  WriteOutput(std::string progN, std::shared_ptr<Repository> store,
-              RadxVol &readVol, const Params &params,
-              vector<Interp::Field> &interpFields);
+  WriteOutput(std::string progN,
+              std::shared_ptr<Repository> store,
+              RadxVol& readVol,
+              const Params& params,
+              vector<Interp::Field>& interpFields);
   ~WriteOutput();
 
   int writeOutputFile();
@@ -26,28 +29,39 @@ public:
   void _computeGridRelative();
   int _setRadarParams();
 
-  int testWriteOutputFile(fl32 **outputFields);
+  int testWriteOutputFile(fl32** outputFields);
 
 protected:
   // class for debug fields
-  class DerivedField {
+  class DerivedField
+  {
   public:
     string name;
     string longName;
     string units;
     vector<double> vertLevels;
-    fl32 *data;
+    fl32* data;
     bool writeToFile;
-    DerivedField(const string &nameStr, const string &longNameStr,
-                 const string &unitsStr, bool writeOut)
-        : name(nameStr), longName(longNameStr), units(unitsStr), data(NULL),
-          writeToFile(writeOut), _nGrid(0) {}
-    ~DerivedField() {
+    DerivedField(const string& nameStr,
+                 const string& longNameStr,
+                 const string& unitsStr,
+                 bool writeOut)
+      : name(nameStr)
+      , longName(longNameStr)
+      , units(unitsStr)
+      , data(NULL)
+      , writeToFile(writeOut)
+      , _nGrid(0)
+    {
+    }
+    ~DerivedField()
+    {
       if (data) {
         delete[] data;
       }
     }
-    void alloc(size_t nGrid, const vector<double> &zLevels) {
+    void alloc(size_t nGrid, const vector<double>& zLevels)
+    {
       vertLevels = zLevels;
       if (nGrid == _nGrid) {
         return;
@@ -61,7 +75,8 @@ protected:
         data[ii] = missingFl32;
       }
     }
-    void setToZero() {
+    void setToZero()
+    {
       for (size_t ii = 0; ii < _nGrid; ii++) {
         data[ii] = 0.0;
       }
@@ -73,44 +88,44 @@ protected:
 
 private:
   std::string _progName;
-  const Params &_params;
   std::shared_ptr<Repository> _store;
-  RadxVol &_readVol;
+  RadxVol& _readVol;
+  const Params& _params;
   MdvxProj _proj;
   vector<double> _gridZLevels;
 
-  vector<Interp::Field> &_interpFields;
+  vector<Interp::Field>& _interpFields;
 
-  DerivedField *_nContribDebug;
-  DerivedField *_gridAzDebug;
-  DerivedField *_gridElDebug;
-  DerivedField *_gridRangeDebug;
-  DerivedField *_llElDebug;
-  DerivedField *_llAzDebug;
-  DerivedField *_lrElDebug;
-  DerivedField *_lrAzDebug;
-  DerivedField *_ulElDebug;
-  DerivedField *_ulAzDebug;
-  DerivedField *_urElDebug;
-  DerivedField *_urAzDebug;
+  DerivedField* _nContribDebug;
+  DerivedField* _gridAzDebug;
+  DerivedField* _gridElDebug;
+  DerivedField* _gridRangeDebug;
+  DerivedField* _llElDebug;
+  DerivedField* _llAzDebug;
+  DerivedField* _lrElDebug;
+  DerivedField* _lrAzDebug;
+  DerivedField* _ulElDebug;
+  DerivedField* _ulAzDebug;
+  DerivedField* _urElDebug;
+  DerivedField* _urAzDebug;
 
-  vector<DerivedField *> _derived3DFields;
-  vector<DerivedField *> _derived2DFields;
+  vector<DerivedField*> _derived3DFields;
+  vector<DerivedField*> _derived2DFields;
 
-  DerivedField *_convStratDbzMax;
-  DerivedField *_convStratDbzCount;
-  DerivedField *_convStratDbzSum;
-  DerivedField *_convStratDbzSqSum;
-  DerivedField *_convStratDbzSqSqSum;
-  DerivedField *_convStratDbzTexture;
-  DerivedField *_convStratFilledTexture;
-  DerivedField *_convStratDbzSqTexture;
-  DerivedField *_convStratFilledSqTexture;
+  DerivedField* _convStratDbzMax;
+  DerivedField* _convStratDbzCount;
+  DerivedField* _convStratDbzSum;
+  DerivedField* _convStratDbzSqSum;
+  DerivedField* _convStratDbzSqSqSum;
+  DerivedField* _convStratDbzTexture;
+  DerivedField* _convStratFilledTexture;
+  DerivedField* _convStratDbzSqTexture;
+  DerivedField* _convStratFilledSqTexture;
 
-  DerivedField *_convStratDbzColMax;
-  DerivedField *_convStratMeanTexture;
-  DerivedField *_convStratMeanSqTexture;
-  DerivedField *_convStratCategory;
+  DerivedField* _convStratDbzColMax;
+  DerivedField* _convStratMeanTexture;
+  DerivedField* _convStratMeanSqTexture;
+  DerivedField* _convStratCategory;
 
   // radar location
 

@@ -39,9 +39,9 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
   _clock = _currentTimestamp();
 
   // Initialize Grid
-  _grid_el = std::make_shared<vector3d<float>>();
-  _grid_gate = std::make_shared<vector3d<float>>();
-  _grid_ground = std::make_shared<vector3d<float>>();
+  _grid_el = std::make_shared<vector3d<double>>();
+  _grid_gate = std::make_shared<vector3d<double>>();
+  _grid_ground = std::make_shared<vector3d<double>>();
   resizeArray(_grid_gate, _DSizeI, _DSizeJ, _DSizeK);
   resizeArray(_grid_el, _DSizeI, _DSizeJ, _DSizeK);
   resizeArray(_grid_ground, _DSizeI, _DSizeJ, _DSizeK);
@@ -53,8 +53,8 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
   for (auto it = _store->_outFields.cbegin(); it != _store->_outFields.cend();
        ++it) {
     string name = (*it).first;
-    auto fieldsum = std::make_shared<vector3d<tbb::atomic<float>>>();
-    auto fieldweight = std::make_shared<vector3d<tbb::atomic<float>>>();
+    auto fieldsum = std::make_shared<vector3d<tbb::atomic<double>>>();
+    auto fieldweight = std::make_shared<vector3d<tbb::atomic<double>>>();
     auto fieldcount = std::make_shared<vector3d<tbb::atomic<int>>>();
     // resize and fill
     resizeArray(fieldsum, _DSizeI, _DSizeJ, _DSizeK);
@@ -71,9 +71,9 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
 }
 
 inline void
-atomicAdd(tbb::atomic<float>& x, float addend)
+atomicAdd(tbb::atomic<double>& x, double addend)
 {
-  float o, n;
+  double o, n;
   do {
     o = x;
     n = o + addend;
@@ -86,24 +86,24 @@ Cart2Grid::interpGrid()
   // Convert everything to 0;
   _clock = _currentTimestamp();
 
-  const float DMinX = _xy_geom.minx * 1000.0f;
-  const float DMinY = _xy_geom.miny * 1000.0f;
-  const float DMinZ = _z_geom.minz * 1000.0f;
-  const float CellX = _xy_geom.dx * 1000.0f;
-  const float CellY = _xy_geom.dy * 1000.0f;
-  const float CellZ = _z_geom.dz * 1000.0f;
-  const float Z0 = _store->_altitudeAgl;
+  const double DMinX = _xy_geom.minx * 1000.0f;
+  const double DMinY = _xy_geom.miny * 1000.0f;
+  const double DMinZ = _z_geom.minz * 1000.0f;
+  const double CellX = _xy_geom.dx * 1000.0f;
+  const double CellY = _xy_geom.dy * 1000.0f;
+  const double CellZ = _z_geom.dz * 1000.0f;
+  const double Z0 = _store->_altitudeAgl;
 
-  tbb::parallel_for(0, _store->_nPoints, [&](int m) {
+  tbb::parallel_for(size_t(0), _store->_nPoints, [&](size_t m) {
     // Grab gates
-    float X = _store->_gateX[m];
-    float Y = _store->_gateY[m];
-    float Z = _store->_gateZ[m];
-    float RoI = _store->_gateRoI[m];
-    float E = _store->_outElevation[m];
-    float G = _store->_outGate[m];
-    float S = _store->_gateGroundDistance[m];
-    float GateSize = _store->_gateSize[0];
+    double X = _store->_gateX[m];
+    double Y = _store->_gateY[m];
+    double Z = _store->_gateZ[m];
+    double RoI = _store->_gateRoI[m];
+    double E = _store->_outElevation[m];
+    double G = _store->_outGate[m];
+    double S = _store->_gateGroundDistance[m];
+    double GateSize = _store->_gateSize[0];
 
     // Put it at grid
     int ci = int((X - DMinX) / CellX);
@@ -137,11 +137,11 @@ Cart2Grid::interpGrid()
           if (!_grid_valid->at(i).at(j).at(k))
             continue;
 
-          float posx = DMinX + i * CellX;
-          float posy = DMinY + j * CellY;
-          float posz = DMinZ + k * CellZ;
+          double posx = DMinX + i * CellX;
+          double posy = DMinY + j * CellY;
+          double posz = DMinZ + k * CellZ;
 
-          float s, el, rg;
+          double s, el, rg;
 
           if (_grid_valid->at(i).at(j).at(k) != 0) {
             s = _grid_gate->at(i).at(j).at(k);
@@ -165,20 +165,20 @@ Cart2Grid::interpGrid()
             continue;
           }
 
-          float max_e_diff = (E < 6.0) ? 1.0 : 3.0;
+          double max_e_diff = (E < 6.0) ? 1.0 : 3.0;
           if (std::abs(el / M_PI * 180.0 - E) > max_e_diff) {
             continue;
           }
 
-          float dot = std::min(1.0f, (posx * X + posy * Y) / S / s);
-          float term1 = std::cos(std::abs(el - E));
-          float term2 = dot;
-          float e_u = std::acos(term1 * term2) * 180.0 / M_PI;
+          double dot = std::min(1.0, (posx * X + posy * Y) / S / s);
+          double term1 = std::cos(std::abs(el - E));
+          double term2 = dot;
+          double e_u = std::acos(term1 * term2) * 180.0 / M_PI;
 
-          float alpha = e_u / max_e_diff;
-          float gate_diff = abs(rg - G) / (2 * GateSize) + 1e-5;
+          double alpha = e_u / max_e_diff;
+          double gate_diff = abs(rg - G) / (2 * GateSize) + 1e-5;
 
-          float w =
+          double w =
             std::pow(0.005, alpha * alpha * alpha) / (gate_diff * gate_diff) +
             2e-5;
 
@@ -186,12 +186,12 @@ Cart2Grid::interpGrid()
                it != _outputGridCount.cend();
                ++it) {
             string name = (*it).first;
-            float v = _store->_outFields[name]->at(m);
+            double v = _store->_outFields[name]->at(m);
             if (v < -100.0f) {
               continue;
             }
 
-            float vw = v * w + 2e-5f;
+            double vw = v * w + 2e-5f;
 
             atomicAdd(_outputGridSum[name]->at(i).at(j).at(k), vw);
             atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k), w);
@@ -217,7 +217,7 @@ Cart2Grid::computeGrid()
   for (auto m = _store->_outFields.cbegin(); m != _store->_outFields.cend();
        ++m) {
     string name = (*m).first;
-    auto field = std::make_shared<vector3d<float>>();
+    auto field = std::make_shared<vector3d<double>>();
     resizeArray(field, _DSizeI, _DSizeJ, _DSizeK);
     tbb::parallel_for(0, _DSizeI, [=](int i) {
       for (int j = 0; j < _DSizeJ; j++) {

@@ -26,14 +26,14 @@ class Cart2Grid
 
 private:
   shared_ptr<Repository> _store;
-  map<string, ptr_vector3d<tbb::atomic<float>>> _outputGridSum;
-  map<string, ptr_vector3d<tbb::atomic<float>>> _outputGridWeight;
+  map<string, ptr_vector3d<tbb::atomic<double>>> _outputGridSum;
+  map<string, ptr_vector3d<tbb::atomic<double>>> _outputGridWeight;
   map<string, ptr_vector3d<tbb::atomic<int>>> _outputGridCount;
-  map<string, ptr_vector3d<float>> _outputFinalGrid;
+  map<string, ptr_vector3d<double>> _outputFinalGrid;
 
-  ptr_vector3d<float> _grid_el;
-  ptr_vector3d<float> _grid_gate;
-  ptr_vector3d<float> _grid_ground;
+  ptr_vector3d<double> _grid_el;
+  ptr_vector3d<double> _grid_gate;
+  ptr_vector3d<double> _grid_ground;
   ptr_vector3d<bool> _grid_valid;
 
   const Params _params;

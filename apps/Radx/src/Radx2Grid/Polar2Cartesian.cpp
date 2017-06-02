@@ -4,14 +4,19 @@
 #include <vector>
 
 // constructor
-Polar2Cartesian::Polar2Cartesian(std::shared_ptr<Repository> store) {
+Polar2Cartesian::Polar2Cartesian(std::shared_ptr<Repository> store)
+{
   _store = store;
 }
 
-Polar2Cartesian::~Polar2Cartesian() {}
+Polar2Cartesian::~Polar2Cartesian()
+{
+}
 
-void Polar2Cartesian::calculateXYZ() {
-  const std::vector<float> &r = _store->_outGate;
+void
+Polar2Cartesian::calculateXYZ()
+{
+  const std::vector<double>& r = _store->_outGate;
   _store->_gateGroundDistance.resize(_store->_nPoints);
   _store->_gateZr.resize(_store->_nPoints);
   _store->_gateX.resize(_store->_nPoints);
@@ -19,11 +24,11 @@ void Polar2Cartesian::calculateXYZ() {
   _store->_gateZ.resize(_store->_nPoints);
   _store->_gateRoI.resize(_store->_nPoints);
 
-  const float R = 4.0 * 6371008.0 / 3.0;
+  const double R = 4.0 * 6371008.0 / 3.0;
 #pragma ivdep
-  tbb::parallel_for(0, _store->_nPoints, [=](auto i) {
+  tbb::parallel_for(size_t(0), _store->_nPoints, [=](size_t i) {
     // Calculate ground distance and relative altitude
-    float rad_e = _store->_outElevation[i] * M_PI / 180.0;
+    double rad_e = _store->_outElevation[i] * M_PI / 180.0;
     float h0 = sqrt(r[i] * r[i] + (r[i] * 2 * R) * sin(rad_e) + R * R) - R;
     _store->_gateGroundDistance[i] = (R * asin(r[i] * cos(rad_e) / (R + h0)));
     _store->_gateZr[i] = h0;

@@ -48,7 +48,7 @@ _pushDataintoBuffer(const std::vector<string>& filepaths, const Params& params)
 }
 
 void
-_popDatafromBuffer(size_t total_size, bool _debug, const Params& params)
+_popDatafromBuffer(int total_size, bool _debug, const Params& params)
 {
 
   for (auto i = 0; i < total_size; i++) {

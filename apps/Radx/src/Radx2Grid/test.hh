@@ -9,12 +9,14 @@
 #include <Radx/RadxVol.hh>
 #include <string>
 
-class Test {
+class Test
+{
 public:
   Test() {}
   ~Test() {}
 
-  int example_call() {
+  int example_call()
+  {
     //    Test t;
     //    if (t.run(_progName, _outputFields, _params, _readVol.getPathInUse())
     //    ==
@@ -26,10 +28,14 @@ public:
     //    if (_params.debug) {
     //      cerr << "  Writing output file ... " << endl;
     //    }
+    return 0;
   }
 
-  int run(string progName, fl32 **outputFields, Params params,
-          const string &filePath) {
+  int run(string progName,
+          fl32** outputFields,
+          Params params,
+          const string& filePath)
+  {
     cout << "DEBUG: inside of Test::run()" << endl;
     //        params.output_dir = "./test";
     cout << "DEBUG: set params_output_dir" << endl;
@@ -37,7 +43,10 @@ public:
     cout << "DEBUG: create PolarDataStream instance" << endl;
     pds.LoadDataFromNetCDFFilesIntoRepository();
     cout << "DEBUG: call LoadDataFromNetCDFFilesIntoRepository()" << endl;
-    WriteOutput wo(progName, pds.getRepository(), pds.getRadxVol(), params,
+    WriteOutput wo(progName,
+                   pds.getRepository(),
+                   pds.getRadxVol(),
+                   params,
                    pds.getInterpFields());
     cout << "DEBUG: create WriteOutput instance" << endl;
     wo.testWriteOutputFile(outputFields);
