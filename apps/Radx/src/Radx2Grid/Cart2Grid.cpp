@@ -57,13 +57,9 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params &params)
 inline void atomicAdd(tbb::atomic<float> &x, float addend) {
   float o, n;
   do {
-    // It is meaning less to add such a small number
-    if (std::fabs(addend) < 1e-5f)
-      break;
     o = x;
     n = o + addend;
-  } while (x.compare_and_swap(n, o) !=
-           o); // This is safe, because addend is at least 2e-5
+  } while (x.compare_and_swap(n, o) != o);
 }
 
 void Cart2Grid::interpGrid() {
@@ -159,10 +155,9 @@ void Cart2Grid::interpGrid() {
 
             float vw = v * w + 2e-5f;
 
-            //           atomicAdd(_outputGridSum[name]->at(i).at(j).at(k), vw);
-            //           atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k),
-            //           w);
-            //           (_outputGridCount[name]->at(i).at(j).at(k))++;
+            atomicAdd(_outputGridSum[name]->at(i).at(j).at(k), vw);
+            atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k), w);
+            (_outputGridCount[name]->at(i).at(j).at(k))++;
           }
         } // Loop k
       }   // Loop j
