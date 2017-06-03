@@ -4,6 +4,12 @@
 #include <assert.h>
 #include <iostream>
 
+ptr_vector3d<double> _grid_el;
+ptr_vector3d<double> _grid_gate;
+ptr_vector3d<double> _grid_ground;
+ptr_vector3d<bool> _grid_valid;
+ptr_vector3d<bool> _grid_computed;
+
 template<typename T>
 inline void
 resizeArray(std::shared_ptr<vector<vector<vector<T>>>>& c,
@@ -15,12 +21,13 @@ resizeArray(std::shared_ptr<vector<vector<vector<T>>>>& c,
 }
 
 inline void
-resizeArrayTrue(std::shared_ptr<vector<vector<vector<bool>>>>& c,
-                size_t x,
-                size_t y,
-                size_t z)
+resizeArray(std::shared_ptr<vector<vector<vector<bool>>>>& c,
+            size_t x,
+            size_t y,
+            size_t z,
+            bool value)
 {
-  c->resize(x, vector<vector<bool>>(y, vector<bool>(z, true)));
+  c->resize(x, vector<vector<bool>>(y, vector<bool>(z, value)));
 }
 
 Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
@@ -39,15 +46,20 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
   _clock = _currentTimestamp();
 
   // Initialize Grid
-  _grid_el = std::make_shared<vector3d<double>>();
-  _grid_gate = std::make_shared<vector3d<double>>();
-  _grid_ground = std::make_shared<vector3d<double>>();
-  resizeArray(_grid_gate, _DSizeI, _DSizeJ, _DSizeK);
-  resizeArray(_grid_el, _DSizeI, _DSizeJ, _DSizeK);
-  resizeArray(_grid_ground, _DSizeI, _DSizeJ, _DSizeK);
+  if (_grid_el == nullptr) {
+    _grid_el = std::make_shared<vector3d<double>>();
+    _grid_gate = std::make_shared<vector3d<double>>();
+    _grid_ground = std::make_shared<vector3d<double>>();
+    resizeArray(_grid_gate, _DSizeI, _DSizeJ, _DSizeK);
+    resizeArray(_grid_el, _DSizeI, _DSizeJ, _DSizeK);
+    resizeArray(_grid_ground, _DSizeI, _DSizeJ, _DSizeK);
 
-  _grid_valid = std::make_shared<vector3d<bool>>();
-  resizeArrayTrue(_grid_valid, _DSizeI, _DSizeJ, _DSizeK);
+    _grid_valid = std::make_shared<vector3d<bool>>();
+    resizeArray(_grid_valid, _DSizeI, _DSizeJ, _DSizeK, true);
+
+    _grid_computed = std::make_shared<vector3d<bool>>();
+    resizeArray(_grid_computed, _DSizeI, _DSizeJ, _DSizeK, false);
+  }
 
   // Initialize Feild
   for (auto it = _store->_outFields.cbegin(); it != _store->_outFields.cend();
@@ -143,7 +155,7 @@ Cart2Grid::interpGrid()
 
           double s, el, rg;
 
-          if (_grid_el->at(i).at(j).at(k) != 0.0) {
+          if (_grid_computed->at(i).at(j).at(k)) {
             s = _grid_ground->at(i).at(j).at(k);
             el = _grid_el->at(i).at(j).at(k);
             rg = _grid_gate->at(i).at(j).at(k);
@@ -151,9 +163,11 @@ Cart2Grid::interpGrid()
             s = std::sqrt(posx * posx + posy * posy);
             el = calculate_elevation(s, posz, Z0);
             rg = calculate_range_gate(s, posz, el, Z0);
+            el = el / M_PI * 180.0;
             _grid_ground->at(i).at(j).at(k) = s;
             _grid_el->at(i).at(j).at(k) = el;
             _grid_gate->at(i).at(j).at(k) = rg;
+            _grid_computed->at(i).at(j).at(k) = true;
           }
 
           if ((el < 0.0) || (el > 20)) {
@@ -166,7 +180,7 @@ Cart2Grid::interpGrid()
           }
 
           double max_e_diff = (E < 6.0) ? 1.0 : 3.0;
-          if (std::abs(el / M_PI * 180.0 - E) > max_e_diff) {
+          if (std::abs(el - E) > max_e_diff) {
             continue;
           }
 
@@ -176,7 +190,7 @@ Cart2Grid::interpGrid()
           double e_u = std::acos(term1 * term2) * 180.0 / M_PI;
 
           double alpha = e_u / max_e_diff;
-          double gate_diff = abs(rg - G) / (2 * GateSize) + 1e-5;
+          double gate_diff = abs(rg - G) / (2 * GateSize) + 1e-8;
 
           double w =
             std::pow(0.005, alpha * alpha * alpha) / (gate_diff * gate_diff) +
@@ -191,11 +205,13 @@ Cart2Grid::interpGrid()
               continue;
             }
 
-            double vw = v * w + 2e-5f;
+            double vw = v * w + 1e-8;
 
-            atomicAdd(_outputGridSum[name]->at(i).at(j).at(k), vw);
-            atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k), w);
-            (_outputGridCount[name]->at(i).at(j).at(k))++;
+            //            atomicAdd(_outputGridSum[name]->at(i).at(j).at(k),
+            //            vw);
+            //            atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k),
+            //            w);
+            //            (_outputGridCount[name]->at(i).at(j).at(k))++;
           }
         } // Loop k
       }   // Loop j

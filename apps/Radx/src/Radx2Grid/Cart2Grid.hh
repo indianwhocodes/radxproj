@@ -31,11 +31,6 @@ private:
   map<string, ptr_vector3d<tbb::atomic<int>>> _outputGridCount;
   map<string, ptr_vector3d<double>> _outputFinalGrid;
 
-  ptr_vector3d<double> _grid_el;
-  ptr_vector3d<double> _grid_gate;
-  ptr_vector3d<double> _grid_ground;
-  ptr_vector3d<bool> _grid_valid;
-
   const Params _params;
   Params::grid_xy_geom_t _xy_geom;
   Params::grid_z_geom_t _z_geom;

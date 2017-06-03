@@ -103,14 +103,7 @@ public:
   int _readFile(const string& filePath);
   void _setupRead(RadxFile& file);
 
-  void _setupTransformFields();
-  void _addTestAndCoverageInputFields();
-  void _addBoundingSweeps();
-  void _initInterpFields();
-  void _loadInterpRays();
-  void _checkFields(const string& filePath);
   bool _isRhi();
-  void _censorInterpRay(Interp::Ray* interpRay);
 
 private:
   std::shared_ptr<Repository> _store;
@@ -123,12 +116,6 @@ private:
   vector<Interp::Ray*> _interpRays;
 
   int _volNum;
-
-  // censoring
-  int _nWarnCensorPrint;
-
-  // class PolarDataStreamImpl;
-  // PolarDataStreamImpl* _dataStreamHandle;
 };
 
 #endif
