@@ -53,6 +53,12 @@ private:
 
   int _DSizeI, _DSizeJ, _DSizeK; // Size of the grid
 
+  template<typename T>
+  inline void _makeGrid(ptr_vector3d<T>& grid);
+
+  template<typename T>
+  inline void _makeGrid(ptr_vector3d<T>& grid, T value);
+
 public:
   Cart2Grid(std::shared_ptr<Repository> store, const Params& params);
   void interpGrid();

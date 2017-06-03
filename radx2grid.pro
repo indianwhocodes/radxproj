@@ -7,7 +7,7 @@ TARGET = radx2grid
 CONFIG -= qt
 CONFIG -= app_bundle
 
-QMAKE_CXXFLAGS += -std=c++14
+QMAKE_CXXFLAGS += -std=c++14 -fopenmp
 
 *-icc* {
     QMAKE_CXXFLAGS_RELEASE -= -O2
@@ -94,6 +94,7 @@ LIBS += -lradar \
     -lpthread \
     -lexpat \
     -lm \
+    -lgomp \
     -lfftw3
 
 CONFIG(debug, debug|release) {

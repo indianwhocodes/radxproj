@@ -7,8 +7,9 @@
 ptr_vector3d<double> _grid_el;
 ptr_vector3d<double> _grid_gate;
 ptr_vector3d<double> _grid_ground;
-ptr_vector3d<bool> _grid_valid;
-ptr_vector3d<bool> _grid_computed;
+ptr_vector3d<double> _grid_x;
+ptr_vector3d<double> _grid_y;
+ptr_vector3d<double> _grid_z;
 
 template<typename T>
 inline void
@@ -30,6 +31,22 @@ resizeArray(std::shared_ptr<vector<vector<vector<bool>>>>& c,
   c->resize(x, vector<vector<bool>>(y, vector<bool>(z, value)));
 }
 
+template<typename T>
+inline void
+Cart2Grid::_makeGrid(ptr_vector3d<T>& grid)
+{
+  grid = std::make_shared<vector3d<T>>();
+  resizeArray(grid, _DSizeI, _DSizeJ, _DSizeK);
+}
+
+template<typename T>
+inline void
+Cart2Grid::_makeGrid(ptr_vector3d<T>& grid, T value)
+{
+  grid = std::make_shared<vector3d<T>>();
+  resizeArray(grid, _DSizeI, _DSizeJ, _DSizeK, value);
+}
+
 Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
   : _store(store)
   , _params(params)
@@ -47,18 +64,45 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
 
   // Initialize Grid
   if (_grid_el == nullptr) {
-    _grid_el = std::make_shared<vector3d<double>>();
-    _grid_gate = std::make_shared<vector3d<double>>();
-    _grid_ground = std::make_shared<vector3d<double>>();
-    resizeArray(_grid_gate, _DSizeI, _DSizeJ, _DSizeK);
-    resizeArray(_grid_el, _DSizeI, _DSizeJ, _DSizeK);
-    resizeArray(_grid_ground, _DSizeI, _DSizeJ, _DSizeK);
 
-    _grid_valid = std::make_shared<vector3d<bool>>();
-    resizeArray(_grid_valid, _DSizeI, _DSizeJ, _DSizeK, true);
+    // Initialize The Grid
+    _makeGrid(_grid_x);
+    _makeGrid(_grid_y);
+    _makeGrid(_grid_z);
 
-    _grid_computed = std::make_shared<vector3d<bool>>();
-    resizeArray(_grid_computed, _DSizeI, _DSizeJ, _DSizeK, false);
+    // Initialize Radar Relative Grid
+    _makeGrid(_grid_el);
+    _makeGrid(_grid_gate);
+    _makeGrid(_grid_ground);
+
+    // Fill in value;
+    const double DMinX = _xy_geom.minx * 1000.0;
+    const double DMinY = _xy_geom.miny * 1000.0;
+    const double DMinZ = _z_geom.minz * 1000.0;
+    const double CellX = _xy_geom.dx * 1000.0;
+    const double CellY = _xy_geom.dy * 1000.0;
+    const double CellZ = _z_geom.dz * 1000.0;
+    const double Z0 = _store->_altitudeAgl;
+
+#pragma omp parallel for collapse(2)
+    for (auto i = 0; i < _DSizeI; i++)
+      for (auto j = 0; j < _DSizeJ; j++)
+#pragma ivdep
+        for (auto k = 0; k < _DSizeK; k++) {
+          double posx = DMinX + i * CellX;
+          double posy = DMinY + j * CellY;
+          double posz = DMinZ + k * CellZ;
+          _grid_x->at(i).at(j).at(k) = posx;
+          _grid_y->at(i).at(j).at(k) = posy;
+          _grid_z->at(i).at(j).at(k) = posz;
+          float s = std::sqrt(posx * posx + posy * posy);
+          float el = calculate_elevation(s, posz, Z0);
+          float rg = calculate_range_gate(s, posz, el, Z0);
+          el = el / M_PI * 180.0;
+          _grid_el->at(i).at(j).at(k) = el;
+          _grid_ground->at(i).at(j).at(k) = s;
+          _grid_gate->at(i).at(j).at(k) = rg;
+        }
   }
 
   // Initialize Feild
@@ -98,16 +142,38 @@ Cart2Grid::interpGrid()
   // Convert everything to 0;
   _clock = _currentTimestamp();
 
-  const double DMinX = _xy_geom.minx * 1000.0f;
-  const double DMinY = _xy_geom.miny * 1000.0f;
-  const double DMinZ = _z_geom.minz * 1000.0f;
-  const double CellX = _xy_geom.dx * 1000.0f;
-  const double CellY = _xy_geom.dy * 1000.0f;
-  const double CellZ = _z_geom.dz * 1000.0f;
-  const double Z0 = _store->_altitudeAgl;
+  const double DMinX = _xy_geom.minx * 1000.0;
+  const double DMinY = _xy_geom.miny * 1000.0;
+  const double DMinZ = _z_geom.minz * 1000.0;
+  const double CellX = _xy_geom.dx * 1000.0;
+  const double CellY = _xy_geom.dy * 1000.0;
+  const double CellZ = _z_geom.dz * 1000.0;
+  const double GateSize = _store->_gateSize[0];
 
   tbb::parallel_for(size_t(0), _store->_nPoints, [&](size_t m) {
-    // Grab gates
+
+    if (_params.debug == _params.DEBUG_VERBOSE) {
+      if (m % 10000 == 0)
+        std::cout << m << std::endl;
+    }
+
+    // Check if there is any valid data on this point
+    // This is greatly useful when we do reflectivity or KDP only
+
+    std::vector<string> validname;
+
+    for (auto it = _store->_outFields.cbegin(); it != _store->_outFields.cend();
+         ++it) {
+      string name = (*it).first;
+      if (name.find("REF") == 0 && (*it).second->at(m) >= 0.0) {
+        validname.push_back(name);
+      }
+      // TODO, for more types
+    }
+
+    if (validname.size() == 0)
+      return;
+
     double X = _store->_gateX[m];
     double Y = _store->_gateY[m];
     double Z = _store->_gateZ[m];
@@ -115,7 +181,6 @@ Cart2Grid::interpGrid()
     double E = _store->_outElevation[m];
     double G = _store->_outGate[m];
     double S = _store->_gateGroundDistance[m];
-    double GateSize = _store->_gateSize[0];
 
     // Put it at grid
     int ci = int((X - DMinX) / CellX);
@@ -140,40 +205,30 @@ Cart2Grid::interpGrid()
     if (endk < startk)
       return;
 
+    // Grab gates
     for (int i = starti; i <= endi; ++i) {
       for (int j = startj; j <= endj; ++j) {
 #pragma ivdep
         for (int k = startk; k <= endk; ++k) {
 
-          // If the grid at a invalid position
-          if (!_grid_valid->at(i).at(j).at(k))
-            continue;
+          double s, el, rg, posx, posy;
 
-          double posx = DMinX + i * CellX;
-          double posy = DMinY + j * CellY;
-          double posz = DMinZ + k * CellZ;
-
-          double s, el, rg;
-
-          if (_grid_computed->at(i).at(j).at(k)) {
-            s = _grid_ground->at(i).at(j).at(k);
-            el = _grid_el->at(i).at(j).at(k);
-            rg = _grid_gate->at(i).at(j).at(k);
-          } else {
-            s = std::sqrt(posx * posx + posy * posy);
-            el = calculate_elevation(s, posz, Z0);
-            rg = calculate_range_gate(s, posz, el, Z0);
-            el = el / M_PI * 180.0;
-            _grid_ground->at(i).at(j).at(k) = s;
-            _grid_el->at(i).at(j).at(k) = el;
-            _grid_gate->at(i).at(j).at(k) = rg;
-            _grid_computed->at(i).at(j).at(k) = true;
-          }
-
-          if ((el < 0.0) || (el > 20)) {
-            _grid_valid->at(i).at(j).at(k) = false;
-            continue;
-          }
+          //          if (_grid_computed->at(i).at(j).at(k)) {
+          s = _grid_ground->at(i).at(j).at(k);
+          el = _grid_el->at(i).at(j).at(k);
+          rg = _grid_gate->at(i).at(j).at(k);
+          posx = _grid_x->at(i).at(j).at(k);
+          posy = _grid_y->at(i).at(j).at(k);
+          //          } else {
+          //            s = std::sqrt(posx * posx + posy * posy);
+          //            el = calculate_elevation(s, posz, Z0);
+          //            rg = calculate_range_gate(s, posz, el, Z0);
+          //            el = el / M_PI * 180.0;
+          //            _grid_ground->at(i).at(j).at(k) = s;
+          //            _grid_el->at(i).at(j).at(k) = el;
+          //            _grid_gate->at(i).at(j).at(k) = rg;
+          //            _grid_computed->at(i).at(j).at(k) = true;
+          //          }
 
           if (std::abs(rg - G) > 2.0 * GateSize) {
             continue;
@@ -185,23 +240,24 @@ Cart2Grid::interpGrid()
           }
 
           double dot = std::min(1.0, (posx * X + posy * Y) / S / s);
+          double adot = std::acos(dot);
+          if (adot > 1.0) {
+            continue;
+          }
           double term1 = std::cos(std::abs(el - E));
           double term2 = dot;
           double e_u = std::acos(term1 * term2) * 180.0 / M_PI;
 
-          double alpha = e_u / max_e_diff;
+          double alpha = e_u;
           double gate_diff = abs(rg - G) / (2 * GateSize) + 1e-8;
 
           double w =
-            std::pow(0.005, alpha * alpha * alpha) / (gate_diff * gate_diff) +
-            2e-5;
+            std::pow(0.005, std::pow(alpha, 3.0)) / std::pow(gate_diff, 2.0) +
+            2e-8;
 
-          for (auto it = _outputGridCount.cbegin();
-               it != _outputGridCount.cend();
-               ++it) {
-            string name = (*it).first;
+          for (auto& name : validname) {
             double v = _store->_outFields[name]->at(m);
-            if (v < -100.0f) {
+            if (v < 0.0) {
               continue;
             }
 

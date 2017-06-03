@@ -40,10 +40,6 @@ WriteOutput::testWriteOutputFile(fl32** outputFields)
   if (_params.debug) {
     cerr << "  Writing output file ... " << endl;
   }
-  // cedric is a special case
-  if (_params.output_format == Params::CEDRIC) {
-    //        return _writeCedricFile(false);  do we need this?
-  }
 
   // initialize the output grid dimensions
   _initGrid();
