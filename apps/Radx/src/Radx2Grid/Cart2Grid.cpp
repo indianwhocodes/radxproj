@@ -207,11 +207,9 @@ Cart2Grid::interpGrid()
 
             double vw = v * w + 1e-8;
 
-            //            atomicAdd(_outputGridSum[name]->at(i).at(j).at(k),
-            //            vw);
-            //            atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k),
-            //            w);
-            //            (_outputGridCount[name]->at(i).at(j).at(k))++;
+            atomicAdd(_outputGridSum[name]->at(i).at(j).at(k), vw);
+            atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k), w);
+            (_outputGridCount[name]->at(i).at(j).at(k))++;
           }
         } // Loop k
       }   // Loop j
