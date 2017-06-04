@@ -1,8 +1,10 @@
-#include "Cart2Grid.hh"
-#include "tbb/compat/thread"
-#include "tbb/parallel_for.h"
 #include <assert.h>
 #include <iostream>
+
+#include "tbb/compat/thread"
+#include "tbb/parallel_for.h"
+
+#include "Cart2Grid.hh"
 
 ptr_vector3d<double> _grid_el;
 ptr_vector3d<double> _grid_gate;
@@ -10,26 +12,6 @@ ptr_vector3d<double> _grid_ground;
 ptr_vector3d<double> _grid_x;
 ptr_vector3d<double> _grid_y;
 ptr_vector3d<double> _grid_z;
-
-template<typename T>
-inline void
-resizeArray(std::shared_ptr<vector<vector<vector<T>>>>& c,
-            size_t x,
-            size_t y,
-            size_t z)
-{
-  c->resize(x, vector<vector<T>>(y, vector<T>(z, 0)));
-}
-
-inline void
-resizeArray(std::shared_ptr<vector<vector<vector<bool>>>>& c,
-            size_t x,
-            size_t y,
-            size_t z,
-            bool value)
-{
-  c->resize(x, vector<vector<bool>>(y, vector<bool>(z, value)));
-}
 
 template<typename T>
 inline void
@@ -82,7 +64,7 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
     const double CellX = _xy_geom.dx * 1000.0;
     const double CellY = _xy_geom.dy * 1000.0;
     const double CellZ = _z_geom.dz * 1000.0;
-    const double Z0 = _store->_altitudeAgl;
+    const double Z0 = _store->altitudeAgl;
 
 #pragma omp parallel for collapse(2)
     for (auto i = 0; i < _DSizeI; i++)
@@ -106,7 +88,7 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
   }
 
   // Initialize Feild
-  for (auto it = _store->_outFields.cbegin(); it != _store->_outFields.cend();
+  for (auto it = _store->outFields.cbegin(); it != _store->outFields.cend();
        ++it) {
     string name = (*it).first;
     auto fieldsum = std::make_shared<vector3d<tbb::atomic<double>>>();
@@ -126,16 +108,6 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
   }
 }
 
-inline void
-atomicAdd(tbb::atomic<double>& x, double addend)
-{
-  double o, n;
-  do {
-    o = x;
-    n = o + addend;
-  } while (x.compare_and_swap(n, o) != o);
-}
-
 void
 Cart2Grid::interpGrid()
 {
@@ -148,9 +120,9 @@ Cart2Grid::interpGrid()
   const double CellX = _xy_geom.dx * 1000.0;
   const double CellY = _xy_geom.dy * 1000.0;
   const double CellZ = _z_geom.dz * 1000.0;
-  const double GateSize = _store->_gateSize[0];
+  const double GateSize = _store->gateSize[0];
 
-  tbb::parallel_for(size_t(0), _store->_nPoints, [&](size_t m) {
+  tbb::parallel_for(size_t(0), _store->nPoints, [&](size_t m) {
 
     if (_params.debug == _params.DEBUG_VERBOSE) {
       if (m % 10000 == 0)
@@ -162,7 +134,7 @@ Cart2Grid::interpGrid()
 
     std::vector<string> validname;
 
-    for (auto it = _store->_outFields.cbegin(); it != _store->_outFields.cend();
+    for (auto it = _store->outFields.cbegin(); it != _store->outFields.cend();
          ++it) {
       string name = (*it).first;
       if (name.find("REF") == 0 && (*it).second->at(m) >= 0.0) {
@@ -174,13 +146,13 @@ Cart2Grid::interpGrid()
     if (validname.size() == 0)
       return;
 
-    double X = _store->_gateX[m];
-    double Y = _store->_gateY[m];
-    double Z = _store->_gateZ[m];
-    double RoI = _store->_gateRoI[m];
-    double E = _store->_outElevation[m];
-    double G = _store->_outGate[m];
-    double S = _store->_gateGroundDistance[m];
+    double X = _store->gateX[m];
+    double Y = _store->gateY[m];
+    double Z = _store->gateZ[m];
+    double RoI = _store->gateRoI[m];
+    double E = _store->outElevation[m];
+    double G = _store->outGate[m];
+    double S = _store->gateGroundDistance[m];
 
     // Put it at grid
     int ci = int((X - DMinX) / CellX);
@@ -256,7 +228,7 @@ Cart2Grid::interpGrid()
             2e-8;
 
           for (auto& name : validname) {
-            double v = _store->_outFields[name]->at(m);
+            double v = _store->outFields[name]->at(m);
             if (v < 0.0) {
               continue;
             }
@@ -284,7 +256,7 @@ Cart2Grid::interpGrid()
 void
 Cart2Grid::computeGrid()
 {
-  for (auto m = _store->_outFields.cbegin(); m != _store->_outFields.cend();
+  for (auto m = _store->outFields.cbegin(); m != _store->outFields.cend();
        ++m) {
     string name = (*m).first;
     auto field = std::make_shared<vector3d<double>>();

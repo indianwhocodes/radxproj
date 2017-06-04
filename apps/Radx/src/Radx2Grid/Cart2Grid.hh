@@ -1,11 +1,11 @@
-#ifndef CART2GRID_HH
-#define CART2GRID_HH
-#include "PolarDataStream.hh"
+#ifndef RADX_RADX2GRID_CART2GRID_H_
+#define RADX_RADX2GRID_CART2GRID_H_
 
 #include <chrono>
 #include <memory>
-#include <tbb/atomic.h>
 #include <vector>
+#include <tbb/atomic.h>
+#include "PolarDataStream.hh"
 
 #define IR 8494677.33f
 
@@ -21,9 +21,42 @@ using vector3d = vector<vector<vector<T>>>;
 template<typename T>
 using ptr_vector3d = std::shared_ptr<vector3d<T>>;
 
+template<typename T>
+inline void
+resizeArray(std::shared_ptr<vector<vector<vector<T>>>>& c,
+            size_t x,
+            size_t y,
+            size_t z)
+{
+  c->resize(x, vector<vector<T>>(y, vector<T>(z, 0)));
+}
+
+inline void
+resizeArray(std::shared_ptr<vector<vector<vector<bool>>>>& c,
+            size_t x,
+            size_t y,
+            size_t z,
+            bool value)
+{
+  c->resize(x, vector<vector<bool>>(y, vector<bool>(z, value)));
+}
+
+inline void
+atomicAdd(tbb::atomic<double>& x, double addend)
+{
+  double o, n;
+  do {
+    o = x;
+    n = o + addend;
+  } while (x.compare_and_swap(n, o) != o);
+}
+
 class Cart2Grid
 {
-
+public:
+  Cart2Grid(std::shared_ptr<Repository> store, const Params& params);
+  void interpGrid();
+  void computeGrid();
 private:
   shared_ptr<Repository> _store;
   map<string, ptr_vector3d<tbb::atomic<double>>> _outputGridSum;
@@ -59,10 +92,6 @@ private:
   template<typename T>
   inline void _makeGrid(ptr_vector3d<T>& grid, T value);
 
-public:
-  Cart2Grid(std::shared_ptr<Repository> store, const Params& params);
-  void interpGrid();
-  void computeGrid();
 };
 
-#endif // CART2GRID_HH
+#endif // RADX_RADX2GRID_CART2GRID_H_

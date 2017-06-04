@@ -1,19 +1,22 @@
-
-#ifndef PolarDataStream_h
-#define PolarDataStream_h
+#ifndef RADX_RADX2GRID_POLARDATASTREAM_H_
+#define RADX_RADX2GRID_POLARDATASTREAM_H_
 
 #define INVALID_DATA_F -9999.0F
 #define INVALID_DATA -9999.0
 
+#include <map>
+#include <vector>
+
+#include <iostream>
+
+#include <string>
+#include <memory>
+
+#include <toolsa/TaArray.hh>
+#include <Radx/RadxVol.hh>
+
 #include "Interp.hh"
 #include "Params.hh"
-#include <Radx/RadxVol.hh>
-#include <iostream>
-#include <map>
-#include <memory>
-#include <string>
-#include <toolsa/TaArray.hh>
-#include <vector>
 
 class RadxFile;
 class RadxRay;
@@ -22,59 +25,59 @@ class RadxField;
 struct RepositoryField
 {
   std::vector<float> fieldValues;
-  float scale_factor = 1.0;
-  float add_offset = 0.0;
-  float fill_value = INVALID_DATA;
+  float scaleFactor = 1.0;
+  float addOffset = 0.0;
+  float fillValue = INVALID_DATA;
 };
 
 struct Repository
 {
   // dimenssions
-  size_t _nPoints;
-  size_t _timeDim;
-  size_t _rangeDim;
+  size_t nPoints;
+  size_t timeDim;
+  size_t rangeDim;
 
   // variables
-  float _latitude;
-  float _longitude;
-  float _altitude;
-  float _altitudeAgl;
+  float latitude;
+  float longitude;
+  float altitude;
+  float altitudeAgl;
 
-  float _scalingFactor;
-  short _fillValue;
-  short __padding0;
-  float _addOffset;
+  float scalingFactor;
+  short fillValue;
+  short padding0;
+  float addOffset;
 
-  std::vector<float> _gateSize;
-  std::vector<int> _rayNGates;
-  std::vector<int> _rayStartIndex;
-  std::vector<float> _rayStartRange;
+  std::vector<float> gateSize;
+  std::vector<int> rayNGates;
+  std::vector<int> rayStartIndex;
+  std::vector<float> rayStartRange;
 
-  std::vector<float> _azimuth;
-  std::vector<float> _elevation;
-  std::vector<float> _timeVar;
-  std::vector<float> _rangeVar;
+  std::vector<float> azimuth;
+  std::vector<float> elevation;
+  std::vector<float> timeVar;
+  std::vector<float> rangeVar;
 
   // name change. Accomodate multiple values.
-  std::vector<float> _raw_reflectivity;
-  std::map<std::string, shared_ptr<RepositoryField>> _inFields;
+  std::vector<float> rawReflectivity;
+  std::map<std::string, shared_ptr<RepositoryField>> inFields;
 
   // input file name;
-  std::string _inputFile;
+  std::string inputFile;
 
   // output values
-  std::vector<double> _outElevation;
-  std::vector<double> _outAzimuth;
-  std::vector<double> _outGate;
-  std::map<std::string, shared_ptr<std::vector<double>>> _outFields;
+  std::vector<double> outElevation;
+  std::vector<double> outAzimuth;
+  std::vector<double> outGate;
+  std::map<std::string, shared_ptr<std::vector<double>>> outFields;
 
   // Cartesian Coords
-  std::vector<double> _gateGroundDistance;
-  std::vector<double> _gateZr;
-  std::vector<double> _gateX;
-  std::vector<double> _gateY;
-  std::vector<double> _gateZ;
-  std::vector<double> _gateRoI;
+  std::vector<double> gateGroundDistance;
+  std::vector<double> gateZr;
+  std::vector<double> gateX;
+  std::vector<double> gateY;
+  std::vector<double> gateZ;
+  std::vector<double> gateRoI;
 };
 
 class PolarDataStream
@@ -100,10 +103,10 @@ public:
   RadxVol& getRadxVol();
   vector<Interp::Field>& getInterpFields();
 
-  int _readFile(const string& filePath);
-  void _setupRead(RadxFile& file);
+  int readFile(const string& filePath);     
+  void setupRead(RadxFile& file);           
 
-  bool _isRhi();
+  bool isRhi();     //TODO: Copy isRhi method definition from Radx2Grid.cc                              
 
 private:
   std::shared_ptr<Repository> _store;
@@ -118,4 +121,4 @@ private:
   int _volNum;
 };
 
-#endif
+#endif //RADX_RADX2GRID_POLARDATASTREAM_H_

@@ -1,6 +1,5 @@
-
-#ifndef Polar2Cartesian_h
-#define Polar2Cartesian_h
+#ifndef RADX_RADX2GRID_POLAR_2_CARTESIAN_H_
+#define RADX_RADX2GRID_POLAR_2_CARTESIAN_H_
 
 #include "PolarDataStream.hh"
 
@@ -16,4 +15,4 @@ private:
   std::shared_ptr<Repository> _store;
 };
 
-#endif
+#endif  //RADX_RADX2GRID_POLAR_2_CARTESIAN_H_
