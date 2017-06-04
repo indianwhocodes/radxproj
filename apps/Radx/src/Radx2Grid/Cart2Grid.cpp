@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <iostream>
 
+#include "tbb/blocked_range3d.h"
 #include "tbb/compat/thread"
 #include "tbb/parallel_for.h"
 
@@ -66,25 +67,33 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
     const double CellZ = _z_geom.dz * 1000.0;
     const double Z0 = _store->altitudeAgl;
 
-#pragma omp parallel for collapse(2)
-    for (auto i = 0; i < _DSizeI; i++)
-      for (auto j = 0; j < _DSizeJ; j++)
+    tbb::parallel_for(
+      tbb::blocked_range3d<int>(0, _DSizeI, 0, _DSizeJ, 0, _DSizeK),
+      [=](const tbb::blocked_range3d<int>& r) {
+#ifdef __GNUC__
+#pragma GCC ivdep
+#else
 #pragma ivdep
-        for (auto k = 0; k < _DSizeK; k++) {
-          double posx = DMinX + i * CellX;
-          double posy = DMinY + j * CellY;
-          double posz = DMinZ + k * CellZ;
-          _grid_x->at(i).at(j).at(k) = posx;
-          _grid_y->at(i).at(j).at(k) = posy;
-          _grid_z->at(i).at(j).at(k) = posz;
-          float s = std::sqrt(posx * posx + posy * posy);
-          float el = calculate_elevation(s, posz, Z0);
-          float rg = calculate_range_gate(s, posz, el, Z0);
-          el = el / M_PI * 180.0;
-          _grid_el->at(i).at(j).at(k) = el;
-          _grid_ground->at(i).at(j).at(k) = s;
-          _grid_gate->at(i).at(j).at(k) = rg;
-        }
+#endif
+        for (auto i = r.pages().begin(); i != r.pages().end(); ++i)
+          for (auto j = r.rows().begin(); j != r.rows().end(); ++j)
+            for (auto k = r.cols().begin(); k != r.cols().end(); ++k) {
+              // We're using a Fortran order at here. So be careful.
+              double posx = DMinX + i * CellX;
+              double posy = DMinY + j * CellY;
+              double posz = DMinZ + k * CellZ;
+              _grid_x->at(i).at(j).at(k) = posx;
+              _grid_y->at(i).at(j).at(k) = posy;
+              _grid_z->at(i).at(j).at(k) = posz;
+              float s = std::sqrt(posx * posx + posy * posy);
+              float el = calculate_elevation(s, posz, Z0);
+              float rg = calculate_range_gate(s, posz, el, Z0);
+              el = el / M_PI * 180.0;
+              _grid_el->at(i).at(j).at(k) = el;
+              _grid_ground->at(i).at(j).at(k) = s;
+              _grid_gate->at(i).at(j).at(k) = rg;
+            }
+      });
   }
 
   // Initialize Feild
@@ -180,7 +189,11 @@ Cart2Grid::interpGrid()
     // Grab gates
     for (int i = starti; i <= endi; ++i) {
       for (int j = startj; j <= endj; ++j) {
+#ifdef __GNUC__
+#pragma GCC ivdep
+#else
 #pragma ivdep
+#endif
         for (int k = startk; k <= endk; ++k) {
 
           double s, el, rg, posx, posy;
@@ -225,14 +238,11 @@ Cart2Grid::interpGrid()
 
           double w =
             std::pow(0.005, std::pow(alpha, 3.0)) / std::pow(gate_diff, 2.0) +
-            2e-8;
+            1e-8;
 
           for (auto& name : validname) {
-            double v = _store->outFields[name]->at(m);
-            if (v < 0.0) {
-              continue;
-            }
 
+            double v = _store->outFields[name]->at(m);
             double vw = v * w + 1e-8;
 
             atomicAdd(_outputGridSum[name]->at(i).at(j).at(k), vw);
