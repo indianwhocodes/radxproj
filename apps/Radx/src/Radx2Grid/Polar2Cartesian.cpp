@@ -22,14 +22,15 @@ void Polar2Cartesian::calculateXYZ()
   _store->gateRoI.resize(_store->nPoints);
 
   const double IR = 4.0 * 6371008.0 / 3.0;
-#pragma ivdep
+  #pragma ivdep
   tbb::parallel_for(size_t(0), _store->nPoints, [=](size_t i) {
     // Calculate ground distance and relative altitude
     double radianElev = _store->outElevation[i] * M_PI / 180.0;
+    // (Eq 2.28b)
     double h0 =
       sqrt(gate[i] * gate[i] + (gate[i] * 2.0 * IR) * 
       sin(radianElev) + IR * IR) - IR;
-    
+    // (Eq 2.28c)
     _store->gateGroundDistance[i] = 
       (IR * asin(gate[i] * cos(radianElev) / (IR + h0)));
     
