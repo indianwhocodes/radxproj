@@ -25,6 +25,7 @@ private:
 
 public:
   static ThreadQueue<std::shared_ptr<PolarDataStream>> polarDataStreamQueue;
+  static ThreadQueue<std::shared_ptr<Cart2Grid>> gridQueue;
 };
 
 #endif

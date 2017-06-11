@@ -4,119 +4,17 @@
 #include <algorithm>
 #include <memory>
 
-WriteOutput::WriteOutput(std::string progN,
-                         std::shared_ptr<Repository> store,
+WriteOutput::WriteOutput(shared_ptr<Repository> store,
                          RadxVol& readVol,
-                         const Params& params,
-                         vector<Interp::Field>& interpFields)
-  : _progName(progN)
-  , _store(store)
+                         const Params& params)
+  : _store(store)
   , _readVol(readVol)
   , _params(params)
-  , _interpFields(interpFields)
 {
-
-  if (_params.output_test_fields) {
-    _createTestFields();
-  }
-
-  // create convective/stratiform fields if needed
-
-  if (_params.identify_convective_stratiform_split) {
-    _createConvStratFields();
-  }
 }
+
 WriteOutput::~WriteOutput()
 {
-}
-
-/////////////////////////////////////////////////////
-// test WriteOutputFile()
-
-int
-WriteOutput::testWriteOutputFile(fl32** outputFields)
-{
-  cout << "DEBUG: inside of testWriteOutputFile()" << endl;
-  if (_params.debug) {
-    cerr << "  Writing output file ... " << endl;
-  }
-
-  // initialize the output grid dimensions
-  _initGrid();
-
-  cout << "DEBUG: after initGrid" << endl;
-
-  if (_setRadarParams()) {
-    cerr << "ERROR - CartInterp::interpVol()" << endl;
-    return -1;
-  }
-
-  OutputMdv out(_progName, _params);
-  out.setMasterHeader(_readVol);
-  for (size_t ifield = 0; ifield < _interpFields.size(); ifield++) {
-    const Interp::Field& ifld = _interpFields[ifield];
-    out.addField(_readVol,
-                 _proj,
-                 _gridZLevels,
-                 ifld.outputName,
-                 ifld.longName,
-                 ifld.units,
-                 ifld.inputDataType,
-                 ifld.inputScale,
-                 ifld.inputOffset,
-                 missingFl32,
-                 outputFields[ifield]);
-  } // ifield
-
-  // debug (test) fields
-
-  for (size_t ii = 0; ii < _derived3DFields.size(); ii++) {
-    const DerivedField* dfld = _derived3DFields[ii];
-    if (dfld->writeToFile) {
-      out.addField(_readVol,
-                   _proj,
-                   dfld->vertLevels,
-                   dfld->name,
-                   dfld->longName,
-                   dfld->units,
-                   Radx::FL32,
-                   1.0,
-                   0.0,
-                   missingFl32,
-                   dfld->data);
-    }
-  }
-
-  for (size_t ii = 0; ii < _derived2DFields.size(); ii++) {
-    const DerivedField* dfld = _derived2DFields[ii];
-    if (dfld->writeToFile) {
-      out.addField(_readVol,
-                   _proj,
-                   dfld->vertLevels,
-                   dfld->name,
-                   dfld->longName,
-                   dfld->units,
-                   Radx::FL32,
-                   1.0,
-                   0.0,
-                   missingFl32,
-                   dfld->data);
-    }
-  }
-
-  // chunks
-
-  out.addChunks(_readVol, _interpFields.size());
-
-  // write out file
-
-  if (out.writeVol()) {
-    cerr << "ERROR - Interp::processFile" << endl;
-    cerr << "  Cannot write file to output_dir: " << _params.output_dir << endl;
-    return -1;
-  }
-
-  return 0;
 }
 
 /////////////////////////////////////////////////////
@@ -125,162 +23,12 @@ WriteOutput::testWriteOutputFile(fl32** outputFields)
 int
 WriteOutput::writeOutputFile()
 {
-  // TODO: This must be rewrite, because data are not written in 1D array, it is
-  // in vector3d
   return 0;
-}
-
-//////////////////////////////////////////////////
-// create the test fields
-
-void
-WriteOutput::_createTestFields()
-{
-
-  _nContribDebug =
-    new DerivedField("nContrib", "n_points_contrib", "count", true);
-  _derived3DFields.push_back(_nContribDebug);
-
-  _gridAzDebug = new DerivedField("gridAz", "grid_azimiuth", "deg", true);
-  _derived3DFields.push_back(_gridAzDebug);
-
-  _gridElDebug = new DerivedField("gridEl", "grid_elevation", "deg", true);
-  _derived3DFields.push_back(_gridElDebug);
-
-  _gridRangeDebug =
-    new DerivedField("gridRange", "grid_slant_range", "km", true);
-  _derived3DFields.push_back(_gridRangeDebug);
-
-  _llElDebug = new DerivedField("llEl", "lower_left_el", "deg", true);
-  _derived3DFields.push_back(_llElDebug);
-  _llAzDebug = new DerivedField("llAz", "lower_left_az", "deg", true);
-  _derived3DFields.push_back(_llAzDebug);
-
-  _lrElDebug = new DerivedField("lrEl", "lower_right_el", "deg", true);
-  _derived3DFields.push_back(_lrElDebug);
-  _lrAzDebug = new DerivedField("lrAz", "lower_right_az", "deg", true);
-  _derived3DFields.push_back(_lrAzDebug);
-
-  _ulElDebug = new DerivedField("ulEl", "upper_left_el", "deg", true);
-  _derived3DFields.push_back(_ulElDebug);
-  _ulAzDebug = new DerivedField("ulAz", "upper_left_az", "deg", true);
-  _derived3DFields.push_back(_ulAzDebug);
-
-  _urElDebug = new DerivedField("urEl", "upper_right_el", "deg", true);
-  _derived3DFields.push_back(_urElDebug);
-  _urAzDebug = new DerivedField("urAz", "upper_right_az", "deg", true);
-  _derived3DFields.push_back(_urAzDebug);
-}
-
-//////////////////////////////////////////////////
-// create the conv-strat fields
-
-void
-WriteOutput::_createConvStratFields()
-
-{
-
-  bool writeDebug = _params.conv_strat_write_debug_fields;
-  bool writePartition = _params.conv_strat_write_partition;
-
-  _convStratDbzMax =
-    new DerivedField("DbzMax", "max_dbz_for_conv_strat", "dbz", writeDebug);
-  _derived3DFields.push_back(_convStratDbzMax);
-
-  _convStratDbzCount = new DerivedField(
-    "DbzCount", "n_points_dbz_for_conv_strat", "count", writeDebug);
-  _derived3DFields.push_back(_convStratDbzCount);
-
-  _convStratDbzSum =
-    new DerivedField("DbzSum", "sum_dbz_for_conv_strat", "dbz", writeDebug);
-  _derived3DFields.push_back(_convStratDbzSum);
-
-  _convStratDbzSqSum = new DerivedField(
-    "DbzSqSum", "sum_dbz_sq_for_conv_strat", "dbz^2", writeDebug);
-  _derived3DFields.push_back(_convStratDbzSqSum);
-
-  _convStratDbzSqSqSum = new DerivedField(
-    "DbzSqSqSum", "sum_dbz_sq_sq_for_conv_strat", "dbz^4", writeDebug);
-  _derived3DFields.push_back(_convStratDbzSqSqSum);
-
-  _convStratDbzTexture = new DerivedField(
-    "DbzTexture", "dbz_texture_for_conv_strat", "dbz", writeDebug);
-  _derived3DFields.push_back(_convStratDbzTexture);
-
-  _convStratFilledTexture = new DerivedField(
-    "FilledTexture", "filled_dbz_texture_for_conv_strat", "dbz", writeDebug);
-  _derived3DFields.push_back(_convStratFilledTexture);
-
-  _convStratDbzSqTexture = new DerivedField(
-    "DbzSqTexture", "dbz_sq_texture_for_conv_strat", "dbz", writeDebug);
-  _derived3DFields.push_back(_convStratDbzSqTexture);
-
-  _convStratFilledSqTexture =
-    new DerivedField("FilledSqTexture",
-                     "filled_dbz_sq_texture_for_conv_strat",
-                     "dbz",
-                     writeDebug);
-  _derived3DFields.push_back(_convStratFilledSqTexture);
-
-  _convStratDbzColMax = new DerivedField(
-    "DbzColMax", "col_max_dbz_for_conv_strat", "dbz", writeDebug);
-  _derived2DFields.push_back(_convStratDbzColMax);
-
-  _convStratMeanTexture = new DerivedField(
-    "MeanTexture", "mean_dbz_texture_for_conv_strat", "dbz", writeDebug);
-  _derived2DFields.push_back(_convStratMeanTexture);
-
-  _convStratMeanSqTexture = new DerivedField(
-    "MeanSqTexture", "mean_dbz_sq_texture_for_conv_strat", "dbz", writeDebug);
-  _derived2DFields.push_back(_convStratMeanSqTexture);
-
-  _convStratCategory = new DerivedField(
-    "ConvStrat", "category_for_conv_strat", "", writePartition);
-  _derived2DFields.push_back(_convStratCategory);
 }
 
 ////////////////////////////////////////////////////////////
 // Initialize output grid
 
-void
-WriteOutput::_initGrid()
-
-{
-
-  // initialize the Z levels
-
-  _initZLevels();
-
-  // init the xy grid
-
-  _gridNx = _params.grid_xy_geom.nx;
-  _gridMinx = _params.grid_xy_geom.minx;
-  _gridDx = _params.grid_xy_geom.dx;
-
-  _gridNy = _params.grid_xy_geom.ny;
-  _gridMiny = _params.grid_xy_geom.miny;
-  _gridDy = _params.grid_xy_geom.dy;
-
-  _nPointsPlane = _gridNx * _gridNy;
-  _nPointsVol = _nPointsPlane * _gridNz;
-
-  for (size_t ii = 0; ii < _derived3DFields.size(); ii++) {
-    _derived3DFields[ii]->alloc(_nPointsVol, _gridZLevels);
-  }
-
-  vector<double> singleLevel;
-  singleLevel.push_back(0.0);
-  for (size_t ii = 0; ii < _derived2DFields.size(); ii++) {
-    _derived2DFields[ii]->alloc(_nPointsPlane, singleLevel);
-  }
-
-  if (_params.identify_convective_stratiform_split) {
-    _convStratDbzCount->setToZero();
-    _convStratDbzSum->setToZero();
-    _convStratDbzSqSum->setToZero();
-    _convStratDbzSqSqSum->setToZero();
-  }
-}
 
 ////////////////////////////////////////////////////////////
 // Initialize Z levels
@@ -314,7 +62,6 @@ WriteOutput::_initZLevels()
 
 void
 WriteOutput::_initProjection()
-
 {
   _radarX = 0.0;
   _radarY = 0.0;

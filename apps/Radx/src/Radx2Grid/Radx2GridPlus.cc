@@ -19,6 +19,8 @@ Radx2GridPlus::~Radx2GridPlus()
 ThreadQueue<std::shared_ptr<PolarDataStream>>
   Radx2GridPlus::polarDataStreamQueue;
 
+ThreadQueue<std::shared_ptr<Cart2Grid>> Radx2GridPlus::gridQueue;
+
 inline long
 _currentTimestamp()
 {
@@ -82,14 +84,11 @@ _popDatafromBuffer(int total_size, bool _debug, const Params& params)
                 << (_currentTimestamp() - start_clock) / 1.0E6 << " sec"
                 << std::endl;
     }
-
-    /* ****************************************************************
-     * WRITE OUTPUT SHOULD HAPPEN HERE!
-     * IF USING ANOTHER BUFFER QUEUE, IT MAY HAPPEN SLIGHTLY LATER    *
-     * CHECK BELOW
-     * ****************************************************************/
+    Radx2GridPlus::gridQueue.
   }
 }
+
+void _writeToDisk
 
 void
 Radx2GridPlus::processFiles(const std::vector<string>& filepaths,
@@ -104,9 +103,11 @@ Radx2GridPlus::processFiles(const std::vector<string>& filepaths,
   std::thread thread_read_nc(_pushDataintoBuffer, filepaths, params);
   std::thread thread_process_polarstream(
     _popDatafromBuffer, n, params.debug > 0, params);
+  std::thread thread_write_out(_writeToDisk, n, params);
 
   thread_read_nc.join();
   thread_process_polarstream.join();
+  thread_write_out.join();
 
   /* ****************************************************************
    * WRITE OUTPUT SHOULD HAPPEN HERE ONLY IF ANOTHER BUFFER QUEUE

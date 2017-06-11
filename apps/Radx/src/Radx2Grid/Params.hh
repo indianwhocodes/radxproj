@@ -102,7 +102,8 @@ public:
     CF_NETCDF = 0,
     ZEBRA_NETCDF = 1,
     MDV = 2,
-    CEDRIC = 3
+    CEDRIC = 3,
+    RASTER = 4
   } output_format_t;
 
   typedef enum {

@@ -2824,7 +2824,7 @@ using namespace std;
     tt->help = tdrpStrDup("CF_NETCDF: CF-compliant NetCDF. See http://cf-pcmdi.llnl.gov/documents/cf-conventions. ZEBRA_NETCDF: NetCDF format specifically for ZEBRA display. This forces a conversion to a LATLON projection. MDV: legacy MDV format.");
     tt->val_offset = (char *) &output_format - &_start_;
     tt->enum_def.name = tdrpStrDup("output_format_t");
-    tt->enum_def.nfields = 4;
+    tt->enum_def.nfields = 5;
     tt->enum_def.fields = (enum_field_t *)
         tdrpMalloc(tt->enum_def.nfields * sizeof(enum_field_t));
       tt->enum_def.fields[0].name = tdrpStrDup("CF_NETCDF");
@@ -2835,6 +2835,8 @@ using namespace std;
       tt->enum_def.fields[2].val = MDV;
       tt->enum_def.fields[3].name = tdrpStrDup("CEDRIC");
       tt->enum_def.fields[3].val = CEDRIC;
+      tt->enum_def.fields[4].name = tdrpStrDup("MULTIBAND_RASTER");
+      tt->enum_def.fields[4].val = RASTER;
     tt->single_val.e = CF_NETCDF;
     tt++;
     
