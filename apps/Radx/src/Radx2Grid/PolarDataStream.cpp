@@ -1,5 +1,6 @@
 #include <vector>
 
+#include "netcdf"
 #include <Mdv/GenericRadxFile.hh>
 #include <Radx/RadxField.hh>
 #include <Radx/RadxPath.hh>
@@ -7,10 +8,9 @@
 #include <Radx/RadxSweep.hh>
 #include <radar/BeamHeight.hh>
 #include <tbb/tbb.h>
-#include "netcdf"
 
-#include "PolarDataStream.hh"
 #include "Params.hh"
+#include "PolarDataStream.hh"
 
 // constructor
 PolarDataStream::PolarDataStream(const std::string& inputFile,
@@ -21,19 +21,14 @@ PolarDataStream::PolarDataStream(const std::string& inputFile,
   _store->inputFile = inputFile;
 }
 
-PolarDataStream::~PolarDataStream() {}
+PolarDataStream::~PolarDataStream()
+{
+}
 
 // read dimenssions, variables from NetCDF file and fill the repository
-void PolarDataStream::LoadDataFromNetCDFFilesIntoRepository()
+void
+PolarDataStream::LoadDataFromNetCDFFilesIntoRepository()
 {
-
-  if (readFile(_store->inputFile)) 
-  {
-    cerr << "ERROR - Radx2Grid::_processFile" << endl;
-  }
-
-  // make sure gate geometry is constant
-  _readVol.remapToFinestGeom();
 
   netCDF::NcFile dataFile(_store->inputFile, netCDF::NcFile::read);
   netCDF::NcDim TimeDim = dataFile.getDim("time");
@@ -104,7 +99,8 @@ void PolarDataStream::LoadDataFromNetCDFFilesIntoRepository()
 }
 
 // create 1D array for Elevation, Azimuth, Gate and field values such as Ref
-void PolarDataStream::populateOutputValues()
+void
+PolarDataStream::populateOutputValues()
 {
   // Size of outGate, outRef, outAzi etc = sum(ray_n_gates) = n_points
 
@@ -112,16 +108,15 @@ void PolarDataStream::populateOutputValues()
   _store->outGate.resize(_store->nPoints);
   _store->outElevation.resize(_store->nPoints);
   _store->outAzimuth.resize(_store->nPoints);
-  
-  for (auto it = _store->inFields.cbegin(); it != _store->inFields.cend(); ++it)
-  {
+
+  for (auto it = _store->inFields.cbegin(); it != _store->inFields.cend();
+       ++it) {
     string name = (*it).first;
     auto fin = (*it).second;
     auto fout = make_shared<std::vector<double>>();
     fout->resize(_store->nPoints);
 
-    tbb::parallel_for(size_t(0), _store->timeDim, [=](size_t i)
-    {
+    tbb::parallel_for(size_t(0), _store->timeDim, [=](size_t i) {
       // Start of Expansion function
       const float& r0 = _store->rayStartRange[i];
       const float& g = _store->gateSize[i];
@@ -145,8 +140,7 @@ void PolarDataStream::populateOutputValues()
         if (fin->fieldValues[j] == fin->fillValue) {
           fout->at(j) = INVALID_DATA;
         } else {
-          fout->at(j) =
-            fin->fieldValues[j] * fin->scaleFactor + fin->addOffset;
+          fout->at(j) = fin->fieldValues[j] * fin->scaleFactor + fin->addOffset;
         }
       }
       // End of Expansion function
@@ -155,17 +149,8 @@ void PolarDataStream::populateOutputValues()
   }
 }
 
-std::shared_ptr<Repository> PolarDataStream::getRepository()
+std::shared_ptr<Repository>
+PolarDataStream::getRepository()
 {
   return _store;
-}
-
-RadxVol& PolarDataStream::getRadxVol()
-{
-  return _readVol;
-}
-
-vector<Interp::Field>& PolarDataStream::getInterpFields()
-{
-  return _interpFields;
 }

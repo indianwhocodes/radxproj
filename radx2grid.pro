@@ -39,7 +39,6 @@ HEADERS += \
            apps/Radx/src/Radx2Grid/Polar2Cartesian.hh \
            apps/Radx/src/Radx2Grid/ThreadQueue.hh \
            apps/Radx/src/Radx2Grid/WriteOutput.hh \
-           apps/Radx/src/Radx2Grid/test.hh \
            apps/Radx/src/Radx2Grid/Cart2Grid.hh
 
 SOURCES += apps/Radx/src/Radx2Grid/Args.cc \

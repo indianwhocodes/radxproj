@@ -2,16 +2,19 @@
 #ifndef Radx2GridPlus_h
 #define Radx2GridPlus_h
 
+#include "Cart2Grid.hh"
 #include "Polar2Cartesian.hh"
 #include "PolarDataStream.hh"
 #include "ThreadQueue.hh"
+#include "WriteOutput.hh"
 #include <string>
 
-class Radx2GridPlus {
+class Radx2GridPlus
+{
 public:
   Radx2GridPlus(std::string pName);
   ~Radx2GridPlus();
-  void processFiles(const vector<string> &filepaths, const Params &params);
+  void processFiles(const vector<string>& filepaths, const Params& params);
 
   // setter, getter
   std::string getInputDir();

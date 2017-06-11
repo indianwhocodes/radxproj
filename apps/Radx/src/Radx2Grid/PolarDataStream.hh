@@ -9,11 +9,11 @@
 
 #include <iostream>
 
-#include <string>
 #include <memory>
+#include <string>
 
-#include <toolsa/TaArray.hh>
 #include <Radx/RadxVol.hh>
+#include <toolsa/TaArray.hh>
 
 #include "Interp.hh"
 #include "Params.hh"
@@ -100,25 +100,10 @@ public:
   std::vector<float> getOutRef();
 
   std::shared_ptr<Repository> getRepository();
-  RadxVol& getRadxVol();
-  vector<Interp::Field>& getInterpFields();
-
-  int readFile(const string& filePath);     
-  void setupRead(RadxFile& file);           
-
-  bool isRhi();     //TODO: Copy isRhi method definition from Radx2Grid.cc                              
 
 private:
   std::shared_ptr<Repository> _store;
   const Params& _params;
-
-  RadxVol _readVol;
-  vector<string> _readPaths;
-  bool _rhiMode;
-  vector<Interp::Field> _interpFields;
-  vector<Interp::Ray*> _interpRays;
-
-  int _volNum;
 };
 
-#endif //RADX_RADX2GRID_POLARDATASTREAM_H_
+#endif // RADX_RADX2GRID_POLARDATASTREAM_H_

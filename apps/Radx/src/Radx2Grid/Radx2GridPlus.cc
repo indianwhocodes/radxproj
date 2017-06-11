@@ -68,8 +68,8 @@ _popDatafromBuffer(int total_size, bool _debug, const Params& params)
 
     // Calculate Cartesian Coords.
     start_clock = _currentTimestamp();
-    Polar2Cartesian p2c(p->getRepository());
-    p2c.calculateXYZ();
+    auto p2c = std::make_shared<Polar2Cartesian>(p->getRepository());
+    p2c->calculateXYZ();
     if (_debug) {
       std::cerr << "Append coordinates: "
                 << (_currentTimestamp() - start_clock) / 1.0E6 << " sec"
@@ -77,18 +77,28 @@ _popDatafromBuffer(int total_size, bool _debug, const Params& params)
     }
 
     start_clock = _currentTimestamp();
-    Cart2Grid c2g(p->getRepository(), params);
-    c2g.interpGrid();
+    auto c2g = std::make_shared<Cart2Grid>(p->getRepository(), params);
+    c2g->interpGrid();
     if (_debug) {
       std::cerr << "Interp coordinates: "
                 << (_currentTimestamp() - start_clock) / 1.0E6 << " sec"
                 << std::endl;
     }
-    Radx2GridPlus::gridQueue.
+    Radx2GridPlus::gridQueue.push(c2g);
   }
 }
 
-void _writeToDisk
+void
+_writeToDisk(int total_size, const Params& params)
+{
+  // TODO: You task
+  for (auto i = 0; i < total_size; i++) {
+    auto c2g = Radx2GridPlus::gridQueue.pop();
+    auto wo = std::make_shared<WriteOutput>(c2g, params);
+    wo->writeOutputFile();
+  }
+  return;
+}
 
 void
 Radx2GridPlus::processFiles(const std::vector<string>& filepaths,
@@ -108,25 +118,4 @@ Radx2GridPlus::processFiles(const std::vector<string>& filepaths,
   thread_read_nc.join();
   thread_process_polarstream.join();
   thread_write_out.join();
-
-  /* ****************************************************************
-   * WRITE OUTPUT SHOULD HAPPEN HERE ONLY IF ANOTHER BUFFER QUEUE
-   * IS USED, REFER TO PREVIOUS CODE TO SEE HOW BUFFER QUEUE IS     *
-   * SET
-   * ****************************************************************/
-
-  // step 4 : Output file
-  // wo->at(i).writeOutputFile();
-}
-
-std::string
-Radx2GridPlus::getInputDir()
-{
-  throw "Not Implemented";
-}
-
-std::string
-Radx2GridPlus::getOutputDir()
-{
-  throw "Not Implemented";
 }
