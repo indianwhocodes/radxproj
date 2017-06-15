@@ -78,6 +78,12 @@ struct Repository
   std::vector<double> gateY;
   std::vector<double> gateZ;
   std::vector<double> gateRoI;
+  
+  //Store global attributes. Will be used while writing.
+  std::string instrumentName;
+  std::string startDateTime;
+  //TODO: Also add Volume Coverage Pattern(VCP).
+  
 };
 
 class PolarDataStream

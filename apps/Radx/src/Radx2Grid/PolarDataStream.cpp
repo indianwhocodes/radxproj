@@ -45,6 +45,10 @@ PolarDataStream::LoadDataFromNetCDFFilesIntoRepository()
   alt_agl.getVar(&_store->altitudeAgl);
   _store->timeVar.resize(_store->timeDim);
   float* timeVarPtr = _store->timeVar.data();
+  netCDF::NcGroupAtt stationName = dataFile.getAtt("instrument_name");
+  stationName.getValues(_store->instrumentName);
+  netCDF::NcGroupAtt startDateTime = dataFile.getAtt("start_datetime");
+  startDateTime.getValues(_store->startDateTime);  
   netCDF::NcVar timeVar = dataFile.getVar("time");
   timeVar.getVar(timeVarPtr);
   _store->rangeVar.resize(_store->timeDim);
