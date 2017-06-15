@@ -57,6 +57,8 @@ public:
   Cart2Grid(std::shared_ptr<Repository> store, const Params& params);
   void interpGrid();
   void computeGrid();
+  std::shared_ptr<Repository> getRepository();
+  
 private:
   shared_ptr<Repository> _store;
   map<string, ptr_vector3d<tbb::atomic<double>>> _outputGridSum;

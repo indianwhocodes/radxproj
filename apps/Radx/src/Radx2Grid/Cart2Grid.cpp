@@ -13,7 +13,6 @@ ptr_vector3d<double> _grid_ground;
 ptr_vector3d<double> _grid_x;
 ptr_vector3d<double> _grid_y;
 ptr_vector3d<double> _grid_z;
-
 template<typename T>
 inline void
 Cart2Grid::_makeGrid(ptr_vector3d<T>& grid)
@@ -288,3 +287,10 @@ Cart2Grid::computeGrid()
     _outputFinalGrid.insert(std::make_pair(name, field));
   } // Loop m
 }
+
+std::shared_ptr<Repository>
+Cart2Grid::getRepository()
+{
+  return _store;
+}
+
