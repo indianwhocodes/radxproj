@@ -58,7 +58,7 @@ public:
   void interpGrid();
   void computeGrid();
   std::shared_ptr<Repository> getRepository();
-  
+  void tempShow();
 private:
   shared_ptr<Repository> _store;
   map<string, ptr_vector3d<tbb::atomic<double>>> _outputGridSum;

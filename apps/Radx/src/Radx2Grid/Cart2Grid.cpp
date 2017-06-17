@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <iostream>
-
+#include<typeinfo>
 #include "tbb/blocked_range3d.h"
 #include "tbb/compat/thread"
 #include "tbb/parallel_for.h"
@@ -292,5 +292,30 @@ std::shared_ptr<Repository>
 Cart2Grid::getRepository()
 {
   return _store;
+}
+
+//Delete this function
+void 
+Cart2Grid::tempShow()
+{
+  vector3d<double> temp = *_outputFinalGrid["REF"];
+  //std::cout<<typeid(temp).name() <<std::endl;
+  //std::cout<< temp.size();
+  std::cout<< "_DSizI: " << _DSizeI << std::endl;
+  std::cout<< "_DSizI: " << _DSizeI << std::endl;
+  std::cout<< "_DSizI: " << _DSizeI << std::endl;
+  
+  for (auto i = temp.begin(); i != temp.end(); i++)
+  {
+    for(auto j = i->begin(); j != i->end(); j++)
+    {
+      for(auto k = j->begin(); k != j->end(); k++)
+      {
+        std::cout << *k << std::endl;
+      }
+    }
+    
+  }
+  
 }
 
