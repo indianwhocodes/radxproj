@@ -67,7 +67,7 @@ public:
   inline float getDMinY(){return _xy_geom.miny;}
   
   //void tempShow();
-  
+
 private:
   shared_ptr<Repository> _store;
   map<string, ptr_vector3d<tbb::atomic<double>>> _outputGridSum;

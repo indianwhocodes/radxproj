@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <iostream>
-
+#include<typeinfo>
 #include "tbb/blocked_range3d.h"
 #include "tbb/compat/thread"
 #include "tbb/parallel_for.h"
