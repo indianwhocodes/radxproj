@@ -57,7 +57,16 @@ public:
   Cart2Grid(std::shared_ptr<Repository> store, const Params& params);
   void interpGrid();
   void computeGrid();
+  
   std::shared_ptr<Repository> getRepository();
+  map<string, ptr_vector3d<double>> getOutputFinalGrid();
+  int getGridDimX();
+  int getGridDimY();
+  int getGridDimZ();
+  inline float getDMinX(){return _xy_geom.minx;}
+  inline float getDMinY(){return _xy_geom.miny;}
+  
+  //void tempShow();
   
 private:
   shared_ptr<Repository> _store;
