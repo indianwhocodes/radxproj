@@ -1,10 +1,13 @@
 #include "WriteOutput.hh"
 #include <Radx/RadxRay.hh>
+
 #include <algorithm>
 #include <memory>
+
 #include "netcdf"
 #include "gdal_priv.h"
 #include "cpl_string.h"
+#include <ogr_spatialref.h>
 
 WriteOutput::WriteOutput(const shared_ptr<Cart2Grid>& grid, 
 						 const shared_ptr<Repository>& store,
@@ -111,20 +114,53 @@ WriteOutput::writeOutputFile()
     
   } else if (_params.output_format == Params::output_format_t::RASTER) {
     // Write out Raster
-      GDALDataset  *poDataset;
+      std::cerr<< "Raster format block" << std::endl; 
+     
       GDALAllRegister();
       const char *pszFormat = "GTiff";
       GDALDriver *poDriver;
-      char **papszMetadata;
+      GDALDataset *poDstDS;
+      char **papszOptions = NULL;
+
       poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
       if( poDriver == NULL )
         exit( 1 );
-      papszMetadata = poDriver->GetMetadata();
-      if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATE, FALSE ) )
-        printf( "Driver %s supports Create() method.\n", pszFormat );
-      if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATECOPY, FALSE ) )
-        printf( "Driver %s supports CreateCopy() method.\n", pszFormat );
-	
+
+      std::string outputFileName("tif_");
+      outputFileName += _store->instrumentName;
+      outputFileName += "_";
+      outputFileName += _store->startDateTime;
+      std::replace(outputFileName.begin(), outputFileName.end(), ':', '-');
+      const char * pszDstFilename = outputFileName.c_str();
+      
+      poDstDS = poDriver->Create( pszDstFilename,_grid->getGridDimX(),
+                                  _grid->getGridDimY(), _grid->getGridDimZ(),
+                                  GDT_Float64, papszOptions );
+
+      std::vector<float> reflData;
+      auto temp_map = _grid->getOutputFinalGrid()["REF"];
+      auto temp = *temp_map;
+      
+      for (auto i = temp.begin(); i != temp.end(); i++)
+         for(auto j = i->begin(); j != i->end(); j++)
+      {
+           auto k = j->begin();  
+           reflData.push_back( static_cast<float> (*k) );
+      }
+
+      GDALRasterBand * rb =  poDstDS->GetRasterBand(1);
+      rb->RasterIO(GF_Write, 0, 0, _grid->getGridDimX(), _grid->getGridDimY(), 
+                      reflData.data(), _grid->getGridDimX(), _grid->getGridDimY(), 
+                      GDT_Float32, 0, 0, NULL);
+
+      OGRSpatialReference::OGRSpatialReference sr; 			
+      std::string temp2("+proj=aeqd +lat_0="+ 
+			std::to_string(_params.radar_latitude_deg) + 
+                        "lon_0=" + std::to_string(_params.radar_longitude_deg) + 
+			"+x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs");	
+      sr.importFromProj4(temp2.c_str());
+
+      GDALClose((GDALDatasetH)poDstDS);
 
 
   } else {

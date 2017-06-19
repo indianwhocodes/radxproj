@@ -93,6 +93,8 @@ LDADD += -lstdc++
 LDADD += -lpthread 
 LDADD += -lm 
 LDADD += -ldl
+LDADD += -lgdal
+
 # set app name
 
 bin_PROGRAMS = Radx2Grid
@@ -114,7 +116,7 @@ Radx2Grid_SOURCES = \
 	SvdData.cc \
 	Thread.cc \
 	Radx2GridPlus.cc \
-	Cart2Grid.cpp \ 
+	Cart2Grid.cpp \
 	PolarDataStream.cpp \
-        Polar2Cartesian.cpp \	
-	WriteOutput.cpp 
+        Polar2Cartesian.cpp \
+	WriteOutput.cpp
