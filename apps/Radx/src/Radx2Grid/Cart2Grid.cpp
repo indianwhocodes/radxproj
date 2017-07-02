@@ -1,9 +1,10 @@
-#include <assert.h>
-#include <iostream>
-#include<typeinfo>
 #include "tbb/blocked_range3d.h"
 #include "tbb/compat/thread"
 #include "tbb/parallel_for.h"
+#include "tbb/spin_mutex.h"
+#include <assert.h>
+#include <iostream>
+#include <typeinfo>
 
 #include "Cart2Grid.hh"
 
@@ -14,26 +15,21 @@ ptr_vector3d<double> _grid_x;
 ptr_vector3d<double> _grid_y;
 ptr_vector3d<double> _grid_z;
 
-template<typename T>
-inline void
-Cart2Grid::_makeGrid(ptr_vector3d<T>& grid)
-{
+tbb::spin_mutex _add_locker1, _add_locker2, _add_locker3;
+
+template <typename T> inline void Cart2Grid::_makeGrid(ptr_vector3d<T> &grid) {
   grid = std::make_shared<vector3d<T>>();
   resizeArray(grid, _DSizeI, _DSizeJ, _DSizeK);
 }
 
-template<typename T>
-inline void
-Cart2Grid::_makeGrid(ptr_vector3d<T>& grid, T value)
-{
+template <typename T>
+inline void Cart2Grid::_makeGrid(ptr_vector3d<T> &grid, T value) {
   grid = std::make_shared<vector3d<T>>();
   resizeArray(grid, _DSizeI, _DSizeJ, _DSizeK, value);
 }
 
-Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
-  : _store(store)
-  , _params(params)
-{
+Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params &params)
+    : _store(store), _params(params) {
   _xy_geom = _params.grid_xy_geom;
   _z_geom = _params.grid_z_geom;
 
@@ -68,41 +64,43 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
     const double Z0 = _store->altitudeAgl;
 
     tbb::parallel_for(
-      tbb::blocked_range3d<int>(0, _DSizeI, 0, _DSizeJ, 0, _DSizeK),
-      [=](const tbb::blocked_range3d<int>& r) {
+        tbb::blocked_range3d<int>(0, _DSizeI, 0, _DSizeJ, 0, _DSizeK),
+        [=](const tbb::blocked_range3d<int> &r) {
+          for (auto i = r.pages().begin(); i != r.pages().end(); ++i) {
+            for (auto j = r.rows().begin(); j != r.rows().end(); ++j) {
 #ifdef __GNUC__
 #pragma GCC ivdep
 #else
 #pragma ivdep
 #endif
-        for (auto i = r.pages().begin(); i != r.pages().end(); ++i)
-          for (auto j = r.rows().begin(); j != r.rows().end(); ++j)
-            for (auto k = r.cols().begin(); k != r.cols().end(); ++k) {
-              // We're using a Fortran order at here. So be careful.
-              double posx = DMinX + i * CellX;
-              double posy = DMinY + j * CellY;
-              double posz = DMinZ + k * CellZ;
-              _grid_x->at(i).at(j).at(k) = posx;
-              _grid_y->at(i).at(j).at(k) = posy;
-              _grid_z->at(i).at(j).at(k) = posz;
-              float s = std::sqrt(posx * posx + posy * posy);
-              float el = calculate_elevation(s, posz, Z0);
-              float rg = calculate_range_gate(s, posz, el, Z0);
-              el = el / M_PI * 180.0;
-              _grid_el->at(i).at(j).at(k) = el;
-              _grid_ground->at(i).at(j).at(k) = s;
-              _grid_gate->at(i).at(j).at(k) = rg;
+              for (auto k = r.cols().begin(); k != r.cols().end(); ++k) {
+                // We're using a Fortran order at here. So be careful.
+                double posx = DMinX + i * CellX;
+                double posy = DMinY + j * CellY;
+                double posz = DMinZ + k * CellZ;
+                _grid_x->at(i).at(j).at(k) = posx;
+                _grid_y->at(i).at(j).at(k) = posy;
+                _grid_z->at(i).at(j).at(k) = posz;
+                double s = std::sqrt(posx * posx + posy * posy);
+                double el = calculate_elevation(s, posz, Z0);
+                double rg = calculate_range_gate(s, posz, el, Z0);
+                el = el / M_PI * 180.0;
+                _grid_el->at(i).at(j).at(k) = el;
+                _grid_ground->at(i).at(j).at(k) = s;
+                _grid_gate->at(i).at(j).at(k) = rg;
+              }
             }
-      });
+          }
+        });
   }
 
   // Initialize Feild
   for (auto it = _store->outFields.cbegin(); it != _store->outFields.cend();
        ++it) {
     string name = (*it).first;
-    auto fieldsum = std::make_shared<vector3d<tbb::atomic<double>>>();
-    auto fieldweight = std::make_shared<vector3d<tbb::atomic<double>>>();
-    auto fieldcount = std::make_shared<vector3d<tbb::atomic<int>>>();
+    auto fieldsum = std::make_shared<vector3d<double>>();
+    auto fieldweight = std::make_shared<vector3d<double>>();
+    auto fieldcount = std::make_shared<vector3d<int>>();
     // resize and fill
     resizeArray(fieldsum, _DSizeI, _DSizeJ, _DSizeK);
     resizeArray(fieldweight, _DSizeI, _DSizeJ, _DSizeK);
@@ -117,9 +115,7 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
   }
 }
 
-void
-Cart2Grid::interpGrid()
-{
+void Cart2Grid::interpGrid() {
   // Convert everything to 0;
   _clock = _currentTimestamp();
 
@@ -133,7 +129,7 @@ Cart2Grid::interpGrid()
 
   tbb::parallel_for(size_t(0), _store->nPoints, [&](size_t m) {
 
-    if (_params.debug == _params.DEBUG_VERBOSE) {
+    if (_params.debug == _params.DEBUG_EXTRA) {
       if (m % 10000 == 0)
         std::cout << m << std::endl;
     }
@@ -169,22 +165,19 @@ Cart2Grid::interpGrid()
     int ck = int((Z - DMinZ) / CellZ);
 
     // Search range
-    int si = int(RoI / CellX) + 1;
-    int sj = int(RoI / CellY) + 1;
-    int sk = int(RoI / CellZ) + 1;
+    int si = int(RoI / CellX);
+    int sj = int(RoI / CellY);
+    int sk = int(RoI / CellZ);
 
+    // Maybe we don't need limits, because loops filter them.
     int starti = std::max(0, ci - si);
     int endi = std::min(_DSizeI - 1, ci + si);
-    if (endi < starti)
-      return;
+
     int startj = std::max(0, cj - sj);
     int endj = std::min(_DSizeJ - 1, cj + sj);
-    if (endj < startj)
-      return;
+
     int startk = std::max(0, ck - sk);
     int endk = std::min(_DSizeK - 1, ck + sk);
-    if (endk < startk)
-      return;
 
     // Grab gates
     for (int i = starti; i <= endi; ++i) {
@@ -198,22 +191,11 @@ Cart2Grid::interpGrid()
 
           double s, el, rg, posx, posy;
 
-          //          if (_grid_computed->at(i).at(j).at(k)) {
           s = _grid_ground->at(i).at(j).at(k);
           el = _grid_el->at(i).at(j).at(k);
           rg = _grid_gate->at(i).at(j).at(k);
           posx = _grid_x->at(i).at(j).at(k);
           posy = _grid_y->at(i).at(j).at(k);
-          //          } else {
-          //            s = std::sqrt(posx * posx + posy * posy);
-          //            el = calculate_elevation(s, posz, Z0);
-          //            rg = calculate_range_gate(s, posz, el, Z0);
-          //            el = el / M_PI * 180.0;
-          //            _grid_ground->at(i).at(j).at(k) = s;
-          //            _grid_el->at(i).at(j).at(k) = el;
-          //            _grid_gate->at(i).at(j).at(k) = rg;
-          //            _grid_computed->at(i).at(j).at(k) = true;
-          //          }
 
           if (std::abs(rg - G) > 2.0 * GateSize) {
             continue;
@@ -237,17 +219,26 @@ Cart2Grid::interpGrid()
           double gate_diff = abs(rg - G) / (2 * GateSize) + 1e-8;
 
           double w =
-            std::pow(0.005, std::pow(alpha, 3.0)) / std::pow(gate_diff, 2.0) +
-            1e-8;
+              std::pow(0.005, std::pow(alpha, 3.0)) / std::pow(gate_diff, 2.0) +
+              1e-8;
 
-          for (auto& name : validname) {
+          for (auto &name : validname) {
 
             double v = _store->outFields[name]->at(m);
             double vw = v * w + 1e-8;
 
-            atomicAdd(_outputGridSum[name]->at(i).at(j).at(k), vw);
-            atomicAdd(_outputGridWeight[name]->at(i).at(j).at(k), w);
-            (_outputGridCount[name]->at(i).at(j).at(k))++;
+            {
+              tbb::spin_mutex::scoped_lock lock(_add_locker1);
+              (_outputGridSum[name]->at(i).at(j).at(k)) += vw;
+            }
+            {
+              tbb::spin_mutex::scoped_lock lock(_add_locker2);
+              (_outputGridWeight[name]->at(i).at(j).at(k)) += w;
+            }
+            {
+              tbb::spin_mutex::scoped_lock lock(_add_locker3);
+              (_outputGridCount[name]->at(i).at(j).at(k))++;
+            }
           }
         } // Loop k
       }   // Loop j
@@ -263,9 +254,7 @@ Cart2Grid::interpGrid()
   }
 }
 
-void
-Cart2Grid::computeGrid()
-{
+void Cart2Grid::computeGrid() {
   for (auto m = _store->outFields.cbegin(); m != _store->outFields.cend();
        ++m) {
     string name = (*m).first;
@@ -279,8 +268,8 @@ Cart2Grid::computeGrid()
             field->at(i).at(j).at(k) = INVALID_DATA;
           } else {
             field->at(i).at(j).at(k) =
-              _outputGridSum[name]->at(i).at(j).at(k) /
-              _outputGridWeight[name]->at(i).at(j).at(k);
+                _outputGridSum[name]->at(i).at(j).at(k) /
+                _outputGridWeight[name]->at(i).at(j).at(k);
           }
         } // Loop k
       }   // Loop j
@@ -289,33 +278,14 @@ Cart2Grid::computeGrid()
   } // Loop m
 }
 
-std::shared_ptr<Repository>
-Cart2Grid::getRepository()
-{
-  return _store;
-}
+std::shared_ptr<Repository> Cart2Grid::getRepository() { return _store; }
 
-int 
-Cart2Grid::getGridDimX()
-{
-  return _DSizeI;
-}
+int Cart2Grid::getGridDimX() { return _DSizeI; }
 
-int 
-Cart2Grid::getGridDimY()
-{
-  return _DSizeJ;
-}
+int Cart2Grid::getGridDimY() { return _DSizeJ; }
 
-int 
-Cart2Grid::getGridDimZ()
-{
-  return _DSizeK;
-}
+int Cart2Grid::getGridDimZ() { return _DSizeK; }
 
-map <string, ptr_vector3d<double>>
-Cart2Grid::getOutputFinalGrid()
-{
-	return _outputFinalGrid;
+map<string, ptr_vector3d<double>> Cart2Grid::getOutputFinalGrid() {
+  return _outputFinalGrid;
 }
-
