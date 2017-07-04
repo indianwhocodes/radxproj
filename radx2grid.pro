@@ -77,7 +77,7 @@ LIBS += -lradar \
     -ldataport \
     -ltdrp \
     -lkd \
-    -lnetcdf-cxx4 \
+    -lnetcdf_c++4 \
     -lnetcdf_c++ \
     -lnetcdf \
     -lhdf5_cpp \

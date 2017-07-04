@@ -7,24 +7,32 @@
 #include <memory>
 #include <thread>
 
-Radx2GridPlus::Radx2GridPlus(std::string pName) : _programName(pName) {}
+Radx2GridPlus::Radx2GridPlus(std::string pName)
+  : _programName(pName)
+{
+}
 
-Radx2GridPlus::~Radx2GridPlus() {}
+Radx2GridPlus::~Radx2GridPlus()
+{
+}
 
 ThreadQueue<std::shared_ptr<PolarDataStream>>
-    Radx2GridPlus::polarDataStreamQueue;
+  Radx2GridPlus::polarDataStreamQueue;
 
 ThreadQueue<std::shared_ptr<Cart2Grid>> Radx2GridPlus::gridQueue;
 
-inline long _currentTimestamp() {
+inline long
+_currentTimestamp()
+{
   std::chrono::microseconds start =
-      std::chrono::duration_cast<std::chrono::microseconds>(
-          std::chrono::system_clock::now().time_since_epoch());
+    std::chrono::duration_cast<std::chrono::microseconds>(
+      std::chrono::system_clock::now().time_since_epoch());
   return start.count();
 }
 
-void _pushDataintoBuffer(const std::vector<string> &filepaths,
-                         const Params &params) {
+void
+_pushDataintoBuffer(const std::vector<string>& filepaths, const Params& params)
+{
 
   // DONE: Make this across threads
   for (size_t i = 0; i < filepaths.size(); i++) {
@@ -41,7 +49,9 @@ void _pushDataintoBuffer(const std::vector<string> &filepaths,
   }
 }
 
-void _popDatafromBuffer(int total_size, bool _debug, const Params &params) {
+void
+_popDatafromBuffer(int total_size, bool _debug, const Params& params)
+{
 
   for (auto i = 0; i < total_size; i++) {
 
@@ -78,7 +88,9 @@ void _popDatafromBuffer(int total_size, bool _debug, const Params &params) {
   }
 }
 
-void _writeToDisk(int total_size, const Params &params) {
+void
+_writeToDisk(int total_size, const Params& params)
+{
   // TODO: You task
   for (auto i = 0; i < total_size; i++) {
     auto c2g = Radx2GridPlus::gridQueue.pop();
@@ -88,8 +100,10 @@ void _writeToDisk(int total_size, const Params &params) {
   return;
 }
 
-void Radx2GridPlus::processFiles(const std::vector<string> &filepaths,
-                                 const Params &params) {
+void
+Radx2GridPlus::processFiles(const std::vector<string>& filepaths,
+                            const Params& params)
+{
   _inputDir = params.input_dir;
   _outputDir = params.output_dir;
 
@@ -97,8 +111,8 @@ void Radx2GridPlus::processFiles(const std::vector<string> &filepaths,
   auto n = filepaths.size();
 
   std::thread thread_read_nc(_pushDataintoBuffer, filepaths, params);
-  std::thread thread_process_polarstream(_popDatafromBuffer, n,
-                                         params.debug > 0, params);
+  std::thread thread_process_polarstream(
+    _popDatafromBuffer, n, params.debug > 0, params);
   std::thread thread_write_out(_writeToDisk, n, params);
 
   thread_read_nc.join();

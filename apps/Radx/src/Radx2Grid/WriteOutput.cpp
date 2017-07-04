@@ -1,27 +1,34 @@
 #include "WriteOutput.hh"
-#include <Radx/RadxRay.hh>
 
 #include <algorithm>
 #include <memory>
 
 #include "cpl_string.h"
 #include "gdal_priv.h"
+#include "ogr_spatialref.h"
+
 #include "netcdf"
-#include <ogr_spatialref.h>
 
-WriteOutput::WriteOutput(const shared_ptr<Cart2Grid> &grid,
-                         const shared_ptr<Repository> &store,
-                         const Params &params)
-    : _grid(grid), _store(store), _params(params)
+WriteOutput::WriteOutput(const shared_ptr<Cart2Grid>& grid,
+                         const shared_ptr<Repository>& store,
+                         const Params& params)
+  : _grid(grid)
+  , _store(store)
+  , _params(params)
 
-{}
+{
+}
 
-WriteOutput::~WriteOutput() {}
+WriteOutput::~WriteOutput()
+{
+}
 
 /////////////////////////////////////////////////////
 // write out data
 
-int WriteOutput::writeOutputFile() {
+int
+WriteOutput::writeOutputFile()
+{
 
   if (_params.output_format == Params::output_format_t::CF_NETCDF) {
     // Write out netcdf
@@ -59,9 +66,9 @@ int WriteOutput::writeOutputFile() {
 
       // define coordinate variables
       netCDF::NcVar x0Var =
-          opFile.addVar(xCoordinateVar, netCDF::ncFloat, x0Dim);
+        opFile.addVar(xCoordinateVar, netCDF::ncFloat, x0Dim);
       netCDF::NcVar y0Var =
-          opFile.addVar(yCoordinateVar, netCDF::ncFloat, y0Dim);
+        opFile.addVar(yCoordinateVar, netCDF::ncFloat, y0Dim);
 
       // write coordinate variable data
       x0Var.putVar(xCoordinates.data());
@@ -73,7 +80,7 @@ int WriteOutput::writeOutputFile() {
       Refldims.push_back(y0Dim);
       Refldims.push_back(z0Dim);
       netCDF::NcVar nc_field =
-          opFile.addVar(reflName, netCDF::ncFloat, Refldims);
+        opFile.addVar(reflName, netCDF::ncFloat, Refldims);
 
       // Add attribute to REF variable
       // netCDF::NcVarAtt refl_att = reflectivity.puttAtt("standard_name",
@@ -101,7 +108,7 @@ int WriteOutput::writeOutputFile() {
 
       // Add global Attributes
       netCDF::NcGroupAtt groupAttr =
-          opFile.putAtt("instrument_name", _store->instrumentName);
+        opFile.putAtt("instrument_name", _store->instrumentName);
       groupAttr = opFile.putAtt("start_datetime", _store->startDateTime);
       // groupAttr = opFile.putAtt("time_dimension", netCDF::NcType::nc_INT,
       // static_cast<int>(_store->timeDim));  groupAttr =
@@ -109,14 +116,16 @@ int WriteOutput::writeOutputFile() {
       // static_cast<int>(_store->rangeDim));  groupAttr =
       // opFile.putAtt("n_points", netCDF::NcType::nc_INT,
       // static_cast<int>(_store->nPoints));
-      groupAttr = opFile.putAtt("latitude", netCDF::NcType::nc_FLOAT,
+      groupAttr = opFile.putAtt("latitude",
+                                netCDF::NcType::nc_FLOAT,
                                 static_cast<float>(_store->latitude));
-      groupAttr = opFile.putAtt("longitude", netCDF::NcType::nc_FLOAT,
+      groupAttr = opFile.putAtt("longitude",
+                                netCDF::NcType::nc_FLOAT,
                                 static_cast<float>(_store->longitude));
       // groupAttr = opFile.putAtt("altitude_agl", netCDF::NcType::nc_FLOAT,
       // static_cast<float>(_store->altitudeAgl));
       return 0;
-    } catch (netCDF::exceptions::NcException &e) {
+    } catch (netCDF::exceptions::NcException& e) {
       e.what();
       return -1;
     }
@@ -126,10 +135,10 @@ int WriteOutput::writeOutputFile() {
     std::cerr << "Raster format block" << std::endl;
 
     GDALAllRegister();
-    const char *pszFormat = "GTiff";
-    GDALDriver *poDriver;
-    GDALDataset *poDstDS;
-    char **papszOptions = NULL;
+    const char* pszFormat = "GTiff";
+    GDALDriver* poDriver;
+    GDALDataset* poDstDS;
+    char** papszOptions = NULL;
 
     poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
     if (poDriver == NULL)
@@ -140,11 +149,14 @@ int WriteOutput::writeOutputFile() {
     outputFileName += "_";
     outputFileName += _store->startDateTime;
     std::replace(outputFileName.begin(), outputFileName.end(), ':', '-');
-    const char *pszDstFilename = outputFileName.c_str();
+    const char* pszDstFilename = outputFileName.c_str();
 
-    poDstDS = poDriver->Create(pszDstFilename, _grid->getGridDimX(),
-                               _grid->getGridDimY(), _grid->getGridDimZ(),
-                               GDT_Float64, papszOptions);
+    poDstDS = poDriver->Create(pszDstFilename,
+                               _grid->getGridDimX(),
+                               _grid->getGridDimY(),
+                               _grid->getGridDimZ(),
+                               GDT_Float64,
+                               papszOptions);
 
     std::vector<float> reflData;
     auto temp_map = _grid->getOutputFinalGrid()["REF"];
@@ -156,19 +168,27 @@ int WriteOutput::writeOutputFile() {
         reflData.push_back(static_cast<float>(*k));
       }
 
-    GDALRasterBand *rb = poDstDS->GetRasterBand(1);
-    CPLErr err =
-        rb->RasterIO(GF_Write, 0, 0, _grid->getGridDimX(), _grid->getGridDimY(),
-                     reflData.data(), _grid->getGridDimX(),
-                     _grid->getGridDimY(), GDT_Float32, 0, 0, NULL);
+    GDALRasterBand* rb = poDstDS->GetRasterBand(1);
+    CPLErr err = rb->RasterIO(GF_Write,
+                              0,
+                              0,
+                              _grid->getGridDimX(),
+                              _grid->getGridDimY(),
+                              reflData.data(),
+                              _grid->getGridDimX(),
+                              _grid->getGridDimY(),
+                              GDT_Float32,
+                              0,
+                              0,
+                              NULL);
 
-    OGRSpatialReference::OGRSpatialReference sr;
+    OGRSpatialReference sr;
     // WHY USE INFORMATION FROM PARAMS RATHER THAN FROM NETCDF INPUT?
     // NEVER USE?!
     std::string temp2(
-        "+proj=aeqd +lat_0=" + std::to_string(_params.radar_latitude_deg) +
-        "lon_0=" + std::to_string(_params.radar_longitude_deg) +
-        "+x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs");
+      "+proj=aeqd +lat_0=" + std::to_string(_params.radar_latitude_deg) +
+      "lon_0=" + std::to_string(_params.radar_longitude_deg) +
+      "+x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs");
     sr.importFromProj4(temp2.c_str());
 
     GDALClose((GDALDatasetH)poDstDS);
