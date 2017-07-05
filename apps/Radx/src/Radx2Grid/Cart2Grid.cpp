@@ -198,43 +198,45 @@ Cart2Grid::interpGrid()
 #endif
         for (int k = startk; k <= endk; ++k) {
 
-          double s, el, rg, posx, posy;
+          double s, el, rg, posx, posy, posz;
 
           s = _grid_ground->at(i).at(j).at(k);
           el = _grid_el->at(i).at(j).at(k);
           rg = _grid_gate->at(i).at(j).at(k);
           posx = _grid_x->at(i).at(j).at(k);
           posy = _grid_y->at(i).at(j).at(k);
+          posz = _grid_z->at(i).at(j).at(k);
 
-          if (std::abs(rg - G) > 2.0 * GateSize) {
+          double gate_diff = abs(rg - G) / (2 * GateSize) + 1e-8;
+          if (gate_diff > 1.0) {
             continue;
           }
 
-          double max_e_diff = (E < 6.0) ? 1.0 : 3.0;
+          double max_e_diff = (E < 8.0) ? 1.0 : 3.0;
           if (std::abs(el - E) > max_e_diff) {
             continue;
           }
 
           double dot = std::min(1.0, (posx * X + posy * Y) / S / s);
-          double adot = std::acos(dot);
+          double adot = std::acos(dot) * 180.0 / M_PI;
           if (adot > 1.0) {
             continue;
           }
-          double term1 = std::cos(std::abs(el - E));
-          double term2 = dot;
-          double e_u = std::acos(term1 * term2) * 180.0 / M_PI;
 
-          double alpha = e_u;
-          double gate_diff = abs(rg - G) / (2 * GateSize) + 1e-8;
+          // double term1 = std::cos(std::abs(el - E));
+          // double term2 = dot;
+          // double e_u = std::acos(term1 * term2) * 180.0 / M_PI;
 
-          double w =
-            std::pow(0.005, std::pow(alpha, 3.0)) / std::pow(gate_diff, 2.0) +
-            1e-8;
+          double alpha = std::abs(el - E);
+
+          double w = std::pow(0.005, std::pow(alpha, 3.0)) * (1.0 - adot) /
+                       std::pow(gate_diff, 2.0) +
+                     1e-8;
 
           for (auto& name : validname) {
 
             double v = _store->outFields[name]->at(m);
-            double vw = v * w + 1e-8;
+            double vw = v * w;
 
             {
               tbb::spin_mutex::scoped_lock lock(_add_locker1);
@@ -274,8 +276,7 @@ Cart2Grid::computeGrid()
     tbb::parallel_for(0, _DSizeI, [=](int i) {
       for (int j = 0; j < _DSizeJ; j++) {
         for (int k = 0; k < _DSizeK; k++) {
-          if (_outputGridCount[name]->at(i).at(j).at(k) < 3 ||
-              _outputGridWeight[name]->at(i).at(j).at(k) == 0) {
+          if (_outputGridWeight[name]->at(i).at(j).at(k) <= 0) {
             field->at(i).at(j).at(k) = INVALID_DATA;
           } else {
             field->at(i).at(j).at(k) =

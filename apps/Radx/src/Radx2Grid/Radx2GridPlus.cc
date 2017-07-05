@@ -95,7 +95,7 @@ _writeToDisk(int total_size, const Params& params)
   for (auto i = 0; i < total_size; i++) {
     auto c2g = Radx2GridPlus::gridQueue.pop();
     auto wo = std::make_shared<WriteOutput>(c2g, c2g->getRepository(), params);
-    // wo->writeOutputFile();
+    wo->writeOutputFile();
   }
   return;
 }
