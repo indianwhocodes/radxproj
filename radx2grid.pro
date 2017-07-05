@@ -7,8 +7,8 @@ QMAKE_CXXFLAGS += -std=c++14
 
 *-icc* {
     QMAKE_CXXFLAGS_RELEASE -= -O2
-    QMAKE_CXXFLAGS_RELEASE += -O3 -xHost -ipo -fp-model fast=2 -openmp
-    LIBS += -lmkl -lmkl_rt
+    QMAKE_CXXFLAGS_RELEASE += -O3 -xHost -ipo -fp-model fast=2 -parallel -openmp
+    LIBS += -lmkl_rt
 }
 
 *-g++* {
