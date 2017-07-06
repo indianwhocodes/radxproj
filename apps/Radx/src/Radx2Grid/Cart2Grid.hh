@@ -51,6 +51,7 @@ public:
   int getGridDimZ();
   inline float getDMinX() { return _xy_geom.minx; }
   inline float getDMinY() { return _xy_geom.miny; }
+  inline float getDMinZ() { return _z_geom.minz; }
 
   // void tempShow();
 

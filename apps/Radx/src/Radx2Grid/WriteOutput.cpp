@@ -41,21 +41,28 @@ WriteOutput::writeOutputFile()
     outputFileName += _store->startDateTime;
     std::replace(outputFileName.begin(), outputFileName.end(), ':', '-');
     outputFileName += ".ncf";
+    std::cout << outputFileName << std::endl;
     std::string xDim("x0");
     std::string yDim("y0");
     std::string zDim("z0");
     std::string xCoordinateVar("x0");
     std::string yCoordinateVar("y0");
-    // WHERE IS z0
+    std::string zCoordinateVar("z0");
+    
     std::vector<float> xCoordinates;
     std::vector<float> yCoordinates;
-    std::string reflName("reflectivity");
+    std::vector<float> zCoordinates;
+    //TODO: Remove this hard coded string. std::string reflName("reflectivity");
 
-    // WHY NOT USE std::iota
+    // WHY NOT USE std::iota? 
+    // It increments only by 1. If we really want, we can implement our own version of
+    // iota that takes another parameter called "stride".  
     for (int i = 0; i < _grid->getGridDimX(); i++)
       xCoordinates.push_back(_grid->getDMinX() + i * 0.5);
     for (int i = 0; i < _grid->getGridDimY(); i++)
       yCoordinates.push_back(_grid->getDMinY() + i * 0.5);
+    for (int i = 0; i < _grid->getGridDimZ(); i++)
+      zCoordinates.push_back(_grid->getDMinZ() + i * 0.5);
 
     // Open file for writing.
     netCDF::NcFile opFile(outputFileName, netCDF::NcFile::replace);
@@ -69,12 +76,41 @@ WriteOutput::writeOutputFile()
       opFile.addVar(xCoordinateVar, netCDF::ncFloat, x0Dim);
     netCDF::NcVar y0Var =
       opFile.addVar(yCoordinateVar, netCDF::ncFloat, y0Dim);
+    netCDF::NcVar z0Var =
+      opFile.addVar(zCoordinateVar, netCDF::ncFloat, z0Dim);
 
     // write coordinate variable data
     x0Var.putVar(xCoordinates.data());
     y0Var.putVar(yCoordinates.data());
+    z0Var.putVar(zCoordinates.data());
+    
+    for (auto const& field : _grid->getOutputFinalGrid())
+    {
+      //Define field Variable
+      std::vector<netCDF::NcDim> fieldDim;
+      fieldDim.push_back(x0Dim);
+      fieldDim.push_back(y0Dim);
+      fieldDim.push_back(z0Dim);
+      
+      netCDF::NcVar nc_field =
+      opFile.addVar(field.first, netCDF::ncFloat, fieldDim);
+      
+      //Write field data
+      std::vector<float> field_data;
+      for (auto i = field.second->cbegin(); i != field.second->cend(); i++) {
+        for (auto j = i->cbegin(); j != i->cend(); j++) {
+          field_data.insert(field_data.end(), j->begin(), j->end());
+        }
+      }
 
+      nc_field.putVar(field_data.data());
+    }
+
+
+    
+    /*
     // Define REF variable
+    
     std::vector<netCDF::NcDim> Refldims;
     Refldims.push_back(x0Dim);
     Refldims.push_back(y0Dim);
@@ -89,6 +125,7 @@ WriteOutput::writeOutputFile()
     // Write REF data
     std::vector<float> field_data;
     auto temp_map = _grid->getOutputFinalGrid()["REF"];
+    
     // WHY COPY IT HERE?
     //      auto temp = *temp_map;
 
@@ -105,7 +142,7 @@ WriteOutput::writeOutputFile()
     }
 
     nc_field.putVar(field_data.data());
-
+    */
     // Add global Attributes
     netCDF::NcGroupAtt groupAttr =
       opFile.putAtt("instrument_name", _store->instrumentName);
