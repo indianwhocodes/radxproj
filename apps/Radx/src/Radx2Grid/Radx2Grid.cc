@@ -178,11 +178,15 @@ int Radx2Grid::_runFilelist() {
 
   int iret = 0;
 
-  for (int ifile = 0; ifile < (int)_args.inputFileList.size(); ifile++) {
-
-    string inputPath = _args.inputFileList[ifile];
-    if (_processFile(inputPath)) {
-      iret = -1;
+  if (_isSafeToCallRadx2GridPlus()) {
+    Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Cart");
+    radx2GridPlus.processFiles(_args.inputFileList, _params);
+  } else {
+    for (int ifile = 0; ifile < (int)_args.inputFileList.size(); ifile++) {
+      string inputPath = _args.inputFileList[ifile];
+      if (_processFile(inputPath)) {
+        iret = -1;
+      }
     }
   }
 
@@ -238,7 +242,7 @@ int Radx2Grid::_runArchive() {
   // modified to here
 
   if (_isSafeToCallRadx2GridPlus()) {
-    Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Grid");
+    Radx2GridPlus radx2GridPlus = Radx2GridPlus("Radx2Cart");
     radx2GridPlus.processFiles(paths, _params);
   } else {
     for (size_t ipath = 0; ipath < paths.size(); ipath++) {

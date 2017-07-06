@@ -86,6 +86,15 @@ AC_ARG_WITH([tbb],
 AC_MSG_RESULT([$TBBDIR])
 AC_SUBST(TBBDIR, [$TBBDIR])
 
+# Did the user specify a location for the GDAL library?
+AC_MSG_CHECKING([whether a location for the tbb library was specified])
+AC_ARG_WITH([gdal],
+              [AS_HELP_STRING([--with-gdal=<directory>],
+                              [Specify location of gdal library. Configure will \
+			      expect to find subdirs include and lib.])],
+            [GDALDIR=$with_gdal])
+AC_MSG_RESULT([$GDALDIR])
+AC_SUBST(GDALDIR, [$GDALDIR])
 
 # Add the RADX directory to includes and link flags
 if test ! "x$RADXDIR" = x; then
@@ -113,7 +122,13 @@ fi
 if test ! "x$TBBDIR" = x; then
    LDFLAGS="${LDFLAGS} -L${TBBDIR}/lib/intel64/gcc4.7"
    CPPFLAGS="${CPPFLAGS} -I${TBBDIR}/include"
-fi    
+fi   
+
+# Add the GDAL directory to includes and link flags
+if test ! "x$GDALDIR" = x; then
+   LDFLAGS="${LDFLAGS} -L${GDALDIR}/lib/"
+   CPPFLAGS="${CPPFLAGS} -I${GDALDIR}/include"
+fi  
 
 # Check for the existance of this file before proceeding.
 # AC_CONFIG_SRCDIR([${NETCDFDIR}/include/Radx/Radx.hh])
