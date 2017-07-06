@@ -32,7 +32,7 @@ struct RepositoryField
 
 struct Repository
 {
-  // dimenssions
+  // dimensions
   size_t nPoints;
   size_t timeDim;
   size_t rangeDim;
