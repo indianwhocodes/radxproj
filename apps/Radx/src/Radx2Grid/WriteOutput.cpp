@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <memory>
 #include "netcdf"
-#include "gdal_priv.h"
-#include "cpl_string.h"
+//#include "gdal_priv.h"
+//#include "cpl_string.h"
 
 WriteOutput::WriteOutput(const shared_ptr<Cart2Grid>& grid, 
 						 const shared_ptr<Repository>& store,
@@ -111,6 +111,7 @@ WriteOutput::writeOutputFile()
     
   } else if (_params.output_format == Params::output_format_t::RASTER) {
     // Write out Raster
+      /*
       GDALDataset  *poDataset;
       GDALAllRegister();
       const char *pszFormat = "GTiff";
@@ -124,9 +125,9 @@ WriteOutput::writeOutputFile()
         printf( "Driver %s supports Create() method.\n", pszFormat );
       if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATECOPY, FALSE ) )
         printf( "Driver %s supports CreateCopy() method.\n", pszFormat );
-	
+	    
 
-
+  */
   } else {
     // Show a warning that outputs format are not supported
     std::cerr<< "The output format specified is not supported" << std::endl; 
