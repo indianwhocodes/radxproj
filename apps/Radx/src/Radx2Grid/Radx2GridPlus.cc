@@ -7,19 +7,58 @@
 #include <memory>
 #include <thread>
 
+/*Define the static variable to solve undefined reference errors.*/
+int Radx2GridPlus::numberOfCores;
+
 Radx2GridPlus::Radx2GridPlus(std::string pName)
-  : _programName(pName)
+  : _programName(pName) 
 {
+  SetupThreadControl();
 }
 
 Radx2GridPlus::~Radx2GridPlus()
-{
-}
+{}
 
 ThreadQueue<std::shared_ptr<PolarDataStream>>
   Radx2GridPlus::polarDataStreamQueue;
 
 ThreadQueue<std::shared_ptr<Cart2Grid>> Radx2GridPlus::gridQueue;
+
+void
+Radx2GridPlus::SetupThreadControl()
+{
+  // If the user wants to control the number of threads, s/he will set the
+  // TBB_NUM_THREADS environment variable. 
+  bool flag = false;
+  
+  if(const char* tbb_num_thread = std::getenv("TBB_NUM_THREADS"))
+  {
+    //set the number of threads to the value of this env_var after validating value
+    for(int i = 0; i < strlen(tbb_num_thread); i++){
+      //ASCII value of 0 = 48, 9 = 57. So if value is outside of numeric range then fail
+      if (tbb_num_thread[i] < 48 || tbb_num_thread[i] > 57){
+        flag = true;
+        break;
+      }
+    }
+    if(!flag){
+      try{
+        std::string temp(tbb_num_thread);
+        numberOfCores = std::stoi(temp);
+      }
+      catch(std::exception const & e){
+        std::cerr<<"error reading TBB_NUM_THREADS: " << e.what() <<std::endl;
+        numberOfCores = std::thread::hardware_concurrency();
+      } 
+    }
+    else
+      numberOfCores = std::thread::hardware_concurrency();
+  }
+  else
+    numberOfCores = std::thread::hardware_concurrency();
+  std::cerr<< "No. of threads: " << numberOfCores <<std::endl;
+}
+
 
 inline long
 _currentTimestamp()
@@ -59,7 +98,7 @@ _popDatafromBuffer(int total_size, bool _debug, const Params& params)
     // Expand data
 
     long start_clock = _currentTimestamp();
-    p->populateOutputValues();
+    p->populateOutputValues(Radx2GridPlus::numberOfCores);
     if (_debug) {
       std::cerr << "Expanding data: "
                 << (_currentTimestamp() - start_clock) / 1.0E6 << " sec"
@@ -69,7 +108,7 @@ _popDatafromBuffer(int total_size, bool _debug, const Params& params)
     // Calculate Cartesian Coords.
     start_clock = _currentTimestamp();
     auto p2c = std::make_shared<Polar2Cartesian>(p->getRepository());
-    p2c->calculateXYZ();
+    p2c->calculateXYZ(Radx2GridPlus::numberOfCores);
     if (_debug) {
       std::cerr << "Append coordinates: "
                 << (_currentTimestamp() - start_clock) / 1.0E6 << " sec"
@@ -77,8 +116,8 @@ _popDatafromBuffer(int total_size, bool _debug, const Params& params)
     }
 
     start_clock = _currentTimestamp();
-    auto c2g = std::make_shared<Cart2Grid>(p->getRepository(), params);
-    c2g->interpGrid();
+    auto c2g = std::make_shared<Cart2Grid>(p->getRepository(), params, Radx2GridPlus::numberOfCores);
+    c2g->interpGrid(Radx2GridPlus::numberOfCores);
     if (_debug) {
       std::cerr << "Interp coordinates: "
                 << (_currentTimestamp() - start_clock) / 1.0E6 << " sec"
@@ -107,6 +146,9 @@ Radx2GridPlus::processFiles(const std::vector<string>& filepaths,
   _inputDir = params.input_dir;
   _outputDir = params.output_dir;
 
+  //set up number of threads to be created
+  //tbb::task_scheduler_init init(numberOfCores); 
+  
   // Get total number of files to be allocated
   auto n = filepaths.size();
 

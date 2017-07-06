@@ -89,8 +89,8 @@ LIBS += -lradar \
     -lpthread \
     -lexpat \
     -lm \
-    -lgomp \
-    -lfftw3
+    -lfftw3 \
+    -lgdal
 
 CONFIG(debug, debug|release) {
     LIBS += -ltbb_debug
@@ -99,7 +99,8 @@ CONFIG(debug, debug|release) {
 }
 
 LIBS += -L/usr/local/lib \
-        -L/apps/lib/expat/2.1.1/lib
+        -L/apps/lib/expat/2.1.1/lib \
+        -L/opt/intel/tbb/lib
 
 unix:{
     T1 = $$(RADX_RUNTIME)
