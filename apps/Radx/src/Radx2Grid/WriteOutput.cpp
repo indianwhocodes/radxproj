@@ -3,21 +3,17 @@
 #include <algorithm>
 #include <memory>
 #include "netcdf"
-//#include "gdal_priv.h"
-//#include "cpl_string.h"
-//#include "gdal_priv.h"
-//#include "ogr_spatialref.h"
+#include "gdal_priv.h"
+#include "cpl_string.h"
+#include "gdal_priv.h"
+#include "ogr_spatialref.h"
 
 
 #include "netcdf"
 
-<<<<<<< HEAD
-WriteOutput::WriteOutput(const shared_ptr<Cart2Grid>& grid, 
-			 const shared_ptr<Repository>& store,
-=======
+
 WriteOutput::WriteOutput(const shared_ptr<Cart2Grid>& grid,
                          const shared_ptr<Repository>& store,
->>>>>>> 9528541a7cea8260d9a52c52fbdf50b7f8f99e7d
                          const Params& params)
   : _grid(grid)
   , _store(store)
@@ -100,32 +96,6 @@ WriteOutput::writeOutputFile()
       netCDF::NcVar nc_field =
       opFile.addVar(field.first, netCDF::ncFloat, fieldDim);
       
-<<<<<<< HEAD
-      //Define REF variable
-      std::vector<netCDF::NcDim> Refldims;
-      Refldims.push_back(x0Dim);
-      Refldims.push_back(y0Dim);
-      Refldims.push_back(z0Dim); 
-      netCDF::NcVar reflectivity = opFile.addVar(reflName, netCDF::ncFloat, Refldims);
-      
-      //Add attribute to REF variable
-      //netCDF::NcVarAtt refl_att = reflectivity.puttAtt("standard_name", "REF");
-      //refl_att = reflectivity.puttAtt("units", "dbZ");
-      
-      //Write REF data
-      std::vector<float> reflData;
-      auto temp_map = _grid->getOutputFinalGrid()["REF"];
-      auto temp = *temp_map;
-
-      
-      for (auto i = temp.begin(); i != temp.end(); i++)
-	
-         for(auto j = i->begin(); j != i->end(); j++)
-      		for(auto k = j->begin(); k != j->end(); k++)
-        		reflData.push_back( static_cast<float> (*k) );
-	
-
-=======
       //Write field data
       std::vector<float> field_data;
       for (auto i = field.second->cbegin(); i != field.second->cend(); i++) {
@@ -133,48 +103,11 @@ WriteOutput::writeOutputFile()
           field_data.insert(field_data.end(), j->begin(), j->end());
         }
       }
->>>>>>> 9528541a7cea8260d9a52c52fbdf50b7f8f99e7d
 
       nc_field.putVar(field_data.data());
     }
 
 
-    
-    /*
-    // Define REF variable
-    
-    std::vector<netCDF::NcDim> Refldims;
-    Refldims.push_back(x0Dim);
-    Refldims.push_back(y0Dim);
-    Refldims.push_back(z0Dim);
-    netCDF::NcVar nc_field =
-      opFile.addVar(reflName, netCDF::ncFloat, Refldims);
-
-    // Add attribute to REF variable
-    // netCDF::NcVarAtt refl_att = reflectivity.puttAtt("standard_name",
-    // "REF");  refl_att = reflectivity.puttAtt("units", "dbZ");
-
-    // Write REF data
-    std::vector<float> field_data;
-    auto temp_map = _grid->getOutputFinalGrid()["REF"];
-    
-    // WHY COPY IT HERE?
-    //      auto temp = *temp_map;
-
-    //      for (auto i = temp.begin(); i != temp.end(); i++)
-    //         for(auto j = i->begin(); j != i->end(); j++)
-    //      		for(auto k = j->begin(); k != j->end(); k++)
-    //        		reflData.push_back( static_cast<float> (*k) );
-
-    // WHY USE push_back RATHER THAN insert
-    for (auto i = temp_map->cbegin(); i != temp_map->cend(); i++) {
-      for (auto j = i->cbegin(); j != i->cend(); j++) {
-        field_data.insert(field_data.end(), j->begin(), j->end());
-      }
-    }
-
-    nc_field.putVar(field_data.data());
-    */
     // Add global Attributes
     netCDF::NcGroupAtt groupAttr =
       opFile.putAtt("instrument_name", _store->instrumentName);
@@ -197,7 +130,7 @@ WriteOutput::writeOutputFile()
     
 
   } else if (_params.output_format == Params::output_format_t::RASTER) {
-<<<<<<< HEAD
+
       //Write out Raster
 
       
@@ -319,87 +252,6 @@ WriteOutput::writeOutputFile()
       }
 
 
-=======
-    // Write out Raster
-
-      /*
-      GDALDataset  *poDataset;
-      GDALAllRegister();
-      const char *pszFormat = "GTiff";
-      GDALDriver *poDriver;
-      char **papszMetadata;
-      poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
-      if( poDriver == NULL )
-        exit( 1 );
-      papszMetadata = poDriver->GetMetadata();
-      if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATE, FALSE ) )
-        printf( "Driver %s supports Create() method.\n", pszFormat );
-      if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATECOPY, FALSE ) )
-        printf( "Driver %s supports CreateCopy() method.\n", pszFormat );
-	    
-    std::cerr << "Raster format block" << std::endl;
-
-    GDALAllRegister();
-    const char* pszFormat = "GTiff";
-    GDALDriver* poDriver;
-    GDALDataset* poDstDS;
-    char** papszOptions = NULL;
-
-    poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
-    if (poDriver == NULL)
-      exit(1);
-
-    std::string outputFileName("tif_");
-    outputFileName += _store->instrumentName;
-    outputFileName += "_";
-    outputFileName += _store->startDateTime;
-    std::replace(outputFileName.begin(), outputFileName.end(), ':', '-');
-    const char* pszDstFilename = outputFileName.c_str();
-
-    poDstDS = poDriver->Create(pszDstFilename,
-                               _grid->getGridDimX(),
-                               _grid->getGridDimY(),
-                               _grid->getGridDimZ(),
-                               GDT_Float64,
-                               papszOptions);
-
-    std::vector<float> reflData;
-    auto temp_map = _grid->getOutputFinalGrid()["REF"];
-    auto temp = *temp_map;
-
-    for (auto i = temp.begin(); i != temp.end(); i++)
-      for (auto j = i->begin(); j != i->end(); j++) {
-        auto k = j->begin();
-        reflData.push_back(static_cast<float>(*k));
-      }
-
-    GDALRasterBand* rb = poDstDS->GetRasterBand(1);
-    CPLErr err = rb->RasterIO(GF_Write,
-                              0,
-                              0,
-                              _grid->getGridDimX(),
-                              _grid->getGridDimY(),
-                              reflData.data(),
-                              _grid->getGridDimX(),
-                              _grid->getGridDimY(),
-                              GDT_Float32,
-                              0,
-                              0,
-                              NULL);
-
-    OGRSpatialReference sr;
-    // WHY USE INFORMATION FROM PARAMS RATHER THAN FROM NETCDF INPUT?
-    // NEVER USE?!
-    std::string temp2(
-      "+proj=aeqd +lat_0=" + std::to_string(_params.radar_latitude_deg) +
-      "lon_0=" + std::to_string(_params.radar_longitude_deg) +
-      "+x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs");
-    sr.importFromProj4(temp2.c_str());
-
-    GDALClose((GDALDatasetH)poDstDS);
-
-  */
->>>>>>> 9528541a7cea8260d9a52c52fbdf50b7f8f99e7d
   } else {
     // Show a warning that outputs format are not supported
     std::cerr << "The output format specified is not supported" << std::endl;
