@@ -22,13 +22,16 @@ public:
 
   // TODO: make it a vector of string... for parallel processing.
 private:
+  void SetupThreadControl();
   std::string _programName;
   std::string _inputDir;
   std::string _outputDir;
+  
 
 public:
   static ThreadQueue<std::shared_ptr<PolarDataStream>> polarDataStreamQueue;
   static ThreadQueue<std::shared_ptr<Cart2Grid>> gridQueue;
+  static int numberOfCores;
 };
 
 #endif

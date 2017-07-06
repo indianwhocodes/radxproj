@@ -97,7 +97,7 @@ public:
   void LoadDataFromNetCDFFilesIntoRepository();
 
   // populate the output values
-  void populateOutputValues();
+  void populateOutputValues(int nthread);
 
   // setter, getter
   std::vector<float> getOutElevation();

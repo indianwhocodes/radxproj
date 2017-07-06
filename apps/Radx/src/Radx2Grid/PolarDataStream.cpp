@@ -104,7 +104,7 @@ PolarDataStream::LoadDataFromNetCDFFilesIntoRepository()
 
 // create 1D array for Elevation, Azimuth, Gate and field values such as Ref
 void
-PolarDataStream::populateOutputValues()
+PolarDataStream::populateOutputValues(int nthread)
 {
   // Size of outGate, outRef, outAzi etc = sum(ray_n_gates) = n_points
 
@@ -112,7 +112,9 @@ PolarDataStream::populateOutputValues()
   _store->outGate.resize(_store->nPoints);
   _store->outElevation.resize(_store->nPoints);
   _store->outAzimuth.resize(_store->nPoints);
-
+  
+  
+  tbb::task_scheduler_init init(nthread);
   for (auto it = _store->inFields.cbegin(); it != _store->inFields.cend();
        ++it) {
     string name = (*it).first;

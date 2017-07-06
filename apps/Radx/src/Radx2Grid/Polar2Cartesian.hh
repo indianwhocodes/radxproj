@@ -9,7 +9,7 @@ public:
   Polar2Cartesian(std::shared_ptr<Repository> store);
   ~Polar2Cartesian();
 
-  void calculateXYZ();
+  void calculateXYZ(int nthreads);
 
 private:
   std::shared_ptr<Repository> _store;

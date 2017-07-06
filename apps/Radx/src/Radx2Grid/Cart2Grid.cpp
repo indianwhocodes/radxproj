@@ -30,7 +30,7 @@ Cart2Grid::_makeGrid(ptr_vector3d<T>& grid, T value)
   resizeArray(grid, _DSizeI, _DSizeJ, _DSizeK, value);
 }
 
-Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
+Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params, int nthreads)
   : _store(store)
   , _params(params)
 {
@@ -118,7 +118,7 @@ Cart2Grid::Cart2Grid(std::shared_ptr<Repository> store, const Params& params)
 }
 
 void
-Cart2Grid::interpGrid()
+Cart2Grid::interpGrid(int nthreads)
 {
   // Convert everything to 0;
   _clock = _currentTimestamp();
@@ -257,15 +257,16 @@ Cart2Grid::interpGrid()
     _timeit("Computation");
   }
   _clock = _currentTimestamp();
-  computeGrid();
+  computeGrid(nthreads);
   if (_params.debug) {
     _timeit("Masking");
   }
 }
 
 void
-Cart2Grid::computeGrid()
+Cart2Grid::computeGrid(int nthreads)
 {
+  
   for (auto m = _store->outFields.cbegin(); m != _store->outFields.cend();
        ++m) {
     string name = (*m).first;

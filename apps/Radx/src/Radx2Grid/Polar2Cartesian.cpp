@@ -11,7 +11,7 @@ Polar2Cartesian::Polar2Cartesian(std::shared_ptr<Repository> store)
 
 Polar2Cartesian::~Polar2Cartesian() {}
 
-void Polar2Cartesian::calculateXYZ()
+void Polar2Cartesian::calculateXYZ(int nthreads)
 {
   const std::vector<double>& gate = _store->outGate;
   _store->gateGroundDistance.resize(_store->nPoints);
@@ -21,6 +21,7 @@ void Polar2Cartesian::calculateXYZ()
   _store->gateZ.resize(_store->nPoints);
   _store->gateRoI.resize(_store->nPoints);
 
+  tbb::task_scheduler_init init(nthreads);
   const double IR = 4.0 * 6371008.0 / 3.0;
   #pragma ivdep
   tbb::parallel_for(size_t(0), _store->nPoints, [=](size_t i) {

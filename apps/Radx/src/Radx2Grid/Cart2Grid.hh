@@ -54,9 +54,9 @@ atomicAdd(tbb::atomic<double>& x, double addend)
 class Cart2Grid
 {
 public:
-  Cart2Grid(std::shared_ptr<Repository> store, const Params& params);
-  void interpGrid();
-  void computeGrid();
+  Cart2Grid(std::shared_ptr<Repository> store, const Params& params, int nthreads);
+  void interpGrid(int nthreads);
+  void computeGrid(int nthreads);
   
   std::shared_ptr<Repository> getRepository();
   map<string, ptr_vector3d<double>> getOutputFinalGrid();
