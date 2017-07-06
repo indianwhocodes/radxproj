@@ -57,80 +57,75 @@ WriteOutput::writeOutputFile()
     for (int i = 0; i < _grid->getGridDimY(); i++)
       yCoordinates.push_back(_grid->getDMinY() + i * 0.5);
 
-    // WHY EXPCETION
-    try {
-      // Open file for writing.
-      netCDF::NcFile opFile(outputFileName, netCDF::NcFile::replace);
-      // Add dimensions to the file.
-      netCDF::NcDim x0Dim = opFile.addDim(xDim, _grid->getGridDimX());
-      netCDF::NcDim y0Dim = opFile.addDim(yDim, _grid->getGridDimY());
-      netCDF::NcDim z0Dim = opFile.addDim(zDim, _grid->getGridDimZ());
+    // Open file for writing.
+    netCDF::NcFile opFile(outputFileName, netCDF::NcFile::replace);
+    // Add dimensions to the file.
+    netCDF::NcDim x0Dim = opFile.addDim(xDim, _grid->getGridDimX());
+    netCDF::NcDim y0Dim = opFile.addDim(yDim, _grid->getGridDimY());
+    netCDF::NcDim z0Dim = opFile.addDim(zDim, _grid->getGridDimZ());
 
-      // define coordinate variables
-      netCDF::NcVar x0Var =
-        opFile.addVar(xCoordinateVar, netCDF::ncFloat, x0Dim);
-      netCDF::NcVar y0Var =
-        opFile.addVar(yCoordinateVar, netCDF::ncFloat, y0Dim);
+    // define coordinate variables
+    netCDF::NcVar x0Var =
+      opFile.addVar(xCoordinateVar, netCDF::ncFloat, x0Dim);
+    netCDF::NcVar y0Var =
+      opFile.addVar(yCoordinateVar, netCDF::ncFloat, y0Dim);
 
-      // write coordinate variable data
-      x0Var.putVar(xCoordinates.data());
-      y0Var.putVar(yCoordinates.data());
+    // write coordinate variable data
+    x0Var.putVar(xCoordinates.data());
+    y0Var.putVar(yCoordinates.data());
 
-      // Define REF variable
-      std::vector<netCDF::NcDim> Refldims;
-      Refldims.push_back(x0Dim);
-      Refldims.push_back(y0Dim);
-      Refldims.push_back(z0Dim);
-      netCDF::NcVar nc_field =
-        opFile.addVar(reflName, netCDF::ncFloat, Refldims);
+    // Define REF variable
+    std::vector<netCDF::NcDim> Refldims;
+    Refldims.push_back(x0Dim);
+    Refldims.push_back(y0Dim);
+    Refldims.push_back(z0Dim);
+    netCDF::NcVar nc_field =
+      opFile.addVar(reflName, netCDF::ncFloat, Refldims);
 
-      // Add attribute to REF variable
-      // netCDF::NcVarAtt refl_att = reflectivity.puttAtt("standard_name",
-      // "REF");  refl_att = reflectivity.puttAtt("units", "dbZ");
+    // Add attribute to REF variable
+    // netCDF::NcVarAtt refl_att = reflectivity.puttAtt("standard_name",
+    // "REF");  refl_att = reflectivity.puttAtt("units", "dbZ");
 
-      // Write REF data
-      std::vector<float> field_data;
-      auto temp_map = _grid->getOutputFinalGrid()["REF"];
-      // WHY COPY IT HERE?
-      //      auto temp = *temp_map;
+    // Write REF data
+    std::vector<float> field_data;
+    auto temp_map = _grid->getOutputFinalGrid()["REF"];
+    // WHY COPY IT HERE?
+    //      auto temp = *temp_map;
 
-      //      for (auto i = temp.begin(); i != temp.end(); i++)
-      //         for(auto j = i->begin(); j != i->end(); j++)
-      //      		for(auto k = j->begin(); k != j->end(); k++)
-      //        		reflData.push_back( static_cast<float> (*k) );
+    //      for (auto i = temp.begin(); i != temp.end(); i++)
+    //         for(auto j = i->begin(); j != i->end(); j++)
+    //      		for(auto k = j->begin(); k != j->end(); k++)
+    //        		reflData.push_back( static_cast<float> (*k) );
 
-      // WHY USE push_back RATHER THAN insert
-      for (auto i = temp_map->cbegin(); i != temp_map->cend(); i++) {
-        for (auto j = i->cbegin(); j != i->cend(); j++) {
-          field_data.insert(field_data.end(), j->begin(), j->end());
-        }
+    // WHY USE push_back RATHER THAN insert
+    for (auto i = temp_map->cbegin(); i != temp_map->cend(); i++) {
+      for (auto j = i->cbegin(); j != i->cend(); j++) {
+        field_data.insert(field_data.end(), j->begin(), j->end());
       }
-
-      nc_field.putVar(field_data.data());
-
-      // Add global Attributes
-      netCDF::NcGroupAtt groupAttr =
-        opFile.putAtt("instrument_name", _store->instrumentName);
-      groupAttr = opFile.putAtt("start_datetime", _store->startDateTime);
-      // groupAttr = opFile.putAtt("time_dimension", netCDF::NcType::nc_INT,
-      // static_cast<int>(_store->timeDim));  groupAttr =
-      // opFile.putAtt("range_dimension", netCDF::NcType::nc_INT,
-      // static_cast<int>(_store->rangeDim));  groupAttr =
-      // opFile.putAtt("n_points", netCDF::NcType::nc_INT,
-      // static_cast<int>(_store->nPoints));
-      groupAttr = opFile.putAtt("latitude",
-                                netCDF::NcType::nc_FLOAT,
-                                static_cast<float>(_store->latitude));
-      groupAttr = opFile.putAtt("longitude",
-                                netCDF::NcType::nc_FLOAT,
-                                static_cast<float>(_store->longitude));
-      // groupAttr = opFile.putAtt("altitude_agl", netCDF::NcType::nc_FLOAT,
-      // static_cast<float>(_store->altitudeAgl));
-      return 0;
-    } catch (netCDF::exceptions::NcException& e) {
-      e.what();
-      return -1;
     }
+
+    nc_field.putVar(field_data.data());
+
+    // Add global Attributes
+    netCDF::NcGroupAtt groupAttr =
+      opFile.putAtt("instrument_name", _store->instrumentName);
+    groupAttr = opFile.putAtt("start_datetime", _store->startDateTime);
+    // groupAttr = opFile.putAtt("time_dimension", netCDF::NcType::nc_INT,
+    // static_cast<int>(_store->timeDim));  groupAttr =
+    // opFile.putAtt("range_dimension", netCDF::NcType::nc_INT,
+    // static_cast<int>(_store->rangeDim));  groupAttr =
+    // opFile.putAtt("n_points", netCDF::NcType::nc_INT,
+    // static_cast<int>(_store->nPoints));
+    groupAttr = opFile.putAtt("latitude",
+                              netCDF::NcType::nc_FLOAT,
+                              static_cast<float>(_store->latitude));
+    groupAttr = opFile.putAtt("longitude",
+                              netCDF::NcType::nc_FLOAT,
+                              static_cast<float>(_store->longitude));
+    // groupAttr = opFile.putAtt("altitude_agl", netCDF::NcType::nc_FLOAT,
+    // static_cast<float>(_store->altitudeAgl));
+    return 0;
+    
 
   } else if (_params.output_format == Params::output_format_t::RASTER) {
     // Write out Raster
