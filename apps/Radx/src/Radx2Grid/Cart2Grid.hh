@@ -65,6 +65,16 @@ public:
   int getGridDimZ();
   inline float getDMinX(){return _xy_geom.minx;}
   inline float getDMinY(){return _xy_geom.miny;}
+
+//By PoornimaReg
+
+
+
+inline Params::grid_xy_geom_t getStructXYGeom(){ return _xy_geom;}
+inline Params::grid_z_geom_t getStructZGeom(){ return _z_geom;}
+
+
+//End of PoornimaReg
   
   //void tempShow();
 

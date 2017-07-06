@@ -10,7 +10,7 @@
 #include <ogr_spatialref.h>
 
 WriteOutput::WriteOutput(const shared_ptr<Cart2Grid>& grid, 
-						 const shared_ptr<Repository>& store,
+			 const shared_ptr<Repository>& store,
                          const Params& params)
   : _grid(grid)
   , _store(store)
@@ -86,11 +86,15 @@ WriteOutput::writeOutputFile()
       std::vector<float> reflData;
       auto temp_map = _grid->getOutputFinalGrid()["REF"];
       auto temp = *temp_map;
+
       
       for (auto i = temp.begin(); i != temp.end(); i++)
+	
          for(auto j = i->begin(); j != i->end(); j++)
       		for(auto k = j->begin(); k != j->end(); k++)
         		reflData.push_back( static_cast<float> (*k) );
+	
+
 
      reflectivity.putVar(reflData.data());
       
@@ -113,54 +117,125 @@ WriteOutput::writeOutputFile()
     
     
   } else if (_params.output_format == Params::output_format_t::RASTER) {
-    // Write out Raster
+      //Write out Raster
+
+      
       std::cerr<< "Raster format block" << std::endl; 
      
+      //Driver Initializaion	
       GDALAllRegister();
       const char *pszFormat = "GTiff";
       GDALDriver *poDriver;
-      GDALDataset *poDstDS;
-      char **papszOptions = NULL;
-
       poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
       if( poDriver == NULL )
         exit( 1 );
 
+
+      //null value initialization
+      GDALDataset *poDstDS;
+      char **papszOptions = NULL;
+      OGRSpatialReference oSRS;
+      char *pszSRS_WKT = NULL;
+      GDALRasterBand *poBand;
+
+            
       std::string outputFileName("tif_");
       outputFileName += _store->instrumentName;
       outputFileName += "_";
       outputFileName += _store->startDateTime;
-      std::replace(outputFileName.begin(), outputFileName.end(), ':', '-');
-      const char * pszDstFilename = outputFileName.c_str();
-      
-      poDstDS = poDriver->Create( pszDstFilename,_grid->getGridDimX(),
-                                  _grid->getGridDimY(), _grid->getGridDimZ(),
-                                  GDT_Float64, papszOptions );
 
-      std::vector<float> reflData;
-      auto temp_map = _grid->getOutputFinalGrid()["REF"];
-      auto temp = *temp_map;
-      
-      for (auto i = temp.begin(); i != temp.end(); i++)
-         for(auto j = i->begin(); j != i->end(); j++)
+      Params::grid_xy_geom_t tempXY = _grid->getStructXYGeom();
+      Params::grid_z_geom_t tempZ= _grid->getStructZGeom();
+
+      map<string, ptr_vector3d<double>> temp_OPFinalGrid = 
+                                        _grid->getOutputFinalGrid();	
+      for (auto const& x : temp_OPFinalGrid) 
       {
-           auto k = j->begin();  
-           reflData.push_back( static_cast<float> (*k) );
-      }
+        outputFileName += "_";	
+	    outputFileName += x.first;
+	    std::replace(outputFileName.begin(), outputFileName.end(), ':', '-');
+      	const char * pszDstFilename = outputFileName.c_str();	
 
-      GDALRasterBand * rb =  poDstDS->GetRasterBand(1);
-      rb->RasterIO(GF_Write, 0, 0, _grid->getGridDimX(), _grid->getGridDimY(), 
-                      reflData.data(), _grid->getGridDimX(), _grid->getGridDimY(), 
-                      GDT_Float32, 0, 0, NULL);
 
-      OGRSpatialReference::OGRSpatialReference sr; 			
-      std::string temp2("+proj=aeqd +lat_0="+ 
-			std::to_string(_params.radar_latitude_deg) + 
-                        "lon_0=" + std::to_string(_params.radar_longitude_deg) + 
+	   //Create a new dataset
+        poDstDS = poDriver->Create( pszDstFilename,
+                                    _grid->getGridDimX(),
+                                    _grid->getGridDimY(),
+                                    _grid->getGridDimZ(),
+                                    GDT_Float32,
+                                    papszOptions );
+	
+        //Setting various options
+       
+       double adfGeoTransform[6] = { tempXY.minx, 
+                                     tempXY.dx,
+                                     0, 
+                                     tempXY.miny+(tempXY.ny * tempXY.dy),
+                                     0, 
+                                     tempXY.dy };
+       poDstDS->SetGeoTransform( adfGeoTransform ); 
+       
+       oSRS.SetUTM( 11, TRUE );
+       oSRS.SetWellKnownGeogCS( "NAD27" );
+       oSRS.exportToWkt( &pszSRS_WKT );
+       poDstDS->SetProjection( pszSRS_WKT );
+       CPLFree( pszSRS_WKT );
+	
+       
+
+       //Write the metadata
+       poDstDS->SetMetadataItem( "instrument_name", _store->instrumentName.c_str(), nullptr );
+       poDstDS->SetMetadataItem( "start_datetime", _store->startDateTime.c_str(), nullptr );
+       poDstDS->SetMetadataItem( "latitude", to_string(_store->latitude).c_str(), nullptr );
+       poDstDS->SetMetadataItem( "longitude", to_string(_store->longitude).c_str(), nullptr );
+      
+
+
+	
+       auto temp_grid = x.second;
+
+       //Writing Raster Band
+       int nbands = _grid->getGridDimZ();
+       std::vector<float> abyRaster;
+       
+       int z = 0;
+       for( int bands = 1; bands <= nbands ; bands++)
+       {
+         poBand = poDstDS->GetRasterBand(bands);
+	     for (int j = _grid->getGridDimY() - 1; j >= 0; --j) {
+           for (int i = 0; i < _grid->getGridDimX(); i++) {
+              abyRaster.push_back( (*temp_grid)[i][j][z] );
+           }
+         }
+         z++;
+  	     
+         poBand->RasterIO( GF_Write, 
+			               0,
+			               0,
+               			   _grid->getGridDimX(),
+                                       _grid->getGridDimY(),
+                                       abyRaster.data(),
+			               _grid->getGridDimX(),
+			               _grid->getGridDimY(),
+			               GDT_Float32,
+			               0,
+			               0  );
+
+	     abyRaster.clear();
+        
+       }
+       
+
+       std::string temp2("+proj=aeqd +lat_0="+ 
+			std::to_string(_store->latitude) + 
+                        "lon_0=" + std::to_string(_store->longitude) + 
 			"+x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs");	
-      sr.importFromProj4(temp2.c_str());
+       oSRS.importFromProj4(temp2.c_str());
 
-      GDALClose((GDALDatasetH)poDstDS);
+       GDALClose((GDALDatasetH)poDstDS);
+	      
+	
+      }
 
 
   } else {
