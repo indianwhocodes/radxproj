@@ -2365,7 +2365,7 @@ output_filename = "ncfGrid.nc";
 //     CEDRIC
 //
 
-output_format = CF_NETCDF;
+output_format = MULTIBAND_RASTER;
 
 ///////////// name_file_from_start_time ///////////////
 //
