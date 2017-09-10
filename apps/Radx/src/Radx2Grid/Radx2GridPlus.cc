@@ -52,11 +52,15 @@ Radx2GridPlus::SetupThreadControl()
       } 
     }
     else
+    {
       numberOfCores = std::thread::hardware_concurrency();
+    }
   }
   else
+  {
     numberOfCores = std::thread::hardware_concurrency();
-  std::cerr<< "No. of threads: " << numberOfCores <<std::endl;
+  }
+  std::cerr << "No. of threads: " << numberOfCores << std::endl;
 }
 
 
@@ -147,8 +151,15 @@ Radx2GridPlus::processFiles(const std::vector<string>& filepaths,
   _outputDir = params.output_dir;
 
   //set up number of threads to be created
-  //tbb::task_scheduler_init init(numberOfCores); 
-  
+  if(numberOfCores > 0) 
+  {
+    tbb::task_scheduler_init init(numberOfCores); 
+  }
+  else
+  {
+    std::cout << "1" << std::endl;
+    tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
+  }
   // Get total number of files to be allocated
   auto n = filepaths.size();
 
