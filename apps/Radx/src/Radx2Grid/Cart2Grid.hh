@@ -39,19 +39,22 @@ inline void resizeArray(ptr_vector3d<bool> &c, size_t x, size_t y, size_t z,
 
 class Cart2Grid {
 public:
-  Cart2Grid(std::shared_ptr<Repository> store, const Params &params);
-  void interpGrid();
-  void computeGrid();
+
+  Cart2Grid(std::shared_ptr<Repository> store, const Params& params, int nthreads);
+  void interpGrid(int nthreads);
+  void computeGrid(int nthreads);
 
   std::shared_ptr<Repository> getRepository();
   map<string, ptr_vector3d<double>> getOutputFinalGrid();
   int getGridDimX();
   int getGridDimY();
   int getGridDimZ();
+  inline Params::grid_xy_geom_t getStructXYGeom(){ return _xy_geom;}
+  inline Params::grid_z_geom_t getStructZGeom(){ return _z_geom;}
   inline float getDMinX() { return _xy_geom.minx; }
   inline float getDMinY() { return _xy_geom.miny; }
+  inline float getDMinZ() { return _z_geom.minz; }
 
-  // void tempShow();
 
 private:
   shared_ptr<Repository> _store;

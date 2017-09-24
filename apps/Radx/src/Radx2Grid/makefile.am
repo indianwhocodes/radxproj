@@ -74,7 +74,7 @@ LDADD += -lkd
 LDADD += -lnetcdf_c++4
 LDADD += -lnetcdf_c++
 LDADD += -lnetcdf
-LDADD += -lnetcdf_c++4
+#LDADD += -lnetcdf_c++4
 LDADD += -lhdf5_cpp
 LDADD += -lhdf5_hl
 LDADD += -lhdf5
@@ -84,23 +84,20 @@ LDADD += -lbz2
 LDADD += -lpthread
 LDADD += -lexpat
 LDADD += -lm
-#LDADD += -lfftw3
+LDADD += -lfftw3
 LDADD += -ltbb
 #LDADD += -lmkl_intel_ilp64 
 #LDADD += -lmkl_tbb_thread 
-LDADD += -lmkl_rt
+#LDADD += -lmkl_rt
 LDADD += -lstdc++ 
 LDADD += -lpthread 
-LDADD += -lm 
-LDADD += -ldl
-LDADD += -lgdal
+
 
 # set app name
 
 bin_PROGRAMS = Radx2Grid
 
 # source files
-
 Radx2Grid_SOURCES = \
 	Params.cc \
 	Args.cc \
@@ -118,5 +115,6 @@ Radx2Grid_SOURCES = \
 	Radx2GridPlus.cc \
 	Cart2Grid.cpp \
 	PolarDataStream.cpp \
-        Polar2Cartesian.cpp \
+	Polar2Cartesian.cpp \
 	WriteOutput.cpp
+	

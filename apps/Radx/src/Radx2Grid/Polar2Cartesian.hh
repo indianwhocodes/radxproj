@@ -11,7 +11,7 @@ public:
   Polar2Cartesian(std::shared_ptr<Repository> store);
   ~Polar2Cartesian();
 
-  void calculateXYZ();
+  void calculateXYZ(int nthreads);
 
   static tbb::affinity_partitioner ap;
 

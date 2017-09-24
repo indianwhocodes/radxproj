@@ -32,7 +32,7 @@ struct RepositoryField
 
 struct Repository
 {
-  // dimenssions
+  // dimensions
   size_t nPoints;
   size_t timeDim;
   size_t rangeDim;
@@ -97,7 +97,7 @@ public:
   void LoadDataFromNetCDFFilesIntoRepository();
 
   // populate the output values
-  void populateOutputValues();
+  void populateOutputValues(int nthread);
 
   // setter, getter
   std::vector<float> getOutElevation();
