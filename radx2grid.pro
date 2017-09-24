@@ -5,19 +5,13 @@ CONFIG -= app_bundle
 
 QMAKE_CXXFLAGS += -std=c++14
 
-*-icc* {
-    QMAKE_CXXFLAGS_RELEASE -= -O2
-    QMAKE_CXXFLAGS_RELEASE += -O3 -xHost -ipo -fp-model fast=2 -openmp
-}
-
-*-g++* {
-    QMAKE_CXXFLAGS_RELEASE -= -O2 -mtune=generic
-    QMAKE_CXXFLAGS_RELEASE += -O3 -ffast-math -fopt-info-loop -fopenmp
-}
-
 INCLUDEPATH += \
     /usr/local/include \
-    /apps/compilers/intel/2016/tbb/include
+    /apps/compilers/intel/2017/1.132/tbb/include \
+    /apps/lib/expat/2.1.1/include \
+    /apps/lib/zlib/1.2.8/include \
+    /apps/bzip2/1.0.6/include \
+    /apps/gcc/5.2.0/gdal/2.2.0/include
 
 
 # Input
@@ -88,9 +82,7 @@ LIBS += -lradar \
     -lbz2 \
     -lpthread \
     -lexpat \
-    -lm \
-    -lfftw3 \
-    -lgdal
+    -lm
 
 CONFIG(debug, debug|release) {
     LIBS += -ltbb_debug
@@ -98,9 +90,25 @@ CONFIG(debug, debug|release) {
     LIBS += -ltbb
 }
 
+*-icc* {
+    QMAKE_CXXFLAGS_RELEASE -= -O2
+    QMAKE_CXXFLAGS_RELEASE += -O3 -xHost -ipo -fp-model fast=2 -parallel -openmp
+    LIBS += -lmkl_rt
+}
+
+*-g++* {
+    QMAKE_CXXFLAGS_RELEASE -= -O2 -mtune=generic
+    QMAKE_CXXFLAGS_RELEASE += -O3 -ffast-math -fopt-info-loop -fopenmp
+    LIBS += -lfftw3
+}
+
 LIBS += -L/usr/local/lib \
+        -L/opt/intel/tbb/lib \
+        -L/apps/compilers/intel/2017/1.132/tbb/lib \
         -L/apps/lib/expat/2.1.1/lib \
-        -L/opt/intel/tbb/lib
+        -L/apps/lib/zlib/1.2.8/lib \
+        -L/apps/bzip2/1.0.6/lib \
+        -L/apps/gcc/5.2.0/gdal/2.2.0/lib
 
 unix:{
     T1 = $$(RADX_RUNTIME)
