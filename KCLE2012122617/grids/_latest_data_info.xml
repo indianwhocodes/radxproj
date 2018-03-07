@@ -1,0 +1,19 @@
+<latest_data_info>
+  <unix_time>1356544897</unix_time>
+  <year>2012</year>
+  <month>12</month>
+  <day>26</day>
+  <hour>18</hour>
+  <min>01</min>
+  <sec>37</sec>
+  <rel_data_path>ncf_20121226_180137.nc</rel_data_path>
+  <file_ext>nc</file_ext>
+  <data_type>netCDF</data_type>
+  <user_info1>none</user_info1>
+  <user_info2>none</user_info2>
+  <is_forecast>false</is_forecast>
+  <forecast_lead_secs>0</forecast_lead_secs>
+  <writer>Mdv2NetCDF</writer>
+  <max_time>1356544897</max_time>
+  <prev_mod_time>0</prev_mod_time>
+</latest_data_info>

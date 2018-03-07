@@ -1,0 +1,190 @@
+netcdf ncf_20121226_171035 {
+dimensions:
+	time = 1 ;
+	bounds = 2 ;
+	x0 = 1 ;
+	y0 = 1 ;
+	z0 = 1 ;
+variables:
+	double time(time) ;
+		time:standard_name = "time" ;
+		time:long_name = "Data time" ;
+		time:units = "seconds since 1970-01-01T00:00:00Z" ;
+		time:axis = "T" ;
+		time:bounds = "time_bounds" ;
+		time:comment = "2012-12-26T17:10:35Z" ;
+	double start_time(time) ;
+		start_time:units = "seconds since 1970-01-01T00:00:00Z" ;
+		start_time:comment = "2012-12-26T17:05:56Z" ;
+	double stop_time(time) ;
+		stop_time:units = "seconds since 1970-01-01T00:00:00Z" ;
+		stop_time:comment = "2012-12-26T17:10:35Z" ;
+	double time_bounds(time, bounds) ;
+		time_bounds:comment = "time_bounds also stored the start and stop times, provided the time variable value lies within the start_time to stop_time interval" ;
+		time_bounds:units = "seconds since 1970-01-01T00:00:00Z" ;
+	float x0(x0) ;
+		x0:standard_name = "projection_x_coordinate" ;
+		x0:units = "km" ;
+		x0:axis = "X" ;
+	float y0(y0) ;
+		y0:standard_name = "projection_y_coordinate" ;
+		y0:units = "km" ;
+		y0:axis = "Y" ;
+	float lat0(y0, x0) ;
+		lat0:standard_name = "latitude" ;
+		lat0:units = "degrees_north" ;
+	float lon0(y0, x0) ;
+		lon0:standard_name = "longitude" ;
+		lon0:units = "degrees_east" ;
+	float z0(z0) ;
+		z0:standard_name = "altitude" ;
+		z0:long_name = "constant altitude levels" ;
+		z0:units = "km" ;
+		z0:positive = "up" ;
+		z0:axis = "Z" ;
+	int grid_mapping_0 ;
+		grid_mapping_0:grid_mapping_name = "azimuthal_equidistant" ;
+		grid_mapping_0:longitude_of_projection_origin = -81.86f ;
+		grid_mapping_0:latitude_of_projection_origin = 41.41306f ;
+		grid_mapping_0:false_easting = 0.f ;
+		grid_mapping_0:false_northing = 0.f ;
+	float REF(time, z0, y0, x0) ;
+		REF:valid_min = 0.f ;
+		REF:valid_max = 0.f ;
+		REF:_FillValue = -9999.f ;
+		REF:standard_name = "REF" ;
+		REF:long_name = "radar_reflectivity" ;
+		REF:units = "dBZ" ;
+		REF:coordinates = "lon0 lat0" ;
+		REF:grid_mapping = "grid_mapping_0" ;
+	float VEL(time, z0, y0, x0) ;
+		VEL:valid_min = 0.f ;
+		VEL:valid_max = 0.f ;
+		VEL:_FillValue = -9999.f ;
+		VEL:standard_name = "VEL" ;
+		VEL:long_name = "radial_velocity" ;
+		VEL:units = "m/s" ;
+		VEL:coordinates = "lon0 lat0" ;
+		VEL:grid_mapping = "grid_mapping_0" ;
+	float SW(time, z0, y0, x0) ;
+		SW:valid_min = 0.f ;
+		SW:valid_max = 0.f ;
+		SW:_FillValue = -9999.f ;
+		SW:standard_name = "SW" ;
+		SW:long_name = "spectrum_width" ;
+		SW:units = "m/s" ;
+		SW:coordinates = "lon0 lat0" ;
+		SW:grid_mapping = "grid_mapping_0" ;
+	float ZDR(time, z0, y0, x0) ;
+		ZDR:valid_min = 0.f ;
+		ZDR:valid_max = 0.f ;
+		ZDR:_FillValue = -9999.f ;
+		ZDR:standard_name = "ZDR" ;
+		ZDR:long_name = "differential_reflectivity" ;
+		ZDR:units = "dB" ;
+		ZDR:coordinates = "lon0 lat0" ;
+		ZDR:grid_mapping = "grid_mapping_0" ;
+	float PHI(time, z0, y0, x0) ;
+		PHI:valid_min = 0.f ;
+		PHI:valid_max = 0.f ;
+		PHI:_FillValue = -9999.f ;
+		PHI:standard_name = "PHI" ;
+		PHI:long_name = "differential_phase" ;
+		PHI:units = "deg" ;
+		PHI:coordinates = "lon0 lat0" ;
+		PHI:grid_mapping = "grid_mapping_0" ;
+	float RHO(time, z0, y0, x0) ;
+		RHO:valid_min = 0.f ;
+		RHO:valid_max = 0.f ;
+		RHO:_FillValue = -9999.f ;
+		RHO:standard_name = "RHO" ;
+		RHO:long_name = "cross_correlation" ;
+		RHO:units = "" ;
+		RHO:coordinates = "lon0 lat0" ;
+		RHO:grid_mapping = "grid_mapping_0" ;
+	float REF_s3(time, z0, y0, x0) ;
+		REF_s3:valid_min = 0.f ;
+		REF_s3:valid_max = 0.f ;
+		REF_s3:_FillValue = -9999.f ;
+		REF_s3:standard_name = "REF_s3" ;
+		REF_s3:long_name = "radar_reflectivity" ;
+		REF_s3:units = "dBZ" ;
+		REF_s3:coordinates = "lon0 lat0" ;
+		REF_s3:grid_mapping = "grid_mapping_0" ;
+	float REF_s7(time, z0, y0, x0) ;
+		REF_s7:valid_min = 0.f ;
+		REF_s7:valid_max = 0.f ;
+		REF_s7:_FillValue = -9999.f ;
+		REF_s7:standard_name = "REF_s7" ;
+		REF_s7:long_name = "radar_reflectivity" ;
+		REF_s7:units = "dBZ" ;
+		REF_s7:coordinates = "lon0 lat0" ;
+		REF_s7:grid_mapping = "grid_mapping_0" ;
+
+// global attributes:
+		:Conventions = "CF-1.0" ;
+		:history = "Applying azimuth offset: 0, time 2018/02/21 19:22:23\nApplying elevation offset: 0, time 2018/02/21 19:22:23\n" ;
+		:institution = "EOL/NCAR" ;
+		:source = "ARCHIVE 2 data" ;
+		:title = "KCLE" ;
+		:comment = "" ;
+data:
+
+ time = 1356541835 ;
+
+ start_time = 1356541556 ;
+
+ stop_time = 1356541835 ;
+
+ time_bounds =
+  // time_bounds(0, 0-1)
+    1356541556, 1356541835 ;
+
+ x0 = 0 ;
+
+ y0 = 0 ;
+
+ lat0 =
+  // lat0(0,0)
+    41.41306 ;
+
+ lon0 =
+  // lon0(0,0)
+    -81.86 ;
+
+ z0 = 0 ;
+
+ grid_mapping_0 = _ ;
+
+ REF =
+  // REF(0,0,0,0)
+    _ ;
+
+ VEL =
+  // VEL(0,0,0,0)
+    _ ;
+
+ SW =
+  // SW(0,0,0,0)
+    _ ;
+
+ ZDR =
+  // ZDR(0,0,0,0)
+    _ ;
+
+ PHI =
+  // PHI(0,0,0,0)
+    _ ;
+
+ RHO =
+  // RHO(0,0,0,0)
+    _ ;
+
+ REF_s3 =
+  // REF_s3(0,0,0,0)
+    _ ;
+
+ REF_s7 =
+  // REF_s7(0,0,0,0)
+    _ ;
+}

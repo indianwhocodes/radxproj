@@ -2835,7 +2835,7 @@ using namespace std;
       tt->enum_def.fields[2].val = MDV;
       tt->enum_def.fields[3].name = tdrpStrDup("CEDRIC");
       tt->enum_def.fields[3].val = CEDRIC;
-      tt->enum_def.fields[4].name = tdrpStrDup("MULTIBAND_RASTER");
+      tt->enum_def.fields[4].name = tdrpStrDup("RASTER");
       tt->enum_def.fields[4].val = RASTER;
     tt->single_val.e = CF_NETCDF;
     tt++;
